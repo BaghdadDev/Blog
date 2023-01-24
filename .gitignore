@@ -1,0 +1,12 @@
+.git
+.idea
+
+node_modules
+
+.env.*
+
+*.lock
+
+/coverage
+
+/build
