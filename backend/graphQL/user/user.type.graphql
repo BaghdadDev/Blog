@@ -1,0 +1,23 @@
+type User {
+  _id: ID!
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  photo: String
+  role: String!
+}
+
+input UserInput {
+  username: String!
+  password: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+}
+
+type Mutation {
+  signUp(userInput: UserInput!): User!
+  signIn(credentials: CredentialsInput!): User!
+  signOut: Boolean
+}

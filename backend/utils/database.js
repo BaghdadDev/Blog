@@ -1,1 +1,18 @@
-const white = {};
+const mongoose = require("mongoose");
+
+async function connectToDatabase() {
+  try {
+    await mongoose.connect(
+      process.env.MONGODB_URI_LOCAL || process.env.MONGODB_URI_ATLAS,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
+    console.log("Successful connecting to the database");
+  } catch (error) {
+    console.log(`Error connecting to Mongoose: ${error.message}`);
+  }
+}
+
+module.exports = connectToDatabase;
