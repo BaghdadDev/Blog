@@ -4,13 +4,16 @@ import { ApolloProvider } from "@apollo/client";
 import { RouterProvider } from "react-router-dom";
 
 import "./index.css";
-import router from "./utils/router.jsx";
-import apolloClient from "./utils/apollo-client.jsx";
+import router from "./config/router.jsx";
+import apolloClient from "./config/apollo-client.jsx";
+import { UserProvider } from "./context/userContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ApolloProvider client={apolloClient}>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
     </ApolloProvider>
   </React.StrictMode>
 );

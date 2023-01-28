@@ -11,8 +11,8 @@ const { ApolloServer } = require("@apollo/server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
 const { applyMiddleware } = require("graphql-middleware");
 
-const connectToDatabase = require("./utils/database.js");
-const whiteList = require("./utils/whiteList.js");
+const connectToDatabase = require("./config/database.js");
+const whiteList = require("./config/whiteList.js");
 const { typeDefs, resolvers } = require("./graphQL");
 
 // Import Middleware for JWT authentication

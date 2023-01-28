@@ -6,6 +6,7 @@ const CommentSchema = new Schema(
   {
     user: { type: ObjectId, ref: "users", required: true },
     post: { type: ObjectId, ref: "posts", required: true },
+    comment: { type: String, required: true },
   },
   { timestamps: true }
 );

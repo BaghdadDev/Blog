@@ -1,23 +1,24 @@
 type User {
-  _id: ID!
-  username: String!
-  firstName: String!
-  lastName: String!
-  email: String!
-  photo: String
-  role: String!
+    _id: ID!
+    username: String!
+    firstName: String!
+    lastName: String!
+    email: String!
+    photo: String
+    role: String!
+    token: Token!
 }
 
 input UserInput {
-  username: String!
-  password: String!
-  email: String!
-  firstName: String!
-  lastName: String!
+    username: String!
+    password: String!
+    email: String!
+    firstName: String!
+    lastName: String!
 }
 
 type Mutation {
-  signUp(userInput: UserInput!): User!
-  signIn(credentials: CredentialsInput!): User!
-  signOut: Boolean
+    signUp(userInput: UserInput!): User!
+    signIn(credentials: CredentialsInput!): User!
+    signOut: Boolean
 }

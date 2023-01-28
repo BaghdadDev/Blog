@@ -1,11 +1,13 @@
 import RoutLayout from "../components/RootLayout.jsx";
 import { createBrowserRouter } from "react-router-dom";
 
-import PATH from "./route-path.jsx";
+import PATH from "../utils/route-path.jsx";
 import ErrorPage from "../components/ErrorPage.jsx";
 import PostDetails from "../routes/postDetails.jsx";
 import EditPost from "../routes/editPost.jsx";
 import Posts from "../routes/posts.jsx";
+import SignIn from "../routes/signIn.jsx";
+import SignUp from "../routes/signUp.jsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,18 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Posts /> },
           {
+            path: PATH.SIGN_IN,
+            element: <SignIn />,
+            // loader: contactLoader,
+            // action: contactAction,
+          },
+          {
+            path: PATH.SIGN_UP,
+            element: <SignUp />,
+            // loader: contactLoader,
+            // action: contactAction,
+          },
+          {
             path: PATH.POST_DETAILS,
             element: <PostDetails />,
             // loader: contactLoader,
@@ -27,6 +41,12 @@ const router = createBrowserRouter([
           },
           {
             path: PATH.EDIT_POST,
+            element: <EditPost />,
+            // loader: contactLoader,
+            // action: editAction,
+          },
+          {
+            path: PATH.PROFILE,
             element: <EditPost />,
             // loader: contactLoader,
             // action: editAction,
