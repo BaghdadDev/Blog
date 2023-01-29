@@ -44,13 +44,13 @@ const Mutation = {
       });
     }
   },
-  signIn: async (_, { credentials }) => {
+  signIn: async (_, { credentialsInput }) => {
     try {
       console.log("Resolver: signIn");
       const { _doc: user } = await UserModel.findOne({
         $or: [
-          { username: credentials?.username },
-          { email: credentials?.email },
+          { username: credentialsInput?.username },
+          { email: credentialsInput?.email },
         ],
       });
       if (!user)
@@ -78,4 +78,4 @@ const Mutation = {
   },
 };
 
-module.exports = { Mutation };
+module.exports = {Mutation};
