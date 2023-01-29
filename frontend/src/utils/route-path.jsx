@@ -1,4 +1,4 @@
-export default {
+const PATH = {
   ROOT: "/",
   POSTS: "posts",
   SIGN_IN: "signIn",
@@ -7,3 +7,4 @@ export default {
   POST_DETAILS: "post/:postId",
   EDIT_POST: "post/:postId/edit",
 };
+export default PATH;

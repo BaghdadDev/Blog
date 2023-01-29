@@ -49,7 +49,9 @@ function RootLayout(props) {
           </div>
         )}
       </header>
-      <div className={"bg-gray-200 grow"}>
+      <div
+        className={"bg-gray-200 grow flex flex-col items-center justify-center"}
+      >
         <Outlet />
       </div>
     </div>

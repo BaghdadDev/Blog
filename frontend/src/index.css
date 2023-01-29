@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .input-form {
+        @apply p-2 rounded outline-none bg-gray-200 text-center;
+    }
+
+    .btn-form {
+        @apply outline-none py-2 px-4 bg-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
+    }
+
+    .link-form {
+        @apply outline-none p-1 text-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
+    }
+}

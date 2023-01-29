@@ -9,6 +9,8 @@ import Posts from "../routes/posts.jsx";
 import SignIn from "../routes/signIn.jsx";
 import SignUp from "../routes/signUp.jsx";
 
+import { action as signUpAction } from "../routes/signUp.jsx";
+
 const router = createBrowserRouter([
   {
     path: PATH.ROOT,
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
             path: PATH.SIGN_UP,
             element: <SignUp />,
             // loader: contactLoader,
-            // action: contactAction,
+            action: signUpAction,
           },
           {
             path: PATH.POST_DETAILS,

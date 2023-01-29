@@ -1,28 +1,28 @@
 type Post {
-  _id: ID!
-  title: String!
-  story: String!
-  keyWords: [String!]
-  user: User
-  thumbnail: String
+    _id: ID!
+    title: String!
+    story: String!
+    keyWords: [String!]
+    user: User
+    thumbnail: String
 }
 
 input PostInput {
-  title: String
-  story: String
-  keyWords: [String!]
-  user: ID
-  thumbnail: String
+    title: String
+    story: String
+    keyWords: [String!]
+    user: ID
+    thumbnail: String
 }
 
 type Query {
-  getPosts: [Post!]!
-  getPostById(idPost: ID!): Post!
-  getPostsByIdUser(idUser: ID!): [Post!]!
+    getPosts: [Post!]!
+    getPostById(idPost: ID!): Post!
+    getPostsByIdUser: [Post!]!
 }
 
 type Mutation {
-  createPost(postInput: PostInput!): Post!
-  updatePost(idPost: ID!, postInput: PostInput!): Post!
-  deletePost(idPost: ID!, idUser: ID!): Post
+    createPost(postInput: PostInput!): Post!
+    updatePost(idPost: ID!, postInput: PostInput!): Post!
+    deletePost(idPost: ID!): Post
 }
