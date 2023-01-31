@@ -8,6 +8,7 @@ const Mutation = {
   signUp: async (_, { userInput }) => {
     try {
       console.log("Resolver: signUp");
+      console.log(userInput);
       if (Object.keys(userInput).length === 0)
         return new GraphQLError("Please fill in your information", {
           extensions: { code: "INVALID-INPUT" },
