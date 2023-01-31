@@ -11,6 +11,10 @@
         @apply outline-none py-2 px-4 bg-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
     }
 
+    .btn-nav {
+        @apply outline-none py-1 px-2 bg-gray-200 hover:bg-gray-600 hover:text-gray-200 transition duration-100 rounded;
+    }
+
     .link-form {
         @apply outline-none p-1 text-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
     }

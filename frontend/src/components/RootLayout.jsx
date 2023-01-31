@@ -1,56 +1,69 @@
-import React, { useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useNavigation,
+  useOutletContext,
+} from "react-router-dom";
 
 import PATH from "../utils/route-path.jsx";
 import { useUserContext } from "../context/userContext.jsx";
 
-function RootLayout(props) {
-  const { user } = useUserContext();
-
-  useEffect(() => {
-    console.log("user:", user);
-  }, [user]);
+export default function RootLayout(props) {
+  const { user, signOut } = useUserContext();
+  const navigation = useNavigation();
+  const location = useLocation();
 
   return (
     <div
       className={
-        "min-h-screen w-screen flex-col flex text-sm md:text-base relative"
+        "relative flex min-h-screen w-screen flex-col text-sm md:text-base"
       }
     >
       <header
         className={
-          "px-2 py-4 sticky top-0 left-0 w-full bg-white shadow-lg flex items-center justify-between"
+          "sticky top-0 left-0 flex w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
         }
       >
         <span>Blog Logo</span>
         <form
           className={
-            "p-2 absolute left-1/2 -translate-x-1/2 w-52 bg-gray-200 rounded-lg"
+            "absolute left-1/2 w-52 -translate-x-1/2 rounded-lg bg-gray-200 p-2"
           }
         >
           <input
             type={"text"}
             placeholder={"Search post..."}
-            className={"bg-transparent w-full h-full outline-none"}
+            className={"h-full w-full bg-transparent outline-none"}
           />
         </form>
-        {Object.keys(user).length === 0 ? (
-          <div>
-            <Link to={PATH.SIGN_IN} className={"btn-nav"}>
-              Connection
-            </Link>
-          </div>
+        {!user ? (
+          location.pathname !== PATH.SIGN_IN &&
+          location.pathname !== PATH.SIGN_UP ? (
+            <div>
+              <Link to={PATH.SIGN_IN} className={"btn-nav"}>
+                Sign In
+              </Link>
+            </div>
+          ) : (
+            ""
+          )
         ) : (
           <div>
             <p>
               {user.firstName} {user.lastName}
             </p>
             <Link to={PATH.PROFILE}>Profile</Link>
+            <button onClick={() => signOut()}>Sign Out</button>
           </div>
         )}
       </header>
       <div
-        className={"bg-gray-200 grow flex flex-col items-center justify-center"}
+        className={`flex grow flex-col items-center justify-center bg-gray-200 ${
+          navigation.state === "loading" &&
+          "opacity-25 transition-opacity delay-200 duration-200"
+        }`}
       >
         <Outlet />
       </div>
@@ -58,4 +71,6 @@ function RootLayout(props) {
   );
 }
 
-export default RootLayout;
+export function useUser() {
+  return useOutletContext();
+}

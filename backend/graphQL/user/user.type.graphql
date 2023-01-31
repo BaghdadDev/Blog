@@ -19,6 +19,6 @@ input UserInput {
 
 type Mutation {
     signUp(userInput: UserInput!): User!
-    signIn(credentialsInput: CredentialsInput!): User!
+    signIn(usernameOrEmail: String!, password: String!): User!
     signOut: Boolean
 }

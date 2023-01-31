@@ -31,7 +31,7 @@ const errorNotAuthenticatedLink = new ApolloLink((operation, forward) => {
 });
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.URL_HOST,
+  uri: import.meta.env.VITE_URL_HOST,
 });
 
 const compositeLinks = from([errorNotAuthenticatedLink, httpLink]);

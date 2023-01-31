@@ -17,8 +17,8 @@ export const SIGN_UP = gql`
 `;
 
 export const SIGN_IN = gql`
-  mutation signIn($credentialsInput: CredentialsInput!) {
-    signIn(credentialsInput: $credentialsInput) {
+  mutation signIn($usernameOrEmail: String!, $password: String!) {
+    signIn(usernameOrEmail: $usernameOrEmail, password: $password) {
       _id
       username
       email

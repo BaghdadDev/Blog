@@ -1,4 +1,4 @@
 type Token {
     accessToken: String!
-    expiresAccessToken: DateTime!
+    expiresAccessToken: Float!
 }

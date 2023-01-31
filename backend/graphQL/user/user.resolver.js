@@ -44,21 +44,22 @@ const Mutation = {
       });
     }
   },
-  signIn: async (_, { credentialsInput }) => {
+  signIn: async (_, { usernameOrEmail, password }) => {
     try {
       console.log("Resolver: signIn");
-      const { _doc: user } = await UserModel.findOne({
-        $or: [
-          { username: credentialsInput?.username },
-          { email: credentialsInput?.email },
-        ],
+      const user = await UserModel.findOne({
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
       });
       if (!user)
         return new GraphQLError("There is no user with these credentials", {
           extensions: { code: "NOT-FOUND" },
         });
+      if (!bcrypt.compareSync(password, user?.password))
+        return new GraphQLError("Password is incorrect", {
+          extensions: { code: "UNAUTHORIZED" },
+        });
       const token = getAccessTokenByIdUser(user._id);
-      return { ...user, token: { ...token } };
+      return { ...user._doc, token: { ...token } };
     } catch (errorSignIn) {
       console.log("Something went wrong during signIn", errorSignIn);
       return new GraphQLError("Something went wrong during signIn", {
@@ -78,4 +79,4 @@ const Mutation = {
   },
 };
 
-module.exports = {Mutation};
+module.exports = { Mutation };
