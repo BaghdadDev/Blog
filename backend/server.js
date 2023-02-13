@@ -25,15 +25,24 @@ async function mountServer() {
   // Setting up the connexion with database
   await connectToDatabase();
 
+  // Import graphqlUploadExpressMiddleware
+  const { default: graphqlUploadExpress } = await import(
+    "graphql-upload/graphqlUploadExpress.mjs"
+  );
+
   // Body-Parser and Cors Policies
-  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(
     cors({
       origin: whiteList,
-      // credentials: true,
-      // methods: ["GET", "PUT", "POST", "OPTIONS", "PATCH", "DELETE"],
-      // allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+      credentials: true,
+      methods: ["GET", "PUT", "POST", "OPTIONS", "PATCH", "DELETE"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "Apollo-Require-Preflight",
+      ],
     })
   );
 
@@ -65,6 +74,9 @@ async function mountServer() {
 
   // Lunch the Apollo Server
   await server.start();
+
+  // Apply graphqlUploadExpressMiddleware
+  app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 
   // Put the api endpoint
   app.use(

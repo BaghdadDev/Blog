@@ -11,7 +11,9 @@
   "dependencies": {
     "@apollo/client": "^3.7.5",
     "@hookform/error-message": "^2.0.1",
+    "apollo-upload-client": "^17.0.0",
     "graphql": "^16.6.0",
+    "graphql-upload": "13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.42.1",

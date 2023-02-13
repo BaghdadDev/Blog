@@ -1,45 +1,36 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  createHttpLink,
-  from,
-  InMemoryCache,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
+import { ApolloClient, ApolloLink, from, InMemoryCache } from "@apollo/client";
+import { createUploadLink } from "apollo-upload-client";
+import { setContext } from "@apollo/client/link/context/index.js";
 
-// const contextLink = setContext(async (_, { headers }) => {
-//   const session = await getSession();
-//   return {
-//     headers: {
-//       ...headers,
-//       Authorization: session?.accessToken
-//         ? `Bearer ${session.accessToken}`
-//         : "",
-//     },
-//   };
-// });
+const contextLink = setContext(async (_, { headers }) => {
+  return {
+    headers: {
+      ...headers,
+      "Apollo-Require-Preflight": true,
+    },
+  };
+});
 
 const errorNotAuthenticatedLink = new ApolloLink((operation, forward) => {
   return forward(operation).map((data) => {
-    if (data?.errors)
-      if (data.errors[0]?.extensions?.code === "NotAuthenticated") {
-        console.log(data.errors[0]?.extensions?.code);
-        console.log(data.errors[0]?.message);
-      }
+    // if (data?.errors)
+    //   if (data.errors[0]?.extensions?.code === "NotAuthenticated") {
+    //     console.log(data.errors[0]?.extensions?.code);
+    //     console.log(data.errors[0]?.message);
+    //   }
     return data;
   });
 });
 
-const httpLink = createHttpLink({
+const terminateLink = createUploadLink({
   uri: import.meta.env.VITE_URL_HOST,
 });
 
-const compositeLinks = from([errorNotAuthenticatedLink, httpLink]);
+const compositeLinks = from([errorNotAuthenticatedLink, terminateLink]);
 
 const apolloClient = new ApolloClient({
   ssrMode: false,
-  // link: contextLink.concat(compositeLinks),
-  link: compositeLinks,
+  link: contextLink.concat(compositeLinks),
   cache: new InMemoryCache(),
 });
 
