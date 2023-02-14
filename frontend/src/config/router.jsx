@@ -1,4 +1,4 @@
-import RoutLayout from "../components/RootLayout.jsx";
+import RoutLayout from "../components/Layout/RootLayout.jsx";
 import { createBrowserRouter } from "react-router-dom";
 
 import PATH from "../utils/route-path.jsx";

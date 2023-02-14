@@ -12,6 +12,12 @@ export const SIGN_UP = gql`
         accessToken
         expiresAccessToken
       }
+      photo {
+        _id
+        filename
+        contentType
+        data
+      }
     }
   }
 `;
@@ -27,6 +33,12 @@ export const SIGN_IN = gql`
       token {
         accessToken
         expiresAccessToken
+      }
+      photo {
+        _id
+        filename
+        contentType
+        data
       }
     }
   }

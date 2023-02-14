@@ -3,12 +3,12 @@ const bcrypt = require("bcryptjs");
 
 const UserModel = require("../../models/UserModel.js");
 const { getAccessTokenByIdUser } = require("../../utils/authFunctions");
+const storeFile = require("../../utils/storeFile");
 
 const Mutation = {
   signUp: async (_, { userInput }) => {
+    console.log("Resolver: signUp");
     try {
-      console.log("Resolver: signUp");
-      console.log(userInput);
       if (Object.keys(userInput).length === 0)
         return new GraphQLError("Please fill in your information", {
           extensions: { code: "INVALID-INPUT" },
@@ -33,11 +33,15 @@ const Mutation = {
             extensions: { code: "CONFLICT-EMAIL" },
           }
         );
-      let { _doc: user } = await UserModel.create({ ...userInput });
+      const photo = await storeFile(userInput.photo.file);
+      let { _doc: user } = await UserModel.create({
+        ...userInput,
+        photo: photo._id,
+      });
       const token = getAccessTokenByIdUser(user._id);
       user.password = undefined;
       delete user.password;
-      return { ...user, token: { ...token } };
+      return { ...user, photo, token: { ...token } };
     } catch (errorSignUp) {
       console.log("Something went wrong during signUp", errorSignUp);
       return new GraphQLError("Something went wrong during signUp", {
@@ -46,11 +50,11 @@ const Mutation = {
     }
   },
   signIn: async (_, { usernameOrEmail, password }) => {
+    console.log("Resolver: signIn");
     try {
-      console.log("Resolver: signIn");
       const user = await UserModel.findOne({
         $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-      });
+      }).populate({ path: "photo" });
       if (!user)
         return new GraphQLError("There is no user with these credentials", {
           extensions: { code: "NOT-FOUND" },
@@ -60,7 +64,11 @@ const Mutation = {
           extensions: { code: "UNAUTHORIZED" },
         });
       const token = getAccessTokenByIdUser(user._id);
-      return { ...user._doc, token: { ...token } };
+      return {
+        ...user._doc,
+        photo: { ...user.photo._doc, data: user.photo.data.toString("base64") },
+        token: { ...token },
+      };
     } catch (errorSignIn) {
       console.log("Something went wrong during signIn", errorSignIn);
       return new GraphQLError("Something went wrong during signIn", {

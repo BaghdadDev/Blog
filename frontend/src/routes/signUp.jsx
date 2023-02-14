@@ -8,6 +8,8 @@ import CustomInput from "../components/Custom/CustomInput.jsx";
 import { SIGN_UP } from "../gql/auth.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import { useUserContext } from "../context/userContext.jsx";
+import CustomInputFile from "../components/Custom/CustomInputFile.jsx";
+import ErrorGraphQL from "../components/ErrorGraphQL";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ function SignUp() {
     watch,
   } = useForm();
 
-  const [signUp, { data: dataSignUp, error: errorSignUp }] =
+  const [signUp, { loading: loadingSignUp, error: errorSignUp }] =
     useMutation(SIGN_UP);
 
   const { persistUser } = useUserContext();
@@ -31,19 +33,20 @@ function SignUp() {
       password: data.password,
       firstName: data.firstName.toLowerCase(),
       lastName: data.lastName.toLowerCase(),
+      photo: data.files[0],
     };
     try {
-      await signUp({ variables: { userInput } });
+      const res = await signUp({ variables: { userInput } });
+      if (res?.data?.signUp) {
+        persistUser(res.data.signUp);
+        navigate(PATH.ROOT);
+      }
     } catch (err) {}
   }
 
   useEffect(() => {
     if (errorSignUp) console.log(errorSignUp);
-    else if (dataSignUp) {
-      persistUser(dataSignUp.signUp);
-      navigate(PATH.ROOT);
-    }
-  }, [dataSignUp, errorSignUp]);
+  }, [errorSignUp]);
 
   return (
     <form
@@ -52,6 +55,7 @@ function SignUp() {
         "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
       }
     >
+      {errorSignUp && <ErrorGraphQL errorGraphQL={errorSignUp} />}
       <h1 className={"text-3xl font-semibold text-gray-200 md:text-4xl"}>
         Sign Up
       </h1>
@@ -145,6 +149,14 @@ function SignUp() {
           />
         </div>
       </div>
+      <CustomInputFile
+        name={"files"}
+        register={register}
+        errors={errors}
+        rules={{
+          required: "Please, select a profile photo",
+        }}
+      />
       <button type={"submit"} className={"btn-form mb-4"}>
         {isSubmitting ? <OvalLoader /> : "Sign Up"}
       </button>

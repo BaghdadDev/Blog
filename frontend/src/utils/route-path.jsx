@@ -5,5 +5,6 @@ const PATH = {
   PROFILE: "/profile/:userID",
   POST_DETAILS: "/post/:postId",
   EDIT_POST: "/post/:postId/edit",
+  NEW_POST: "/post/new",
 };
 export default PATH;

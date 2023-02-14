@@ -1,6 +1,8 @@
 const { Schema, models, model } = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const ObjectId = Schema.Types.ObjectId;
+
 const UserSchema = new Schema(
   {
     username: { type: String, required: true },
@@ -8,7 +10,11 @@ const UserSchema = new Schema(
     email: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    photo: { type: String, required: false },
+    photo: {
+      type: ObjectId,
+      ref: "files",
+      required: true,
+    },
     role: {
       type: String,
       enum: ["admin", "moderator", "creator"],

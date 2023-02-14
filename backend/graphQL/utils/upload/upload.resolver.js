@@ -39,7 +39,6 @@ const resolveFunction = {
     singleUpload: async (parent, { file: { file } }) => {
       console.log("Resolver: singleUpload");
       try {
-        // const { file } = file;
         console.log(file);
         const { createReadStream, filename, mimetype } = await file;
         const stream = createReadStream();
