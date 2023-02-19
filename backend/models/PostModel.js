@@ -6,7 +6,6 @@ const PortSchema = new Schema(
   {
     title: { type: String, required: true },
     story: { type: String, required: true },
-    keyWords: { type: [String], required: true },
     user: { type: ObjectId, ref: "users", required: true },
     picture: {
       type: ObjectId,

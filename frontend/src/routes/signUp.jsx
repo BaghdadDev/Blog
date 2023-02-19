@@ -156,6 +156,7 @@ function SignUp() {
         rules={{
           required: "Please, select a profile photo",
         }}
+        classImage={"!rounded-full !w-24"}
       />
       <button type={"submit"} className={"btn-form mb-4"}>
         {isSubmitting ? <OvalLoader /> : "Sign Up"}

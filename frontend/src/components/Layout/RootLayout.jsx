@@ -7,12 +7,12 @@ export default function RootLayout() {
   return (
     <div
       className={
-        "relative flex min-h-screen w-screen flex-col text-sm md:text-base"
+        "relative flex min-h-screen w-full flex-col text-sm md:text-base"
       }
     >
       <Header />
       <div
-        className={`flex grow flex-col items-center justify-center bg-gray-200 ${
+        className={`flex w-full grow flex-col items-center justify-center bg-gray-200 ${
           navigation.state === "loading" &&
           "opacity-25 transition-opacity delay-200 duration-200"
         }`}

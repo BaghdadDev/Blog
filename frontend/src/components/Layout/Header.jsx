@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, NavLink } from "react-router-dom";
 import { FaSignInAlt, FaPenFancy } from "react-icons/fa";
 
 import PATH from "../../utils/route-path.jsx";
@@ -14,10 +14,10 @@ function Header() {
   return (
     <header
       className={
-        "sticky top-0 left-0 flex h-16 w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
+        "sticky top-0 left-0 z-10 flex h-16 w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
       }
     >
-      <span>Blog Logo</span>
+      <Link to={PATH.ROOT}>Blog Logo</Link>
       <form
         className={
           "absolute left-1/2 w-52 -translate-x-1/2 rounded-lg bg-gray-200 p-2"
@@ -42,13 +42,16 @@ function Header() {
         )
       ) : (
         <div className={"flex items-center"}>
-          <Link to={PATH.NEW_POST}>
+          <NavLink
+            to={PATH.NEW_POST}
+            className={({ isActive }) => isActive && "rounded bg-gray-200 px-2"}
+          >
             <CustomButton
               label={"Write a Post"}
               Icon={FaPenFancy}
               className={"italic"}
             />
-          </Link>
+          </NavLink>
           <div
             className={
               "ml-4 flex items-center gap-x-2 border-l-2 border-gray-600 pl-4"

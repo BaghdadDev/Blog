@@ -8,6 +8,7 @@ import EditPost from "../routes/editPost.jsx";
 import Posts from "../routes/posts.jsx";
 import SignIn from "../routes/signIn.jsx";
 import SignUp from "../routes/signUp.jsx";
+import NewPost from "../routes/newPost.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
           {
             path: PATH.SIGN_UP,
             element: <SignUp />,
+          },
+          {
+            path: PATH.NEW_POST,
+            element: <NewPost />,
           },
           {
             path: PATH.POST_DETAILS,

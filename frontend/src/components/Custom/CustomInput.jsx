@@ -1,5 +1,23 @@
 import React from "react";
 import { ErrorMessage } from "@hookform/error-message";
+import PropTypes from "prop-types";
+
+CustomInput.defaultProps = {
+  type: "text",
+  rules: {
+    required: false,
+  },
+};
+
+CustomInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  type: PropTypes.oneOf(["text", "multiline"]),
+  rules: PropTypes.object,
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired,
+  className: PropTypes.string,
+};
 
 function CustomInput({
   name,
@@ -12,13 +30,22 @@ function CustomInput({
 }) {
   return (
     <div className={`relative flex w-full flex-col items-center ${className}`}>
-      <input
-        type={type ? type : "text"}
-        placeholder={placeholder}
-        name={name}
-        {...register(name, rules ? rules : { required: false })}
-        className={"input-form"}
-      />
+      {type === "multiline" ? (
+        <textarea
+          name={name}
+          placeholder={placeholder}
+          {...register(name, rules)}
+          className={"input-form"}
+        ></textarea>
+      ) : (
+        <input
+          type={type}
+          placeholder={placeholder}
+          name={name}
+          {...register(name, rules)}
+          className={"input-form"}
+        />
+      )}
       <ErrorMessage
         errors={errors}
         name={name}

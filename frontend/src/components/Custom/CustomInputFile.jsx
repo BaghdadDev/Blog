@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { MdInsertPhoto } from "react-icons/md";
 import { ErrorMessage } from "@hookform/error-message";
+import PropTypes from "prop-types";
 
-function CustomInputFile({ name, register, rules, errors }) {
+CustomInputFile.defaultProps = {
+  size: 2,
+};
+
+CustomInputFile.propTypes = {
+  size: PropTypes.number,
+  name: PropTypes.string.isRequired,
+  register: PropTypes.func.isRequired,
+  rules: PropTypes.object,
+  errors: PropTypes.object.isRequired,
+  className: PropTypes.string,
+};
+
+function CustomInputFile({ size, name, register, rules, errors, classImage }) {
   const [file, setFile] = useState(undefined);
 
   return (
-    <label
-      htmlFor={name}
-      className={"relative flex w-full flex-col items-center"}
-    >
+    <label htmlFor={name} className={`relative flex flex-col items-center`}>
       {!file ? (
         <MdInsertPhoto
-          className={
-            "h-10 w-10 rounded-full p-1 text-blue-200 transition duration-100 hover:cursor-pointer hover:bg-gray-300 hover:text-blue-400"
-          }
+          style={{ width: `${size}rem` }}
+          className={`h-full rounded-lg text-blue-200 shadow-lg hover:text-blue-50`}
         />
       ) : (
         <img
           src={URL.createObjectURL(file)}
           alt={file.filename}
-          className={
-            "h-20 w-20 rounded-full border-2 border-gray-200 transition duration-100 hover:cursor-pointer hover:brightness-50"
-          }
+          className={`w-3/4 rounded border-2 border-gray-200 hover:cursor-pointer hover:brightness-50 md:w-1/2 ${classImage}`}
         />
       )}
       <ErrorMessage
@@ -41,6 +49,7 @@ function CustomInputFile({ name, register, rules, errors }) {
       <input
         id={name}
         type={"file"}
+        accept={"image/*"}
         {...register(
           name,
           rules

@@ -2,17 +2,15 @@ type Post {
     _id: ID!
     title: String!
     story: String!
-    keyWords: [String!]
-    user: User
-    thumbnail: String
+    user: User!
+    picture: File!
 }
 
 input PostInput {
-    title: String
-    story: String
-    keyWords: [String!]
-    user: ID
-    thumbnail: String
+    title: String!
+    story: String!
+    user: ID!
+    picture: Upload!
 }
 
 type Query {
@@ -24,5 +22,5 @@ type Query {
 type Mutation {
     createPost(postInput: PostInput!): Post!
     updatePost(idPost: ID!, postInput: PostInput!): Post!
-    deletePost(idPost: ID!): Post
+    deletePost(idPost: ID!): Post!
 }

@@ -3,19 +3,41 @@
 @tailwind utilities;
 
 @layer utilities {
-    .input-form {
-        @apply p-2 rounded outline-none bg-gray-200 text-center w-full ;
-    }
+  .text-editor-h1 {
+    @apply mb-2 text-3xl font-extrabold;
+  }
+  .text-editor-h2 {
+    @apply mb-2 text-2xl font-bold;
+  }
+  .text-editor-code {
+    @apply bg-[#EEEEEE] p-1;
+  }
+  .text-editor-blockquote {
+    @apply relative mb-2 mb-2 overflow-hidden pl-4 italic text-[#AAAAAA] before:absolute before:left-0 before:h-full before:w-[2px] before:bg-[#AAAAAA];
+  }
+  .text-editor-p {
+    @apply mb-2;
+  }
+  .text-editor-ol {
+    @apply mb-2 list-decimal pl-8;
+  }
+  .text-editor-ul {
+    @apply mb-2 list-disc pl-8;
+  }
 
-    .btn-form {
-        @apply outline-none py-2 px-4 bg-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
-    }
+  .input-form {
+    @apply w-full rounded bg-white p-2 text-center outline-none;
+  }
 
-    .btn-nav {
-        @apply outline-none py-1 px-2 bg-gray-200 hover:bg-gray-600 hover:text-gray-200 transition duration-100 rounded;
-    }
+  .btn-form {
+    @apply rounded bg-blue-200 py-2 px-4 outline-none transition duration-100 hover:bg-blue-600 hover:text-gray-200;
+  }
 
-    .link-form {
-        @apply outline-none p-1 text-blue-200 hover:bg-blue-600 hover:text-gray-200 transition duration-100 rounded;
-    }
+  .btn-nav {
+    @apply rounded bg-gray-200 py-1 px-2 outline-none transition duration-100 hover:bg-gray-600 hover:text-gray-200;
+  }
+
+  .link-form {
+    @apply rounded p-1 text-blue-200 outline-none transition duration-100 hover:bg-blue-600 hover:text-gray-200;
+  }
 }

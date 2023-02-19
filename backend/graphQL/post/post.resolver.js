@@ -1,17 +1,44 @@
 const { GraphQLError } = require("graphql");
 
 const PostModel = require("../../models/PostModel");
+const storeFile = require("../../utils/storeFile");
 
 const Query = {
   getPosts: async () => {
+    console.log("Resolver: getPosts");
     try {
-      console.log("Resolver: getPosts");
-      const posts = await PostModel.find();
+      const posts = await PostModel.find()
+        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({ path: "picture" })
+        .sort({ createdAt: -1 });
       if (!posts || posts.length === 0)
         return new GraphQLError("There is no post available", {
           extensions: { code: "NOT-FOUND" },
         });
-      return posts.map((post) => ({ ...post._doc }));
+      return posts.map((post) => {
+        const copyPost = { ...post._doc };
+        let copyUser = { ...copyPost.user._doc };
+        copyPost.password = undefined;
+        delete copyPost.password;
+        const copyUserPhoto = { ...copyPost.user.photo._doc };
+        const copyPicture = { ...copyPost.picture._doc };
+        return {
+          ...copyPost,
+          picture: {
+            ...copyPicture,
+            data: copyPicture.data.toString("base64"),
+            // data: undefined,
+          },
+          user: {
+            ...copyUser,
+            photo: {
+              ...copyUserPhoto,
+              data: copyUserPhoto.data.toString("base64"),
+              // data: undefined,
+            },
+          },
+        };
+      });
     } catch (errorGetPosts) {
       console.log("Something went wrong during Get Posts", errorGetPosts);
       return new GraphQLError("Something went wrong during Get Posts", {
@@ -53,10 +80,17 @@ const Query = {
 
 const Mutation = {
   createPost: async (_, { postInput }) => {
+    console.log("Resolver: createPost");
     try {
-      console.log("Resolver: createPost");
-      const { _doc: post } = await PostModel.create({ ...postInput });
-      return { ...post };
+      // Store the file
+      const file = await storeFile(postInput.picture.file);
+      // Create new post
+      const { _doc: newPost } = await PostModel.create({
+        ...postInput,
+        picture: file._id,
+      });
+      // Return the new post
+      return { ...newPost };
     } catch (errorCreatePost) {
       console.log("Something went wrong during Create Post", errorCreatePost);
       return new GraphQLError("Something went wrong during Create Post", {
@@ -90,11 +124,11 @@ const Mutation = {
     }
   },
   deletePost: async (_, { idPost, idUser }) => {
+    console.log("Resolver: deletePost");
     try {
-      console.log("Resolver: deletePost");
       const postExists = await PostModel.findById(idPost);
       if (!postExists)
-        return new GraphQLError("There no post with this id: " + idPost, {
+        return new GraphQLError("There is no post with this id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
       if (postExists.user.equals(idUser))
@@ -102,6 +136,7 @@ const Mutation = {
           extensions: { code: "NOT-ALLOWED" },
         });
       await PostModel.findOneAndDelete({ _id: idPost });
+      return { ...postExists._doc };
     } catch (errorDeletePost) {
       console.log("Something went wrong during Delete Post", errorDeletePost);
       return new GraphQLError("Something went wrong during Delete Post", {
