@@ -1,6 +1,6 @@
 import React from "react";
 
-function SkeletonPosts(props) {
+function SkeletonPosts() {
   return (
     <div className={"my-2 flex w-full max-w-md animate-pulse flex-col gap-y-2"}>
       <div className={"flex flex-col gap-y-2"}>

@@ -47,7 +47,29 @@ const Query = {
     }
   },
   getPostById: async (_, { idPost }) => {
+    console.log("Resolver: getPostById");
     try {
+      const post = await PostModel.findById(idPost)
+        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({ path: "picture" });
+      if (!post)
+        return new GraphQLError("There is no Post with Id: " + idPost, {
+          extensions: { code: "NOT-FOUND" },
+        });
+      return {
+        ...post._doc,
+        picture: {
+          ...post.picture._doc,
+          data: post.picture.data.toString("base64"),
+        },
+        user: {
+          ...post.user._doc,
+          photo: {
+            ...post.user.photo._doc,
+            data: post.user.photo.data.toString("base64"),
+          },
+        },
+      };
     } catch (errorGetPostById) {
       console.log(
         "Something went wrong during Get Post By Id: " + idPost,

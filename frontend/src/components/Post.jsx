@@ -1,18 +1,27 @@
 import React from "react";
+import { useMutation } from "@apollo/client";
+import { AiFillDelete } from "react-icons/ai";
+import { Node } from "slate";
+
 import Avatar from "./Avatar.jsx";
 import { useUserContext } from "../context/userContext.jsx";
-import { AiFillDelete } from "react-icons/ai";
-import { useMutation } from "@apollo/client";
 import { DELETE_POST, GET_POSTS } from "../gql/post.jsx";
 import OvalLoader from "./OvalLoader.jsx";
 import ErrorGraphQL from "./ErrorGraphQL";
-import TextEditor from "./TextEditor/index.jsx";
+import PATH from "../utils/route-path.jsx";
+import { Link } from "react-router-dom";
 
 function Post({ post }) {
   const { user } = useUserContext();
 
   const [deletePost, { error: errorDeletePost, loading: loadingDeletePost }] =
     useMutation(DELETE_POST, { refetchQueries: [{ query: GET_POSTS }] });
+
+  function textToString(value) {
+    return JSON.parse(value)
+      .map((n) => Node.string(n))
+      .join(" ");
+  }
 
   async function handleDeletePost() {
     try {
@@ -25,7 +34,7 @@ function Post({ post }) {
   return (
     <div
       className={
-        "relative flex w-full flex-col gap-y-2 overflow-hidden rounded bg-white"
+        "relative flex w-full flex-col gap-y-1 overflow-hidden rounded bg-white"
       }
     >
       {user._id === post.user._id && (
@@ -54,13 +63,15 @@ function Post({ post }) {
           {post.user.lastName.toUpperCase()}
         </p>
       </div>
-      <img
-        src={`data:${post.picture.contentType};base64,${post.picture.data}`}
-        alt={post.picture.filename}
-        className={"w-full"}
-      />
-      <p className={" w-full text-center font-semibold"}>{post.title}</p>
-      <TextEditor readOnly={true} initValue={post.story} />
+      <Link to={PATH.POST_DETAILS.split(":")[0] + `${post._id}`}>
+        <img
+          src={`data:${post.picture.contentType};base64,${post.picture.data}`}
+          alt={post.picture.filename}
+          className={"w-full hover:cursor-pointer"}
+        />
+      </Link>
+      <p className={"pl-2 font-semibold"}>{post.title}</p>
+      <p className={"w-full truncate px-2"}>{textToString(post.story)}</p>
     </div>
   );
 }

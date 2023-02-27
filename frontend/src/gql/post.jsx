@@ -40,3 +40,28 @@ export const DELETE_POST = gql`
     }
   }
 `;
+
+export const GET_POST_BY_ID = gql`
+  query getPostById($idPost: ID!) {
+    getPostById(idPost: $idPost) {
+      _id
+      title
+      story
+      user {
+        _id
+        firstName
+        lastName
+        photo {
+          filename
+          contentType
+          data
+        }
+      }
+      picture {
+        filename
+        contentType
+        data
+      }
+    }
+  }
+`;

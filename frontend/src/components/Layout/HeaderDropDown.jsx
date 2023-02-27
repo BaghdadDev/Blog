@@ -21,7 +21,6 @@ function HeaderDropDown() {
       <Avatar
         {...user.photo}
         onClick={(e) => {
-          console.log("click on avatar");
           setOpen((prev) => !prev);
         }}
       />
