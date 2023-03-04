@@ -41,7 +41,7 @@ const Mutation = {
       const token = getAccessTokenByIdUser(user._id);
       user.password = undefined;
       delete user.password;
-      return { ...user, photo, token: { ...token } };
+      return { ...user, photo: { ...photo }, token: { ...token } };
     } catch (errorSignUp) {
       console.log("Something went wrong during signUp", errorSignUp);
       return new GraphQLError("Something went wrong during signUp", {
@@ -66,7 +66,6 @@ const Mutation = {
       const token = getAccessTokenByIdUser(user._id);
       return {
         ...user._doc,
-        photo: { ...user.photo._doc, data: user.photo.data.toString("base64") },
         token: { ...token },
       };
     } catch (errorSignIn) {

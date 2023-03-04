@@ -4,6 +4,10 @@ type Post {
     story: String!
     user: User!
     picture: File!
+    likes: [User!]!
+    nbrLikes: Int!
+    comments: [Comment!]!
+    nbrComments: Int!
 }
 
 input PostInput {
@@ -22,5 +26,6 @@ type Query {
 type Mutation {
     createPost(postInput: PostInput!): Post!
     updatePost(idPost: ID!, postInput: PostInput!): Post!
+    toggleLikePost(idPost: ID!, idUser: ID!): Boolean!
     deletePost(idPost: ID!): Post!
 }

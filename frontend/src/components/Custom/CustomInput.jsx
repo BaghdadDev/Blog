@@ -12,7 +12,7 @@ CustomInput.defaultProps = {
 CustomInput.propTypes = {
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
-  type: PropTypes.oneOf(["text", "multiline"]),
+  type: PropTypes.oneOf(["text", "multiline", "password"]),
   rules: PropTypes.object,
   register: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired,

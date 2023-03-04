@@ -12,6 +12,16 @@ const PortSchema = new Schema(
       ref: "files",
       required: true,
     },
+    likes: {
+      type: [{ type: ObjectId, ref: "users" }],
+      required: true,
+      default: [],
+    },
+    comments: {
+      type: [{ type: ObjectId, ref: "comments" }],
+      required: true,
+      default: [],
+    },
   },
   { timestamps: true }
 );

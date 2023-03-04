@@ -2,6 +2,7 @@ const { GraphQLError } = require("graphql");
 
 const PostModel = require("../../models/PostModel");
 const storeFile = require("../../utils/storeFile");
+const CommentModel = require("../../models/CommentModel");
 
 const Query = {
   getPosts: async () => {
@@ -15,30 +16,13 @@ const Query = {
         return new GraphQLError("There is no post available", {
           extensions: { code: "NOT-FOUND" },
         });
-      return posts.map((post) => {
-        const copyPost = { ...post._doc };
-        let copyUser = { ...copyPost.user._doc };
-        copyPost.password = undefined;
-        delete copyPost.password;
-        const copyUserPhoto = { ...copyPost.user.photo._doc };
-        const copyPicture = { ...copyPost.picture._doc };
-        return {
-          ...copyPost,
-          picture: {
-            ...copyPicture,
-            data: copyPicture.data.toString("base64"),
-            // data: undefined,
-          },
-          user: {
-            ...copyUser,
-            photo: {
-              ...copyUserPhoto,
-              data: copyUserPhoto.data.toString("base64"),
-              // data: undefined,
-            },
-          },
-        };
-      });
+      return posts.map((post) => ({
+        ...post._doc,
+        nbrLikes: post.likes.length,
+        likes: undefined,
+        nbrComments: post.comments.length,
+        comments: undefined,
+      }));
     } catch (errorGetPosts) {
       console.log("Something went wrong during Get Posts", errorGetPosts);
       return new GraphQLError("Something went wrong during Get Posts", {
@@ -51,25 +35,30 @@ const Query = {
     try {
       const post = await PostModel.findById(idPost)
         .populate({ path: "user", populate: { path: "photo" } })
-        .populate({ path: "picture" });
+        .populate({ path: "picture" })
+        .populate({
+          path: "likes",
+          select: "_id firstName lastName photo",
+          populate: { path: "photo" },
+        });
       if (!post)
         return new GraphQLError("There is no Post with Id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
-      return {
-        ...post._doc,
-        picture: {
-          ...post.picture._doc,
-          data: post.picture.data.toString("base64"),
-        },
-        user: {
-          ...post.user._doc,
-          photo: {
-            ...post.user.photo._doc,
-            data: post.user.photo.data.toString("base64"),
-          },
-        },
-      };
+      const comments = await CommentModel.find({ post: idPost })
+        .populate({
+          path: "user",
+          select: "_id firstName lastName photo",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "post", select: "_id" })
+        .populate({
+          path: "likes",
+          select: "_id firstName lastName photo",
+          populate: { path: "photo" },
+        })
+        .sort({ createdAt: -1 });
+      return { ...post._doc, comments: comments.map((c) => c) };
     } catch (errorGetPostById) {
       console.log(
         "Something went wrong during Get Post By Id: " + idPost,
@@ -143,6 +132,45 @@ const Mutation = {
       return new GraphQLError("Something went wrong during Update Post", {
         extensions: { code: "ERROR-SERVER" },
       });
+    }
+  },
+  toggleLikePost: async (_, { idPost, idUser }) => {
+    console.log("resolver: toggleLikePost");
+    try {
+      const post = await PostModel.findOne({ _id: idPost }).populate({
+        path: "likes",
+        select: "_id",
+      });
+      if (!post) {
+        return new GraphQLError("There is no post with id " + idPost, {
+          extensions: { code: "NOT-FOUND" },
+        });
+      }
+      if (
+        post.likes.findIndex(({ _id: userId }) => userId.equals(idUser)) !== -1
+      ) {
+        await PostModel.findOneAndUpdate(
+          { _id: idPost },
+          { $pull: { likes: idUser } }
+        );
+      } else {
+        await PostModel.findOneAndUpdate(
+          { _id: idPost },
+          { $push: { likes: idUser } }
+        );
+      }
+      return true;
+    } catch (errorToggleLikePost) {
+      console.log(
+        "Something went wrong during Toggling Like Post",
+        errorToggleLikePost
+      );
+      return new GraphQLError(
+        "Something went wrong during Toggling Like Post",
+        {
+          extensions: { code: "ERROR-SERVER" },
+        }
+      );
     }
   },
   deletePost: async (_, { idPost, idUser }) => {

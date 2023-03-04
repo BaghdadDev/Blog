@@ -8,7 +8,7 @@ import { useUserContext } from "../../context/userContext.jsx";
 import CustomButton from "../Custom/CustomButton.jsx";
 
 function Header() {
-  const { user, signOut } = useUserContext();
+  const { user } = useUserContext();
 
   const location = useLocation();
   return (
@@ -44,7 +44,9 @@ function Header() {
         <div className={"flex items-center"}>
           <NavLink
             to={PATH.NEW_POST}
-            className={({ isActive }) => isActive && "rounded bg-gray-200 px-2"}
+            className={({ isActive }) =>
+              isActive ? "rounded bg-gray-200 px-2" : ""
+            }
           >
             <CustomButton
               label={"Write a Post"}

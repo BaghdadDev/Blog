@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Form, Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SIGN_IN } from "../gql/auth.jsx";
 import { useMutation } from "@apollo/client";
 import { useUserContext } from "../context/userContext.jsx";
@@ -9,7 +9,7 @@ import CustomInput from "../components/Custom/CustomInput.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 
-function SignIn(props) {
+function SignIn() {
   const {
     register,
     handleSubmit,
@@ -20,27 +20,24 @@ function SignIn(props) {
 
   const { persistUser } = useUserContext();
 
-  const [signIn, { data: dataSignIn, error: errorSignIn }] =
-    useMutation(SIGN_IN);
+  const [signIn, { error: errorSignIn }] = useMutation(SIGN_IN);
 
   async function handleSubmitSignIn(data) {
     try {
-      await signIn({
+      const {
+        data: { signIn: dataUser },
+      } = await signIn({
         variables: {
           usernameOrEmail: data.usernameOrEmail.toLowerCase(),
           password: data.password,
         },
       });
-    } catch (err) {}
-  }
-
-  useEffect(() => {
-    if (errorSignIn) console.log(errorSignIn);
-    else if (dataSignIn?.signIn) {
-      persistUser(dataSignIn.signIn);
+      persistUser(dataUser);
       navigate(PATH.ROOT);
+    } catch (catchErrorSignIn) {
+      console.log(catchErrorSignIn);
     }
-  }, [dataSignIn, errorSignIn]);
+  }
 
   return (
     <form

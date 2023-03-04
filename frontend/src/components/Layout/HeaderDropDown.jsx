@@ -24,7 +24,7 @@ function HeaderDropDown() {
           setOpen((prev) => !prev);
         }}
       />
-      {open && (
+      {open ? (
         <div
           className={
             "absolute bottom-0 right-1/2 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-gray-100 shadow-xl"
@@ -50,6 +50,8 @@ function HeaderDropDown() {
             <span>Sign Out</span>
           </button>
         </div>
+      ) : (
+        ""
       )}
     </div>
   );

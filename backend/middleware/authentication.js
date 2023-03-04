@@ -8,11 +8,27 @@ async function authenticationMiddleware(resolve, root, args, context, info) {
     const accessToken =
       context.headers.authorization &&
       String(context.headers.authorization).split(" ")[1];
-    if (!accessToken) return await resolve(root, args, context, info);
-    let idUser = null;
+    console.log(info.operation.name.value);
+    console.log(accessToken);
+    if (!accessToken) {
+      if (
+        info.operation.name.value === "signUp" ||
+        info.operation.name.value === "signIn"
+      ) {
+        return await resolve(root, args, context, info);
+      }
+      return new GraphQLError("Your need to be authenticated first.", {
+        extensions: { code: "NOT-AUTHENTICATED" },
+      });
+    }
     try {
-      idUser = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+      const { idUser } = jwt.verify(
+        accessToken,
+        process.env.ACCESS_TOKEN_SECRET
+      );
+      return await resolve(root, { ...args, idUser: idUser }, context, info);
     } catch (errorVerifyingJWT) {
+      console.log(errorVerifyingJWT);
       return new GraphQLError(
         "Your authentication is invalid, the Access Token is not valid.",
         {
@@ -20,7 +36,6 @@ async function authenticationMiddleware(resolve, root, args, context, info) {
         }
       );
     }
-    return await resolve(root, { ...args, idUser: idUser }, context, info);
   } catch (errorAuthMiddleware) {
     console.log(
       "Something went wrong in authentication middleware.",

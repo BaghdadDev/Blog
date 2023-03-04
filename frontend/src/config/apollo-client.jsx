@@ -3,10 +3,13 @@ import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context/index.js";
 
 const contextLink = setContext(async (_, { headers }) => {
+  const accessToken =
+    JSON.parse(localStorage.getItem("userBlog"))?.token?.accessToken ?? null;
   return {
     headers: {
       ...headers,
       "Apollo-Require-Preflight": true,
+      Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
     },
   };
 });

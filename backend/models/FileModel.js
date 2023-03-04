@@ -4,7 +4,7 @@ const FileSchema = new Schema(
   {
     filename: String,
     contentType: String,
-    data: Buffer,
+    data: String,
   },
   { timestamps: true }
 );

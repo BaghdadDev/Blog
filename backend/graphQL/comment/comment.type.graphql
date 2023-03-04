@@ -1,0 +1,19 @@
+type Comment {
+    _id: ID!
+    user: User!
+    post: Post!
+    comment: String!
+    likes: [User!]!
+}
+
+input CommentInput {
+    user: ID!
+    post: ID!
+    comment: String!
+}
+
+type Mutation {
+    createComment(commentInput: CommentInput!): Comment!
+    updateComment(idComment: ID!, commentInput: CommentInput!): Comment!
+    deleteComment(idComment: ID): Comment!
+}

@@ -1,6 +1,7 @@
 import React from "react";
 import { useMutation } from "@apollo/client";
-import { AiFillDelete } from "react-icons/ai";
+import { AiFillDelete, AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { FaRegCommentDots } from "react-icons/fa";
 import { Node } from "slate";
 
 import Avatar from "./Avatar.jsx";
@@ -72,6 +73,27 @@ function Post({ post }) {
       </Link>
       <p className={"pl-2 font-semibold"}>{post.title}</p>
       <p className={"w-full truncate px-2"}>{textToString(post.story)}</p>
+      <div
+        className={"mb-2 flex w-full select-none items-center justify-evenly "}
+      >
+        <div className={"flex items-center gap-x-2"}>
+          {post.nbrLikes === 0 ? (
+            <>
+              <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
+              <span>0</span>
+            </>
+          ) : (
+            <>
+              <AiFillHeart className={"h-6 w-6 text-red-800"} />
+              <span>{post.nbrLikes}</span>
+            </>
+          )}
+        </div>
+        <div className={"flex items-center gap-x-2"}>
+          <FaRegCommentDots className={"h-6 w-6 text-gray-800"} />
+          <span>{post.nbrComments}</span>
+        </div>
+      </div>
     </div>
   );
 }

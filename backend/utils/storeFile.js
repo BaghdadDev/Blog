@@ -13,9 +13,9 @@ async function storeFile(file) {
     const storedFile = await FileModel.create({
       filename,
       contentType: mimetype,
-      data: fileData,
+      data: fileData.toString("base64"),
     });
-    return { ...storedFile._doc, data: storedFile.data.toString("base64") };
+    return { ...storedFile._doc };
   } catch (errorStoreFile) {
     console.log("Something went wrong while storing file.", errorStoreFile);
     return new GraphQLError("Something went wrong while storing file", {
