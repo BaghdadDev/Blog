@@ -10,6 +10,8 @@ const {
 const { ApolloServer } = require("@apollo/server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
 const { applyMiddleware } = require("graphql-middleware");
+const { WebSocketServer } = require("ws");
+const { useServer } = require("graphql-ws/lib/use/ws");
 
 const connectToDatabase = require("./config/database.js");
 const whiteList = require("./config/whiteList.js");
@@ -53,10 +55,35 @@ async function mountServer() {
     authenticationMiddleware
   );
 
+  // Creating the WebSocket server
+  const wsServer = new WebSocketServer({
+    // This is the `httpServer` we created in a previous step.
+    server: httpServer,
+    // Pass a different path here if app.use
+    // serves expressMiddleware at a different path
+    path: "/graphql",
+  });
+
+  // Hand in the schema we just created and have the
+  // WebSocketServer start listening.
+  const serverCleanup = useServer({ schema }, wsServer);
+
   // Set up Apollo Server
   const server = new ApolloServer({
     schema: schemaWithMiddleware,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      // Proper shutdown for the WebSocket server.
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
     includeStacktraceInErrorResponses: process.env.NODE_ENV !== "production",
     introspection: process.env.NODE_ENV !== "production",
     // formatError: (formatError) => {

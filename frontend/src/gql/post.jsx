@@ -113,3 +113,30 @@ export const TOGGLE_LIKE_POST = gql`
     toggleLikePost(idPost: $idPost, idUser: $idUser)
   }
 `;
+
+export const POSTS_SUBSCRIPTION = gql`
+  subscription PostCreated {
+    postCreated {
+      _id
+      title
+      story
+      user {
+        _id
+        firstName
+        lastName
+        photo {
+          filename
+          contentType
+          data
+        }
+      }
+      picture {
+        filename
+        contentType
+        data
+      }
+      nbrLikes
+      nbrComments
+    }
+  }
+`;

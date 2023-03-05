@@ -16,4 +16,5 @@ type Mutation {
     createComment(commentInput: CommentInput!): Comment!
     updateComment(idComment: ID!, commentInput: CommentInput!): Comment!
     deleteComment(idComment: ID): Comment!
+    toggleLikeComment(idComment: ID!): Comment!
 }

@@ -8,8 +8,6 @@ async function authenticationMiddleware(resolve, root, args, context, info) {
     const accessToken =
       context.headers.authorization &&
       String(context.headers.authorization).split(" ")[1];
-    console.log(info.operation.name.value);
-    console.log(accessToken);
     if (!accessToken) {
       if (
         info.operation.name.value === "signUp" ||

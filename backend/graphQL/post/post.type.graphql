@@ -17,6 +17,10 @@ input PostInput {
     picture: Upload!
 }
 
+type Subscription {
+    postCreated: Post!
+}
+
 type Query {
     getPosts: [Post!]!
     getPostById(idPost: ID!): Post!

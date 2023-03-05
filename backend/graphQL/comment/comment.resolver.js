@@ -53,6 +53,40 @@ const Mutation = {
       });
     }
   },
+  toggleLikeComment: async (_, { idUser, idComment }) => {
+    console.log("resolver: toggleLikeComment");
+    try {
+      const comment = await CommentModel.findById(idComment);
+      if (!comment) {
+        return new GraphQLError("There is no comment with id " + idComment, {
+          extensions: { code: "NOT-FOUND" },
+        });
+      }
+      let commentUpdated = undefined;
+      if (comment.likes.findIndex((userId) => userId.equals(idUser)) !== -1) {
+        commentUpdated = await CommentModel.findOneAndUpdate(
+          { _id: idComment },
+          { $pull: { likes: idUser } },
+          { upsert: true }
+        );
+      } else {
+        commentUpdated = await CommentModel.findOneAndUpdate(
+          { _id: idComment },
+          { $push: { likes: idUser } },
+          { upsert: true }
+        );
+      }
+      return commentUpdated;
+    } catch (errorToggleLikeComment) {
+      console.log(
+        `Something went wrong Toggling Like Comment.`,
+        errorToggleLikeComment
+      );
+      return new GraphQLError(`Something went wrong Toggling Like Comment.`, {
+        extensions: { code: "ERROR-SERVER" },
+      });
+    }
+  },
 };
 
 module.exports = { Mutation };

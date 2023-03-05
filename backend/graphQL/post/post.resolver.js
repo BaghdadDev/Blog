@@ -1,8 +1,11 @@
 const { GraphQLError } = require("graphql");
+const { PubSub } = require("graphql-subscriptions");
 
 const PostModel = require("../../models/PostModel");
 const storeFile = require("../../utils/storeFile");
 const CommentModel = require("../../models/CommentModel");
+
+const pubSub = new PubSub();
 
 const Query = {
   getPosts: async () => {
@@ -90,18 +93,30 @@ const Query = {
 };
 
 const Mutation = {
-  createPost: async (_, { postInput }) => {
+  createPost: async (_, { postInput }, { postController }) => {
     console.log("Resolver: createPost");
     try {
       // Store the file
       const file = await storeFile(postInput.picture.file);
       // Create new post
-      const { _doc: newPost } = await PostModel.create({
+      const { _doc: createdPost } = await PostModel.create({
         ...postInput,
         picture: file._id,
       });
-      // Return the new post
-      return { ...newPost };
+      // Retrieve the new post with populate
+      const newPost = await PostModel.findById(createdPost._id)
+        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({ path: "picture" });
+      // Return the new post for subscription
+      await pubSub.publish("POST_CREATED", {
+        postCreated: {
+          ...newPost._doc,
+          nbrComments: newPost.comments.length,
+          nbrLikes: newPost.likes.length,
+        },
+      });
+      // Return the new post for resolver
+      return { ...newPost._doc };
     } catch (errorCreatePost) {
       console.log("Something went wrong during Create Post", errorCreatePost);
       return new GraphQLError("Something went wrong during Create Post", {
@@ -196,4 +211,10 @@ const Mutation = {
   },
 };
 
-module.exports = { Query, Mutation };
+const Subscription = {
+  postCreated: {
+    subscribe: () => pubSub.asyncIterator(["POST_CREATED"]),
+  },
+};
+
+module.exports = { Query, Mutation, Subscription };

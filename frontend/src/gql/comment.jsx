@@ -15,3 +15,11 @@ export const DELETE_COMMENT = gql`
     }
   }
 `;
+
+export const TOGGLE_LIKE_COMMENT = gql`
+  mutation toggleLikeComment($idComment: ID!) {
+    toggleLikeComment(idComment: $idComment) {
+      _id
+    }
+  }
+`;
