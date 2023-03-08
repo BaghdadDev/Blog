@@ -1,11 +1,9 @@
 const { GraphQLError } = require("graphql");
-const { PubSub } = require("graphql-subscriptions");
 
 const PostModel = require("../../models/PostModel");
 const storeFile = require("../../utils/storeFile");
 const CommentModel = require("../../models/CommentModel");
-
-const pubSub = new PubSub();
+const pubSub = require("../../config/PubSub.js");
 
 const Query = {
   getPosts: async () => {
@@ -48,20 +46,14 @@ const Query = {
         return new GraphQLError("There is no Post with Id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
-      const comments = await CommentModel.find({ post: idPost })
-        .populate({
-          path: "user",
-          select: "_id firstName lastName photo",
-          populate: { path: "photo" },
-        })
-        .populate({ path: "post", select: "_id" })
-        .populate({
-          path: "likes",
-          select: "_id firstName lastName photo",
-          populate: { path: "photo" },
-        })
-        .sort({ createdAt: -1 });
-      return { ...post._doc, comments: comments.map((c) => c) };
+
+      console.log(post.comments.length);
+
+      return {
+        ...post._doc,
+        comments: undefined,
+        nbrComments: post.comments.length,
+      };
     } catch (errorGetPostById) {
       console.log(
         "Something went wrong during Get Post By Id: " + idPost,
@@ -196,7 +188,8 @@ const Mutation = {
         return new GraphQLError("There is no post with this id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
-      if (postExists.user.equals(idUser))
+      console.log(postExists.user);
+      if (!postExists.user.equals(idUser))
         return new GraphQLError("Your are not allowed to delete this post", {
           extensions: { code: "NOT-ALLOWED" },
         });

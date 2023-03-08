@@ -12,6 +12,14 @@ input CommentInput {
     comment: String!
 }
 
+type Subscription {
+    commentCreated(idPost: ID!): Comment!
+}
+
+type Query {
+    getComments(idPost: ID!): [Comment!]!
+}
+
 type Mutation {
     createComment(commentInput: CommentInput!): Comment!
     updateComment(idComment: ID!, commentInput: CommentInput!): Comment!

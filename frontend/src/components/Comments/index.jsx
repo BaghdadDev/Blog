@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BiSend } from "react-icons/bi";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import Avatar from "../Avatar.jsx";
 import CustomInput from "../Custom/CustomInput.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
-import { CREATE_COMMENT } from "../../gql/comment.jsx";
-import { GET_POST_BY_ID } from "../../gql/post.jsx";
+import {
+  COMMENT_CREATED,
+  CREATE_COMMENT,
+  GET_COMMENTS,
+} from "../../gql/comment.jsx";
 import Comment from "./Comment.jsx";
+import ErrorGraphQL from "../ErrorGraphQL";
 
-function IndexComments({ post }) {
+function IndexComments({ idPost }) {
   const {
     user: { _id: idUser, photo: photoUser },
   } = useUserContext();
@@ -22,20 +26,42 @@ function IndexComments({ post }) {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const [createComment, { loading: loadingCreateComment }] = useMutation(
-    CREATE_COMMENT,
-    {
-      refetchQueries: [
-        { query: GET_POST_BY_ID, variables: { idPost: post._id } },
-      ],
-    }
-  );
+  const {
+    subscribeToMore,
+    data: dataGetComments,
+    loading: loadingGetComments,
+    error: errorGetComments,
+  } = useQuery(GET_COMMENTS, { variables: { idPost: idPost } });
+
+  const [createComment, { loading: loadingCreateComment }] =
+    useMutation(CREATE_COMMENT);
+
+  function handleSubscribeToComments() {
+    subscribeToMore({
+      document: COMMENT_CREATED,
+      variables: { idPost: idPost },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newFeedItem = subscriptionData.data.commentCreated;
+
+        const copyPrev = prev?.getComments ? prev.getComments : [];
+
+        return Object.assign({}, prev, {
+          getComments: [newFeedItem, ...copyPrev],
+        });
+      },
+    });
+  }
+
+  useEffect(() => {
+    handleSubscribeToComments();
+  }, []);
 
   async function handleSubmitComment(data) {
     try {
       const commentInput = {
         user: idUser,
-        post: post._id,
+        post: idPost,
         comment: data.commentText,
       };
       await createComment({ variables: { commentInput: commentInput } });
@@ -44,6 +70,20 @@ function IndexComments({ post }) {
       console.log(errorSubmittingComment);
     }
   }
+
+  if (loadingGetComments) return <p>Loading Comments ...</p>;
+
+  if (errorGetComments) {
+    if (errorGetComments?.graphQLErrors[0]?.extensions?.code !== "NOT-FOUND") {
+      return (
+        <div className={"w-ful flex items-center justify-center"}>
+          <ErrorGraphQL errorGraphQL={errorGetComments} />
+        </div>
+      );
+    }
+  }
+
+  const comments = dataGetComments?.getComments;
 
   return (
     <div className={"w-full"}>
@@ -70,7 +110,7 @@ function IndexComments({ post }) {
         </form>
       </div>
       <div className={"w-full"}>
-        {post.comments.map((comment) => (
+        {comments?.map((comment) => (
           <Comment key={comment._id} comment={comment} />
         ))}
       </div>

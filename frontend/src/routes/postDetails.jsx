@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegCommentDots } from "react-icons/fa";
 
-import { GET_POST_BY_ID, TOGGLE_LIKE_POST } from "../gql/post.jsx";
+import {
+  GET_POST_BY_ID,
+  POSTS_SUBSCRIPTION,
+  TOGGLE_LIKE_POST,
+} from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
 import TextEditor from "../components/TextEditor/index.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comments";
 import { useUserContext } from "../context/userContext.jsx";
+import { COMMENT_CREATED } from "../gql/comment.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
@@ -20,6 +25,7 @@ function PostDetails() {
   } = useUserContext();
 
   const {
+    subscribeToMore,
     data: dataPost,
     loading: loadingPost,
     error: errorPost,
@@ -43,6 +49,27 @@ function PostDetails() {
       console.log(errorToggleLikePost);
     }
   }
+
+  function handleSubscribeToCommentCreated() {
+    subscribeToMore({
+      document: COMMENT_CREATED,
+      variables: { idPost: postId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        console.log(prev);
+        return Object.assign({}, prev, {
+          getPostById: {
+            ...prev.getPostById,
+            nbrComments: prev.getPostById.nbrComments + 1,
+          },
+        });
+      },
+    });
+  }
+
+  useEffect(() => {
+    handleSubscribeToCommentCreated();
+  }, []);
 
   if (loadingPost)
     return (
@@ -94,11 +121,11 @@ function PostDetails() {
           }
         >
           <FaRegCommentDots className={"h-6 w-6 text-gray-800"} />
-          <span>{post.comments.length}</span>
+          <span>{post.nbrComments}</span>
         </div>
       </div>
       <TextEditor readOnly={true} initValue={post.story} />
-      <Comments post={post} />
+      <Comments idPost={post._id} />
     </div>
   );
 }

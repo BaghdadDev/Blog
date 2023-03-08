@@ -75,35 +75,7 @@ export const GET_POST_BY_ID = gql`
           data
         }
       }
-      comments {
-        _id
-        comment
-        post {
-          _id
-        }
-        user {
-          _id
-          firstName
-          lastName
-          photo {
-            _id
-            filename
-            contentType
-            data
-          }
-        }
-        likes {
-          _id
-          firstName
-          lastName
-          photo {
-            _id
-            filename
-            contentType
-            data
-          }
-        }
-      }
+      nbrComments
     }
   }
 `;

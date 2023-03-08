@@ -2,6 +2,39 @@ const { GraphQLError } = require("graphql");
 
 const CommentModel = require("../../models/CommentModel.js");
 const PostModel = require("../../models/PostModel.js");
+const pubSub = require("../../config/PubSub.js");
+
+const Query = {
+  getComments: async (_, { idPost }) => {
+    console.log("resolver: getComments");
+    try {
+      const comments = await CommentModel.find({ post: idPost })
+        .populate({
+          path: "user",
+          select: "_id firstName lastName photo",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "post", select: "_id" })
+        .populate({
+          path: "likes",
+          select: "_id firstName lastName photo",
+          populate: { path: "photo" },
+        })
+        .sort({ createdAt: -1 });
+      if (!comments || comments.length === 0) {
+        return new GraphQLError("There are no comments for this post", {
+          extensions: { code: "NOT-FOUND" },
+        });
+      }
+      return comments.map((c) => c);
+    } catch (errorGetComments) {
+      console.log(`Something went wrong getting comments.`, errorGetComments);
+      return new GraphQLError(`Something went wrong getting comments.`, {
+        extensions: { code: "ERROR-SERVER" },
+      });
+    }
+  },
+};
 
 const Mutation = {
   createComment: async (_, { commentInput }) => {
@@ -18,10 +51,21 @@ const Mutation = {
       const comment = await CommentModel.create({ ...commentInput });
       await PostModel.findOneAndUpdate(
         { _id: commentInput.post },
-        { $push: comment._id },
+        { $push: { comments: comment._id } },
         { upsert: true }
       );
-      return { _id: comment._id };
+      const commentCreated = await CommentModel.findById(comment._id)
+        .populate({
+          path: "user",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "likes", populate: { path: "photo" } })
+        .populate({ path: "post", select: "_id" });
+      // Return the new comment for subscription
+      await pubSub.publish("COMMENT_CREATED", {
+        commentCreated: commentCreated,
+      });
+      return commentCreated;
     } catch (errorCreateComment) {
       console.log(`Something went wrong creating comment.`, errorCreateComment);
       return new GraphQLError(`Something went wrong creating comment.`, {
@@ -37,14 +81,17 @@ const Mutation = {
           extensions: { code: "NOT-FOUND" },
         });
       }
-      console.log(idUser);
-      console.log(comment.user);
       if (!comment.user.equals(idUser)) {
         return new GraphQLError("You are not allowed to delete this comment", {
           extensions: { code: "NOT-ALLOWED" },
         });
       }
       await CommentModel.findOneAndDelete({ _id: idComment });
+      await PostModel.findByIdAndUpdate(
+        { _id: comment.post },
+        { $pull: { comments: idComment } },
+        { upsert: true }
+      );
       return { _id: idComment };
     } catch (errorDeleteComment) {
       console.log(`Something went wrong deleting comment.`, errorDeleteComment);
@@ -89,4 +136,10 @@ const Mutation = {
   },
 };
 
-module.exports = { Mutation };
+const Subscription = {
+  commentCreated: {
+    subscribe: () => pubSub.asyncIterator(["COMMENT_CREATED"]),
+  },
+};
+
+module.exports = { Query, Mutation, Subscription };

@@ -10,6 +10,7 @@ import { setContext } from "@apollo/client/link/context/index.js";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import PATH from "../utils/route-path.jsx";
 
 const contextLink = setContext(async (_, { headers }) => {
   const accessToken =
@@ -25,11 +26,13 @@ const contextLink = setContext(async (_, { headers }) => {
 
 const errorNotAuthenticatedLink = new ApolloLink((operation, forward) => {
   return forward(operation).map((data) => {
-    // if (data?.errors)
-    //   if (data.errors[0]?.extensions?.code === "NotAuthenticated") {
-    //     console.log(data.errors[0]?.extensions?.code);
-    //     console.log(data.errors[0]?.message);
-    //   }
+    if (data?.errors)
+      if (data.errors[0]?.extensions?.code === "NOT-AUTHENTICATED") {
+        console.log(data.errors[0]?.extensions?.code);
+        console.log(data.errors[0]?.message);
+        localStorage.removeItem("userBlog");
+        window.location.replace(PATH.SIGN_IN);
+      }
     return data;
   });
 });
