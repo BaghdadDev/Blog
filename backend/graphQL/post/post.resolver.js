@@ -1,6 +1,7 @@
 const { GraphQLError } = require("graphql");
 
 const PostModel = require("../../models/PostModel");
+const UserModel = require("../../models/UserModel");
 const storeFile = require("../../utils/storeFile");
 const CommentModel = require("../../models/CommentModel");
 const pubSub = require("../../config/PubSub.js");
@@ -46,9 +47,6 @@ const Query = {
         return new GraphQLError("There is no Post with Id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
-
-      console.log(post.comments.length);
-
       return {
         ...post._doc,
         comments: undefined,
@@ -100,7 +98,7 @@ const Mutation = {
         .populate({ path: "user", populate: { path: "photo" } })
         .populate({ path: "picture" });
       // Return the new post for subscription
-      await pubSub.publish("POST_CREATED", {
+      await pubSub.publish("CREATED_POST", {
         postCreated: {
           ...newPost._doc,
           nbrComments: newPost.comments.length,
@@ -144,27 +142,32 @@ const Mutation = {
   toggleLikePost: async (_, { idPost, idUser }) => {
     console.log("resolver: toggleLikePost");
     try {
-      const post = await PostModel.findOne({ _id: idPost }).populate({
-        path: "likes",
-        select: "_id",
-      });
+      const post = await PostModel.findOne({ _id: idPost });
       if (!post) {
         return new GraphQLError("There is no post with id " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
       }
-      if (
-        post.likes.findIndex(({ _id: userId }) => userId.equals(idUser)) !== -1
-      ) {
+      let updatedLikes;
+      if (post.likes.findIndex((userId) => userId.equals(idUser)) !== -1) {
         await PostModel.findOneAndUpdate(
           { _id: idPost },
           { $pull: { likes: idUser } }
         );
+        await pubSub.publish("DISLIKED_POST", {
+          dislikedPost: idUser,
+        });
       } else {
         await PostModel.findOneAndUpdate(
           { _id: idPost },
           { $push: { likes: idUser } }
         );
+        const user = await UserModel.findById(idUser).populate({
+          path: "photo",
+        });
+        await pubSub.publish("LIKED_POST", {
+          likedPost: { ...user._doc },
+        });
       }
       return true;
     } catch (errorToggleLikePost) {
@@ -188,13 +191,16 @@ const Mutation = {
         return new GraphQLError("There is no post with this id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
-      console.log(postExists.user);
       if (!postExists.user.equals(idUser))
         return new GraphQLError("Your are not allowed to delete this post", {
           extensions: { code: "NOT-ALLOWED" },
         });
+      await CommentModel.deleteMany({ post: idPost });
       await PostModel.findOneAndDelete({ _id: idPost });
-      return { ...postExists._doc };
+      await pubSub.publish("DELETED_POST", {
+        deletedPost: idPost,
+      });
+      return idPost;
     } catch (errorDeletePost) {
       console.log("Something went wrong during Delete Post", errorDeletePost);
       return new GraphQLError("Something went wrong during Delete Post", {
@@ -206,7 +212,16 @@ const Mutation = {
 
 const Subscription = {
   postCreated: {
-    subscribe: () => pubSub.asyncIterator(["POST_CREATED"]),
+    subscribe: () => pubSub.asyncIterator(["CREATED_POST"]),
+  },
+  likedPost: {
+    subscribe: () => pubSub.asyncIterator(["LIKED_POST"]),
+  },
+  dislikedPost: {
+    subscribe: () => pubSub.asyncIterator(["DISLIKED_POST"]),
+  },
+  deletedPost: {
+    subscribe: () => pubSub.asyncIterator(["DELETED_POST"]),
   },
 };
 

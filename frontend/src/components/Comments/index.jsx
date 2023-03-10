@@ -7,8 +7,9 @@ import Avatar from "../Avatar.jsx";
 import CustomInput from "../Custom/CustomInput.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import {
-  COMMENT_CREATED,
   CREATE_COMMENT,
+  CREATED_COMMENT_SUB,
+  DELETED_COMMENT_SUB,
   GET_COMMENTS,
 } from "../../gql/comment.jsx";
 import Comment from "./Comment.jsx";
@@ -36,25 +37,41 @@ function IndexComments({ idPost }) {
   const [createComment, { loading: loadingCreateComment }] =
     useMutation(CREATE_COMMENT);
 
-  function handleSubscribeToComments() {
+  function handleSubscribeToCreatedComment() {
     subscribeToMore({
-      document: COMMENT_CREATED,
+      document: CREATED_COMMENT_SUB,
       variables: { idPost: idPost },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newFeedItem = subscriptionData.data.commentCreated;
-
+        const createdComment = subscriptionData.data.commentCreated;
         const copyPrev = prev?.getComments ? prev.getComments : [];
-
         return Object.assign({}, prev, {
-          getComments: [newFeedItem, ...copyPrev],
+          getComments: [createdComment, ...copyPrev],
+        });
+      },
+    });
+  }
+
+  function handleSubscribeToDeletedComment() {
+    subscribeToMore({
+      document: DELETED_COMMENT_SUB,
+      variables: { idPost: idPost },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const idDeletedComment = subscriptionData.data.deletedComment;
+        const filteredComments = prev.getComments.filter(
+          (comment) => comment._id !== idDeletedComment
+        );
+        return Object.assign({}, prev, {
+          getComments: [...filteredComments],
         });
       },
     });
   }
 
   useEffect(() => {
-    handleSubscribeToComments();
+    handleSubscribeToCreatedComment();
+    handleSubscribeToDeletedComment();
   }, []);
 
   async function handleSubmitComment(data) {

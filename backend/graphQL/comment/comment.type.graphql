@@ -14,6 +14,7 @@ input CommentInput {
 
 type Subscription {
     commentCreated(idPost: ID!): Comment!
+    deletedComment(idPost: ID!): ID!
 }
 
 type Query {

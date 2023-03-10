@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegCommentDots } from "react-icons/fa";
+import apolloClient from "../config/apollo-client.jsx";
 
 import {
+  DISLIKED_POST_SUB,
   GET_POST_BY_ID,
-  POSTS_SUBSCRIPTION,
+  GET_POSTS,
+  LIKED_POST_SUB,
   TOGGLE_LIKE_POST,
 } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
@@ -15,7 +18,7 @@ import TextEditor from "../components/TextEditor/index.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comments";
 import { useUserContext } from "../context/userContext.jsx";
-import { COMMENT_CREATED } from "../gql/comment.jsx";
+import { CREATED_COMMENT_SUB } from "../gql/comment.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
@@ -31,14 +34,13 @@ function PostDetails() {
     error: errorPost,
   } = useQuery(GET_POST_BY_ID, { variables: { idPost: postId } });
 
-  const [toggleLikePost, { loading: loadingToggleLikePost }] = useMutation(
-    TOGGLE_LIKE_POST,
-    {
-      refetchQueries: [
-        { query: GET_POST_BY_ID, variables: { idPost: postId } },
-      ],
-    }
-  );
+  const [toggleLikePost, { loading: loadingToggleLikePost }] =
+    useMutation(TOGGLE_LIKE_POST);
+
+  const { data: dataLikedPostSub, loading: loadingLikedPostSub } =
+    useSubscription(LIKED_POST_SUB, {
+      variables: { idPost: postId },
+    });
 
   async function handleToggleLikePost() {
     try {
@@ -50,13 +52,12 @@ function PostDetails() {
     }
   }
 
-  function handleSubscribeToCommentCreated() {
+  function subscribeToCreatedComment() {
     subscribeToMore({
-      document: COMMENT_CREATED,
+      document: CREATED_COMMENT_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        console.log(prev);
         return Object.assign({}, prev, {
           getPostById: {
             ...prev.getPostById,
@@ -67,9 +68,64 @@ function PostDetails() {
     });
   }
 
+  function subscribeToLikedPost() {
+    subscribeToMore({
+      document: LIKED_POST_SUB,
+      variables: { idPost: postId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const user = subscriptionData.data.likedPost;
+        return Object.assign({}, prev, {
+          getPostById: {
+            ...prev.getPostById,
+            likes: [...prev.getPostById.likes, user],
+          },
+        });
+      },
+    });
+  }
+
+  function subscribeToDislikedPost() {
+    subscribeToMore({
+      document: DISLIKED_POST_SUB,
+      variables: { idPost: postId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const idUser = subscriptionData.data.dislikedPost;
+        const filteredLikes = prev.getPostById.likes.filter(
+          (like) => like._id !== idUser
+        );
+        return Object.assign({}, prev, {
+          getPostById: {
+            ...prev.getPostById,
+            likes: [...filteredLikes],
+          },
+        });
+      },
+    });
+  }
+
   useEffect(() => {
-    handleSubscribeToCommentCreated();
+    subscribeToCreatedComment();
+    subscribeToLikedPost();
+    subscribeToDislikedPost();
   }, []);
+
+  useEffect(() => {
+    console.log(dataLikedPostSub);
+    if (dataLikedPostSub) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (data) => {
+        const indexPost = data.getPosts.findIndex((p) => p._id === postId);
+        if (indexPost === -1) return { getPosts: [...data.getPosts] };
+        let posts = [...data.getPosts];
+        let post = { ...posts[indexPost] };
+        post.nbrLikes++;
+        posts.splice(indexPost, 1, post);
+        return { getPosts: [...posts] };
+      });
+    }
+  }, [dataLikedPostSub]);
 
   if (loadingPost)
     return (

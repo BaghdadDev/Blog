@@ -56,7 +56,7 @@ export const TOGGLE_LIKE_COMMENT = gql`
   }
 `;
 
-export const COMMENT_CREATED = gql`
+export const CREATED_COMMENT_SUB = gql`
   subscription CommentCreated($idPost: ID!) {
     commentCreated(idPost: $idPost) {
       _id
@@ -85,5 +85,11 @@ export const COMMENT_CREATED = gql`
         }
       }
     }
+  }
+`;
+
+export const DELETED_COMMENT_SUB = gql`
+  subscription DeletedComment($idPost: ID!) {
+    deletedComment(idPost: $idPost)
   }
 `;

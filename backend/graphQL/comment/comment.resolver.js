@@ -92,6 +92,9 @@ const Mutation = {
         { $pull: { comments: idComment } },
         { upsert: true }
       );
+      await pubSub.publish("DELETED_COMMENT", {
+        deletedComment: idComment,
+      });
       return { _id: idComment };
     } catch (errorDeleteComment) {
       console.log(`Something went wrong deleting comment.`, errorDeleteComment);
@@ -139,6 +142,9 @@ const Mutation = {
 const Subscription = {
   commentCreated: {
     subscribe: () => pubSub.asyncIterator(["COMMENT_CREATED"]),
+  },
+  deletedComment: {
+    subscribe: () => pubSub.asyncIterator(["DELETED_COMMENT"]),
   },
 };
 

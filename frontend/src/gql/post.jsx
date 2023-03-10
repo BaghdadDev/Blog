@@ -37,9 +37,7 @@ export const GET_POSTS = gql`
 
 export const DELETE_POST = gql`
   mutation deletePost($idPost: ID!) {
-    deletePost(idPost: $idPost) {
-      _id
-    }
+    deletePost(idPost: $idPost)
   }
 `;
 
@@ -86,7 +84,7 @@ export const TOGGLE_LIKE_POST = gql`
   }
 `;
 
-export const POSTS_SUBSCRIPTION = gql`
+export const CREATED_POST_SUB = gql`
   subscription PostCreated {
     postCreated {
       _id
@@ -110,5 +108,33 @@ export const POSTS_SUBSCRIPTION = gql`
       nbrLikes
       nbrComments
     }
+  }
+`;
+
+export const LIKED_POST_SUB = gql`
+  subscription LikedPost($idPost: ID!) {
+    likedPost(idPost: $idPost) {
+      _id
+      firstName
+      lastName
+      photo {
+        _id
+        filename
+        contentType
+        data
+      }
+    }
+  }
+`;
+
+export const DISLIKED_POST_SUB = gql`
+  subscription DislikedPost($idPost: ID!) {
+    dislikedPost(idPost: $idPost)
+  }
+`;
+
+export const DELETED_POST_SUB = gql`
+  subscription DeletedPost {
+    deletedPost
   }
 `;

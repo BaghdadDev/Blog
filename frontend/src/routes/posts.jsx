@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import ErrorGraphQL from "../components/ErrorGraphQL";
-import { GET_POSTS, POSTS_SUBSCRIPTION } from "../gql/post.jsx";
+import { CREATED_POST_SUB, DELETED_POST_SUB, GET_POSTS } from "../gql/post.jsx";
 import Post from "../components/Post.jsx";
-import { useQuery, useSubscription } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
 
 function Posts() {
@@ -13,24 +13,37 @@ function Posts() {
     loading: loadingGetPosts,
   } = useQuery(GET_POSTS);
 
-  function handleSubscribeToPosts() {
+  function subscribeToCreatedPost() {
     subscribeToMore({
-      document: POSTS_SUBSCRIPTION,
+      document: CREATED_POST_SUB,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newFeedItem = subscriptionData.data.postCreated;
-
+        const newPost = subscriptionData.data.postCreated;
         return Object.assign({}, prev, {
-          getPosts: {
-            comments: [newFeedItem, ...prev.getPosts],
-          },
+          getPosts: [newPost, ...prev.getPosts],
+        });
+      },
+    });
+  }
+  function subscribeToDeletedPost() {
+    subscribeToMore({
+      document: DELETED_POST_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const idDeletedPost = subscriptionData.data.deletedPost;
+        const filteredPosts = prev.getPosts.filter(
+          (post) => post._id !== idDeletedPost
+        );
+        return Object.assign({}, prev, {
+          getPosts: [...filteredPosts],
         });
       },
     });
   }
 
   useEffect(() => {
-    handleSubscribeToPosts();
+    subscribeToCreatedPost();
+    subscribeToDeletedPost();
   }, []);
 
   if (loadingGetPosts) return <SkeletonPosts />;
