@@ -106,7 +106,7 @@ function IndexComments({ idPost }) {
     <div className={"w-full"}>
       <div
         className={
-          "flex w-full items-center gap-x-2 rounded-lg bg-white bg-gray-200 p-2 text-sm"
+          "flex w-full items-center gap-x-2 rounded-lg bg-white bg-gray-200 p-2 text-xs md:text-sm"
         }
       >
         <Avatar {...photoUser} />

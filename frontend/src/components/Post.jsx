@@ -35,7 +35,7 @@ function Post({ post }) {
   return (
     <div
       className={
-        "relative flex w-full flex-col gap-y-1 overflow-hidden rounded bg-white"
+        "relative flex w-full flex-col overflow-hidden rounded bg-white"
       }
     >
       {user._id === post.user._id && (
@@ -56,7 +56,7 @@ function Post({ post }) {
         </div>
       )}
       {errorDeletePost && <ErrorGraphQL errorGraphQL={errorDeletePost} />}
-      <div className={"mt-2 flex items-center gap-x-2 pl-2"}>
+      <div className={"my-1 flex items-center gap-x-2 pl-2"}>
         <Avatar {...post.user.photo} />
         <p className={"font-semibold"}>
           {post.user.firstName.charAt(0).toUpperCase() +
@@ -74,25 +74,18 @@ function Post({ post }) {
       <p className={"pl-2 font-semibold"}>{post.title}</p>
       <p className={"w-full truncate px-2"}>{textToString(post.story)}</p>
       <div
-        className={"mb-2 flex w-full select-none items-center justify-evenly "}
+        className={
+          "flex w-full select-none items-center justify-end gap-x-2 px-2 italic "
+        }
       >
-        <div className={"flex items-center gap-x-2"}>
-          {post.nbrLikes === 0 ? (
-            <>
-              <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
-              <span>0</span>
-            </>
-          ) : (
-            <>
-              <AiFillHeart className={"h-6 w-6 text-red-800"} />
-              <span>{post.nbrLikes}</span>
-            </>
-          )}
-        </div>
-        <div className={"flex items-center gap-x-2"}>
-          <FaRegCommentDots className={"h-6 w-6 text-gray-800"} />
+        <p className={"flex items-center gap-x-1"}>
+          <span>{post.nbrLikes}</span>
+          <span>Likes</span>
+        </p>
+        <p className={"flex items-center gap-x-1"}>
           <span>{post.nbrComments}</span>
-        </div>
+          <span>Comments</span>
+        </p>
       </div>
     </div>
   );
