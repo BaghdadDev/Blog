@@ -1,34 +1,31 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 
 import useOutsideClick from "../Hook/useOutsideClick.jsx";
-import { DELETE_COMMENT } from "../../gql/comment.jsx";
-import { GET_POST_BY_ID } from "../../gql/post.jsx";
-import OvalLoader from "../OvalLoader.jsx";
+import { DELETE_POST } from "../../gql/post.jsx";
+import { useNavigate } from "react-router-dom";
+import PATH from "../../utils/route-path.jsx";
 
-function OptionsComment({ idComment, idPost }) {
+function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const ref = useOutsideClick(() => setOpen(false));
 
-  const [deleteComment, { loading: loadingDeleteComment }] = useMutation(
-    DELETE_COMMENT,
-    {
-      refetchQueries: [
-        { query: GET_POST_BY_ID, variables: { idPost: idPost } },
-      ],
-    }
-  );
+  const [deletePost] = useMutation(DELETE_POST);
 
-  async function handleDeleteComment() {
+  async function handleDeletePost() {
+    setLoadingDeletingPost(true);
     try {
-      await deleteComment({ variables: { idComment: idComment } });
-    } catch (errorDeleteComment) {
-      console.log(errorDeleteComment);
+      await deletePost({ variables: { idPost: idPost } });
+      navigate(PATH.ROOT);
+    } catch (errorDeletePost) {
+      console.log(errorDeletePost);
     }
     setOpen((prev) => !prev);
+    setLoadingDeletingPost(false);
   }
 
   return (
@@ -36,18 +33,14 @@ function OptionsComment({ idComment, idPost }) {
       ref={ref}
       className={"relative flex flex-col items-center justify-center"}
     >
-      {loadingDeleteComment ? (
-        <OvalLoader />
-      ) : (
-        <SlOptions
-          className={
-            "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
-          }
-          onClick={(e) => {
-            setOpen((prev) => !prev);
-          }}
-        />
-      )}
+      <SlOptions
+        className={
+          "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
+        }
+        onClick={(e) => {
+          setOpen((prev) => !prev);
+        }}
+      />
 
       {open && (
         <div
@@ -67,7 +60,7 @@ function OptionsComment({ idComment, idPost }) {
             className={
               "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
             }
-            onClick={handleDeleteComment}
+            onClick={handleDeletePost}
           >
             <AiFillDelete className={"h-4 w-4 text-red-800"} />
             <span>Delete</span>
@@ -78,4 +71,4 @@ function OptionsComment({ idComment, idPost }) {
   );
 }
 
-export default OptionsComment;
+export default OptionsPostDetails;

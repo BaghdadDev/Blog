@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import { CREATED_POST_SUB, DELETED_POST_SUB, GET_POSTS } from "../gql/post.jsx";
-import Post from "../components/Post.jsx";
+import Post from "../components/post/Post.jsx";
 import { useQuery } from "@apollo/client";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
 
@@ -31,6 +31,7 @@ function Posts() {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const idDeletedPost = subscriptionData.data.deletedPost;
+        console.log("ID deleted post :", idDeletedPost);
         const filteredPosts = prev.getPosts.filter(
           (post) => post._id !== idDeletedPost
         );

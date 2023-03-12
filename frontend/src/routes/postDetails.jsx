@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import apolloClient from "../config/apollo-client.jsx";
@@ -18,13 +18,15 @@ import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx"
 import Comments from "../components/Comments";
 import { useUserContext } from "../context/userContext.jsx";
 import { CREATED_COMMENT_SUB } from "../gql/comment.jsx";
+import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
+import OvalLoader from "../components/OvalLoader.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
 
-  const {
-    user: { _id: idUser },
-  } = useUserContext();
+  const { user } = useUserContext();
+
+  const [loadingDeletingPost, setLoadingDeletingPost] = useState(false);
 
   const {
     subscribeToMore,
@@ -39,7 +41,7 @@ function PostDetails() {
   async function handleToggleLikePost() {
     try {
       await toggleLikePost({
-        variables: { idPost: postId, idUser: idUser },
+        variables: { idPost: postId, idUser: user._id },
       });
     } catch (errorToggleLikePost) {
       console.log(errorToggleLikePost);
@@ -143,7 +145,20 @@ function PostDetails() {
   const post = dataPost.getPostById;
 
   return (
-    <div className={"my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2"}>
+    <div
+      className={
+        "relative my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2"
+      }
+    >
+      {loadingDeletingPost ? (
+        <div
+          className={
+            "absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center bg-gray-400 bg-opacity-50"
+          }
+        >
+          <OvalLoader size={40} />
+        </div>
+      ) : undefined}
       <div className={"relative flex items-center gap-x-2"}>
         <Avatar {...post.user.photo} />
         <p className={"font-semibold"}>
@@ -151,22 +166,31 @@ function PostDetails() {
             post.user.firstName.substring(1)}{" "}
           {post.user.lastName.toUpperCase()}
         </p>
-        <div
-          className={`absolute right-2 flex items-center gap-x-2 rounded-lg bg-white py-1 px-2 text-sm hover:cursor-pointer hover:bg-gray-100 ${
-            loadingToggleLikePost
-              ? "pointer-events-none"
-              : "pointer-events-auto"
-          }`}
-          onClick={handleToggleLikePost}
-        >
-          {post.likes.findIndex(({ _id: userId }) => userId === idUser) ===
-          -1 ? (
-            <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
-          ) : (
-            <AiFillHeart className={"h-6 w-6 text-red-800"} />
-          )}
+        <div className={"absolute right-2 flex items-center gap-x-2"}>
+          <div
+            className={`rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 ${
+              loadingToggleLikePost
+                ? "pointer-events-none"
+                : "pointer-events-auto"
+            }`}
+            onClick={handleToggleLikePost}
+          >
+            {post.likes.findIndex(({ _id: userId }) => userId === user._id) ===
+            -1 ? (
+              <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
+            ) : (
+              <AiFillHeart className={"h-6 w-6 text-red-800"} />
+            )}
+          </div>
+          {user._id === post.user._id ? (
+            <OptionsPostDetails
+              idPost={postId}
+              setLoadingDeletingPost={setLoadingDeletingPost}
+            />
+          ) : undefined}
         </div>
       </div>
+
       <p className={"text-center text-2xl font-semibold"}>{post.title}</p>
       <img
         src={`data:${post.picture.contentType};base64,${post.picture.data}`}

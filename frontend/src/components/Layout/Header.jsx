@@ -14,7 +14,7 @@ function Header() {
   return (
     <header
       className={
-        "sticky top-0 left-0 z-10 flex h-16 w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
+        "sticky top-0 left-0 z-20 flex h-16 w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
       }
     >
       <Link to={PATH.ROOT}>Blog Logo</Link>

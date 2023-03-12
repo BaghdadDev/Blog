@@ -1,5 +1,6 @@
 const { RedisPubSub } = require("graphql-redis-subscriptions");
 const Redis = require("ioredis");
+const { PubSub } = require("graphql-subscriptions");
 
 /*
  - For production environment we need to use Redis :
@@ -24,7 +25,9 @@ const options = {
   },
 };
 
-module.exports = new RedisPubSub({
-  publisher: new Redis(options),
-  subscriber: new Redis(options),
-});
+// module.exports = new RedisPubSub({
+//   publisher: new Redis(options),
+//   subscriber: new Redis(options),
+// });
+
+module.exports = new PubSub();
