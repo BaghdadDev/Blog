@@ -9,6 +9,11 @@ type User {
     token: Token!
 }
 
+type UserToggledLike {
+    id: ID!
+    idUser: ID!
+}
+
 input UserInput {
     username: String!
     password: String!

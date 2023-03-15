@@ -18,16 +18,7 @@ export const GET_COMMENTS = gql`
           data
         }
       }
-      likes {
-        _id
-        firstName
-        lastName
-        photo {
-          filename
-          contentType
-          data
-        }
-      }
+      likes
     }
   }
 `;
@@ -35,6 +26,14 @@ export const GET_COMMENTS = gql`
 export const CREATE_COMMENT = gql`
   mutation createComment($commentInput: CommentInput!) {
     createComment(commentInput: $commentInput) {
+      _id
+    }
+  }
+`;
+
+export const UPDATE_COMMENT = gql`
+  mutation UpdateComment($idComment: ID!, $commentInput: CommentInput!) {
+    updateComment(idComment: $idComment, commentInput: $commentInput) {
       _id
     }
   }
@@ -57,8 +56,47 @@ export const TOGGLE_LIKE_COMMENT = gql`
 `;
 
 export const CREATED_COMMENT_SUB = gql`
-  subscription CommentCreated($idPost: ID!) {
-    commentCreated(idPost: $idPost) {
+  subscription CreatedComment($idPost: ID!) {
+    createdComment(idPost: $idPost) {
+      _id
+      comment
+      post {
+        _id
+      }
+      user {
+        _id
+        firstName
+        lastName
+        photo {
+          _id
+          filename
+          contentType
+          data
+        }
+      }
+      likes
+    }
+  }
+`;
+
+export const DELETED_COMMENT_SUB = gql`
+  subscription DeletedComment($idPost: ID!) {
+    deletedComment(idPost: $idPost)
+  }
+`;
+
+export const TOGGLED_LIKE_COMMENT_SUB = gql`
+  subscription ToggledLikeComment($idComment: ID!) {
+    toggledLikeComment(idComment: $idComment) {
+      id
+      idUser
+    }
+  }
+`;
+
+export const UPDATED_COMMENT_SUB = gql`
+  subscription UpdatedComment($idComment: ID!) {
+    updatedComment(idComment: $idComment) {
       _id
       comment
       post {
@@ -74,22 +112,7 @@ export const CREATED_COMMENT_SUB = gql`
           data
         }
       }
-      likes {
-        _id
-        firstName
-        lastName
-        photo {
-          filename
-          contentType
-          data
-        }
-      }
+      likes
     }
-  }
-`;
-
-export const DELETED_COMMENT_SUB = gql`
-  subscription DeletedComment($idPost: ID!) {
-    deletedComment(idPost: $idPost)
   }
 `;

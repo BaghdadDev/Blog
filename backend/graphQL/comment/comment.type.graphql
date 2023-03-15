@@ -3,18 +3,20 @@ type Comment {
     user: User!
     post: Post!
     comment: String!
-    likes: [User!]!
+    likes: [ID!]!
 }
 
 input CommentInput {
-    user: ID!
-    post: ID!
-    comment: String!
+    user: ID
+    post: ID
+    comment: String
 }
 
 type Subscription {
-    commentCreated(idPost: ID!): Comment!
+    createdComment(idPost: ID!): Comment!
+    updatedComment(idComment: ID!): Comment!
     deletedComment(idPost: ID!): ID!
+    toggledLikeComment(idComment: ID!): UserToggledLike!
 }
 
 type Query {

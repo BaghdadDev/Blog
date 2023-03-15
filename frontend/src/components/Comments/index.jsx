@@ -43,7 +43,7 @@ function IndexComments({ idPost }) {
       variables: { idPost: idPost },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const createdComment = subscriptionData.data.commentCreated;
+        const createdComment = subscriptionData.data.createdComment;
         const copyPrev = prev?.getComments ? prev.getComments : [];
         return Object.assign({}, prev, {
           getComments: [createdComment, ...copyPrev],
@@ -103,10 +103,10 @@ function IndexComments({ idPost }) {
   const comments = dataGetComments?.getComments;
 
   return (
-    <div className={"w-full"}>
+    <div className={"flex w-full flex-col items-center justify-center"}>
       <div
         className={
-          "flex w-full items-center gap-x-2 rounded-lg bg-white bg-gray-200 p-2 text-xs md:text-sm"
+          "mb-4 flex w-full items-center gap-x-2 rounded-lg bg-white bg-gray-200 text-xs md:text-sm"
         }
       >
         <Avatar {...photoUser} />
@@ -126,9 +126,13 @@ function IndexComments({ idPost }) {
           </button>
         </form>
       </div>
-      <div className={"w-full"}>
+      <div className={"w-full pb-10 md:w-3/4"}>
         {comments?.map((comment) => (
-          <Comment key={comment._id} comment={comment} />
+          <Comment
+            key={comment._id}
+            comment={comment}
+            subscribeToMore={subscribeToMore}
+          />
         ))}
       </div>
     </div>

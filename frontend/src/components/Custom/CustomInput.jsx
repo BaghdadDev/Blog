@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 
 CustomInput.defaultProps = {
   type: "text",
+  defaultValue: "",
   rules: {
     required: false,
   },
@@ -13,6 +14,7 @@ CustomInput.propTypes = {
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.oneOf(["text", "multiline", "password"]),
+  defaultValue: PropTypes.string,
   rules: PropTypes.object,
   register: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired,
@@ -23,6 +25,7 @@ function CustomInput({
   name,
   placeholder,
   type,
+  defaultValue,
   register,
   rules,
   errors,
@@ -36,12 +39,15 @@ function CustomInput({
           placeholder={placeholder}
           {...register(name, rules)}
           className={"input-form"}
-        ></textarea>
+        >
+          {defaultValue}
+        </textarea>
       ) : (
         <input
           type={type}
           placeholder={placeholder}
           name={name}
+          defaultValue={defaultValue}
           {...register(name, rules)}
           className={"input-form"}
         />

@@ -8,7 +8,7 @@ import { DELETE_COMMENT } from "../../gql/comment.jsx";
 import { GET_POST_BY_ID } from "../../gql/post.jsx";
 import OvalLoader from "../OvalLoader.jsx";
 
-function OptionsComment({ idComment, idPost }) {
+function OptionsComment({ idComment, idPost, setReadyOnly }) {
   const [open, setOpen] = useState(false);
 
   const ref = useOutsideClick(() => setOpen(false));
@@ -59,6 +59,7 @@ function OptionsComment({ idComment, idPost }) {
             className={
               "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
             }
+            onClick={() => setReadyOnly(false)}
           >
             <AiFillEdit className={"h-4 w-4 text-blue-800"} />
             <span>Edit</span>

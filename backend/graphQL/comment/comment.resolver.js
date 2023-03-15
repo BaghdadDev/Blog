@@ -15,11 +15,6 @@ const Query = {
           populate: { path: "photo" },
         })
         .populate({ path: "post", select: "_id" })
-        .populate({
-          path: "likes",
-          select: "_id firstName lastName photo",
-          populate: { path: "photo" },
-        })
         .sort({ createdAt: -1 });
       if (!comments || comments.length === 0) {
         return new GraphQLError("There are no comments for this post", {
@@ -59,11 +54,10 @@ const Mutation = {
           path: "user",
           populate: { path: "photo" },
         })
-        .populate({ path: "likes", populate: { path: "photo" } })
         .populate({ path: "post", select: "_id" });
       // Return the new comment for subscription
-      await pubSub.publish("COMMENT_CREATED", {
-        commentCreated: commentCreated,
+      await pubSub.publish("CREATED_COMMENT", {
+        createdComment: commentCreated,
       });
       return commentCreated;
     } catch (errorCreateComment) {
@@ -117,15 +111,18 @@ const Mutation = {
         commentUpdated = await CommentModel.findOneAndUpdate(
           { _id: idComment },
           { $pull: { likes: idUser } },
-          { upsert: true }
+          { new: true }
         );
       } else {
         commentUpdated = await CommentModel.findOneAndUpdate(
           { _id: idComment },
           { $push: { likes: idUser } },
-          { upsert: true }
+          { new: true }
         );
       }
+      await pubSub.publish("TOGGLED_LIKE_COMMENT", {
+        toggledLikeComment: { idUser: idUser, id: commentUpdated._id },
+      });
       return commentUpdated;
     } catch (errorToggleLikeComment) {
       console.log(
@@ -137,14 +134,47 @@ const Mutation = {
       });
     }
   },
+  updateComment: async (_, { idComment, commentInput }) => {
+    console.log("resolver: updatedComment");
+    try {
+      const ifExists = await CommentModel.findById(idComment);
+      if (!ifExists) {
+        return new GraphQLError("There is no comment with id " + idComment, {
+          extensions: { code: "NOT-FOUND" },
+        });
+      }
+      const commentUpdated = await CommentModel.findByIdAndUpdate(
+        { _id: idComment },
+        { ...commentInput },
+        { new: true }
+      )
+        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({ path: "post", select: "_id" });
+      await pubSub.publish("UPDATED_COMMENT", {
+        updatedComment: { ...commentUpdated._doc },
+      });
+      return { ...commentUpdated._doc };
+    } catch (errorUpdateComment) {
+      console.log(`Something went wrong Updating Comment.`, errorUpdateComment);
+      return new GraphQLError(`Something went wrong Updating Comment.`, {
+        extensions: { code: "ERROR-SERVER" },
+      });
+    }
+  },
 };
 
 const Subscription = {
-  commentCreated: {
-    subscribe: () => pubSub.asyncIterator(["COMMENT_CREATED"]),
+  createdComment: {
+    subscribe: () => pubSub.asyncIterator(["CREATED_COMMENT"]),
+  },
+  updatedComment: {
+    subscribe: () => pubSub.asyncIterator(["UPDATED_COMMENT"]),
   },
   deletedComment: {
     subscribe: () => pubSub.asyncIterator(["DELETED_COMMENT"]),
+  },
+  toggledLikeComment: {
+    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_COMMENT"]),
   },
 };
 
