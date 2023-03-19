@@ -55,8 +55,8 @@ function TextEditor({ placeholder, error, initValue, readOnly }) {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
   const initialValue = (initValue && deserialize(initValue)) ||
-    (localStorage.getItem("draft") &&
-      deserialize(localStorage.getItem("draft"))) || [
+    localStorage.getItem("draft") ||
+    deserialize(localStorage.getItem("draft")) || [
       {
         type: "paragraph",
         children: [{ text: "" }],
@@ -131,6 +131,7 @@ const serialize = (value) => {
 };
 
 const deserialize = (string) => {
+  // localStorage.setItem("draft", string);
   return JSON.parse(string);
 };
 

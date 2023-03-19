@@ -5,7 +5,7 @@ import { SlOptions } from "react-icons/sl";
 
 import useOutsideClick from "../Hook/useOutsideClick.jsx";
 import { DELETE_POST } from "../../gql/post.jsx";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PATH from "../../utils/route-path.jsx";
 
 function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
@@ -48,17 +48,26 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
             "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-white text-sm italic shadow-xl"
           }
         >
-          <p
-            className={
-              "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
+          <Link
+            to={
+              PATH.EDIT_POST.split(":postId")[0] +
+              idPost +
+              PATH.EDIT_POST.split(":postId")[1]
             }
           >
-            <AiFillEdit className={"h-4 w-4 text-blue-800"} />
-            <span>Edit</span>
-          </p>
+            <p
+              className={
+                "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
+              }
+            >
+              <AiFillEdit className={"h-4 w-4 text-blue-800"} />
+              <span>Edit</span>
+            </p>
+          </Link>
+
           <p
             className={
-              "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
+              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
             }
             onClick={handleDeletePost}
           >

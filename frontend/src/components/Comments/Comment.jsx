@@ -87,10 +87,12 @@ function Comment({ comment, subscribeToMore }) {
 
   return (
     <div
-      className={"relative flex w-full flex-col items-center justify-center"}
+      className={
+        "mb-2 flex w-full flex-col items-center justify-center rounded-lg bg-gray-200 p-1 shadow"
+      }
     >
       <div className={"flex w-full items-center gap-x-2"}>
-        <Avatar {...comment.user.photo} />
+        <Avatar {...comment.user.photo} size={30} />
         <CommentInput
           idComment={comment._id}
           text={comment.comment}
@@ -98,28 +100,33 @@ function Comment({ comment, subscribeToMore }) {
           setReadOnly={setReadOnly}
         />
         {readOnly ? (
-          <OptionsComment
-            idComment={comment._id}
-            idPost={comment.post._id}
-            setReadyOnly={setReadOnly}
-          />
+          <>
+            <OptionsComment
+              idComment={comment._id}
+              idPost={comment.post._id}
+              setReadyOnly={setReadOnly}
+            />
+            <div className={"flex items-center gap-x-1"}>
+              <div
+                className={
+                  "rounded-full p-1 hover:cursor-pointer hover:bg-gray-100"
+                }
+                onClick={handleToggleLikeComment}
+              >
+                {comment.likes.findIndex((userId) => userId === user._id) ===
+                -1 ? (
+                  <AiOutlineHeart className={"h-4 w-4 text-red-800"} />
+                ) : (
+                  <AiFillHeart className={"h-4 w-4 text-red-800"} />
+                )}
+              </div>
+              <span className={"text-xs md:text-sm"}>
+                {comment.likes.length}
+              </span>
+            </div>
+          </>
         ) : undefined}
       </div>
-      {readOnly ? (
-        <div className={"flex items-center gap-x-1"}>
-          <div
-            className={"rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100"}
-            onClick={handleToggleLikeComment}
-          >
-            {comment.likes.findIndex((userId) => userId === user._id) === -1 ? (
-              <AiOutlineHeart className={"h-4 w-4 text-red-800"} />
-            ) : (
-              <AiFillHeart className={"h-4 w-4 text-red-800"} />
-            )}
-          </div>
-          <span className={"text-xs md:text-sm"}>{comment.likes.length}</span>
-        </div>
-      ) : undefined}
     </div>
   );
 }

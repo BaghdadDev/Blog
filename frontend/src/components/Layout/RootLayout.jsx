@@ -12,7 +12,7 @@ export default function RootLayout() {
     >
       <Header />
       <div
-        className={`flex w-full grow flex-col items-center justify-center bg-gray-200 ${
+        className={`flex w-full grow flex-col items-center justify-center bg-gradient-to-t from-gray-200 to-gray-100 ${
           navigation.state === "loading" &&
           "opacity-25 transition-opacity delay-200 duration-200"
         }`}

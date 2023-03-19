@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, NavLink } from "react-router-dom";
+import { AiOutlineSearch } from "react-icons/ai";
 import { FaSignInAlt, FaPenFancy } from "react-icons/fa";
 
 import PATH from "../../utils/route-path.jsx";
@@ -11,22 +12,26 @@ function Header() {
   const { user } = useUserContext();
 
   const location = useLocation();
+
   return (
     <header
       className={
-        "sticky top-0 left-0 z-20 flex h-16 w-full items-center justify-between bg-white px-2 py-4 shadow-lg"
+        "sticky top-0 left-0 z-20 flex h-16 w-full items-center justify-between bg-white px-2 py-4 text-sm shadow-lg"
       }
     >
       <Link to={PATH.ROOT}>Blog Logo</Link>
       <form
         className={
-          "absolute left-1/2 w-52 -translate-x-1/2 rounded-lg bg-gray-200 p-2"
+          "absolute left-1/2 flex w-1/3 -translate-x-1/2 items-center rounded-lg bg-gray-200 p-2"
         }
       >
+        <AiOutlineSearch className={"mr-2 h-4 w-4"} />
         <input
           type={"text"}
           placeholder={"Search post..."}
-          className={"h-full w-full bg-transparent outline-none"}
+          className={
+            "h-full w-full bg-transparent outline-none placeholder:italic"
+          }
         />
       </form>
       {!user ? (
@@ -37,15 +42,13 @@ function Header() {
               <CustomButton label={"Sign In"} Icon={FaSignInAlt} />
             </Link>
           </div>
-        ) : (
-          ""
-        )
+        ) : undefined
       ) : (
         <div className={"flex items-center"}>
           <NavLink
             to={PATH.NEW_POST}
             className={({ isActive }) =>
-              isActive ? "rounded bg-gray-200 px-2" : ""
+              isActive ? "pointer-events-none rounded bg-gray-200" : ""
             }
           >
             <CustomButton
@@ -59,7 +62,7 @@ function Header() {
               "ml-4 flex items-center gap-x-2 border-l-2 border-gray-600 pl-4"
             }
           >
-            <p className={"font-semibold"}>
+            <p className={"hidden font-semibold lg:flex"}>
               {user.firstName.charAt(0).toUpperCase() +
                 user.firstName.substring(1)}{" "}
               {user.lastName.toUpperCase()}

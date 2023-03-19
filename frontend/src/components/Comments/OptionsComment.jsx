@@ -57,7 +57,7 @@ function OptionsComment({ idComment, idPost, setReadyOnly }) {
         >
           <p
             className={
-              "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
+              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
             }
             onClick={() => setReadyOnly(false)}
           >
@@ -66,7 +66,7 @@ function OptionsComment({ idComment, idPost, setReadyOnly }) {
           </p>
           <p
             className={
-              "flex items-center gap-x-1 p-1 hover:cursor-pointer hover:bg-gray-100"
+              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
             }
             onClick={handleDeleteComment}
           >

@@ -103,15 +103,15 @@ function IndexComments({ idPost }) {
   const comments = dataGetComments?.getComments;
 
   return (
-    <div className={"flex w-full flex-col items-center justify-center"}>
-      <div
-        className={
-          "mb-4 flex w-full items-center gap-x-2 rounded-lg bg-white bg-gray-200 text-xs md:text-sm"
-        }
-      >
+    <div
+      className={
+        "mb-16 flex w-full flex-col items-center justify-center px-2 text-xs md:text-sm"
+      }
+    >
+      <div className={"mb-4 flex w-full items-center gap-x-2"}>
         <Avatar {...photoUser} />
         <form
-          className={"flex grow items-center"}
+          className={"flex grow items-center rounded-lg bg-gray-100 shadow-lg"}
           onSubmit={handleSubmit(handleSubmitComment)}
         >
           <CustomInput
@@ -119,14 +119,14 @@ function IndexComments({ idPost }) {
             errors={errors}
             register={register}
             placeholder={"Write your comment here !"}
-            className={""}
+            className={"!bg-transparent"}
           />
           <button type={"submit"} className={"hidden"}>
             <BiSend className={"h-6 w-6 text-blue-800"} />
           </button>
         </form>
       </div>
-      <div className={"w-full pb-10 md:w-3/4"}>
+      <div className={"w-3/4"}>
         {comments?.map((comment) => (
           <Comment
             key={comment._id}

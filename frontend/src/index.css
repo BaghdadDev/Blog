@@ -26,7 +26,7 @@
   }
 
   .input-form {
-    @apply w-full rounded bg-white p-2 text-center outline-none;
+    @apply w-full rounded bg-white p-2 text-center outline-none placeholder:italic;
   }
 
   .btn-form {

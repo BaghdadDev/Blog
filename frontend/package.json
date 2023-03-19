@@ -16,6 +16,7 @@
     "graphql-upload": "13",
     "graphql-ws": "^5.11.3",
     "is-hotkey": "^0.2.0",
+    "node-base64-to-file": "^1.0.4",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

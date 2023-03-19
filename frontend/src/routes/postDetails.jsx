@@ -159,14 +159,16 @@ function PostDetails() {
           <OvalLoader size={40} />
         </div>
       ) : undefined}
-      <div className={"relative flex items-center gap-x-2"}>
-        <Avatar {...post.user.photo} />
-        <p className={"font-semibold"}>
-          {post.user.firstName.charAt(0).toUpperCase() +
-            post.user.firstName.substring(1)}{" "}
-          {post.user.lastName.toUpperCase()}
-        </p>
-        <div className={"absolute right-2 flex items-center gap-x-2"}>
+      <div className={"flex w-full items-center justify-between px-2"}>
+        <div className={"flex items-center gap-x-2"}>
+          <Avatar {...post.user.photo} />
+          <p className={"font-semibold"}>
+            {post.user.firstName.charAt(0).toUpperCase() +
+              post.user.firstName.substring(1)}{" "}
+            {post.user.lastName.toUpperCase()}
+          </p>
+        </div>
+        <div className={"flex items-center gap-x-2"}>
           <div
             className={`rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 ${
               loadingToggleLikePost
@@ -197,7 +199,10 @@ function PostDetails() {
         alt={post.picture.filename}
         className={"rounded"}
       />
-      <div className={"flex items-center gap-x-2 self-end italic"}>
+      <div className={"mx-2 shadow"}>
+        <TextEditor readOnly={true} initValue={post.story} />
+      </div>
+      <div className={"mx-2 flex items-center gap-x-2 self-end text-sm italic"}>
         <p className={"flex items-center gap-x-1"}>
           <span>{post.likes.length}</span>
           <span>Likes</span>
@@ -207,7 +212,11 @@ function PostDetails() {
           <span>Comments</span>
         </p>
       </div>
-      <TextEditor readOnly={true} initValue={post.story} />
+      <div className={"mt-2 mb-4 flex items-center gap-x-4 self-center"}>
+        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
+        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
+        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
+      </div>
       <Comments idPost={post._id} />
     </div>
   );

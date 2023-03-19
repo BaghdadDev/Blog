@@ -32,13 +32,13 @@ function CustomInput({
   className,
 }) {
   return (
-    <div className={`relative flex w-full flex-col items-center ${className}`}>
+    <div className={`relative flex w-full flex-col items-center`}>
       {type === "multiline" ? (
         <textarea
           name={name}
           placeholder={placeholder}
           {...register(name, rules)}
-          className={"input-form"}
+          className={`input-form ${className}`}
         >
           {defaultValue}
         </textarea>
@@ -49,7 +49,7 @@ function CustomInput({
           name={name}
           defaultValue={defaultValue}
           {...register(name, rules)}
-          className={"input-form"}
+          className={`input-form ${className}`}
         />
       )}
       <ErrorMessage

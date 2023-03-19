@@ -119,7 +119,7 @@ const Mutation = {
       console.log("Resolver: updatePost");
       const ifExists = await PostModel.findById(idPost);
       if (!ifExists)
-        return new GraphQLError("There no post with this id: " + idPost, {
+        return new GraphQLError("There is no post with id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
       if (!ifExists.user.equals(idUser))
@@ -129,7 +129,7 @@ const Mutation = {
       const { _doc: post } = await PostModel.findOneAndUpdate(
         { _id: idPost },
         { ...postInput },
-        { upsert: true }
+        { new: true }
       );
       return { ...post };
     } catch (errorUpdatePost) {

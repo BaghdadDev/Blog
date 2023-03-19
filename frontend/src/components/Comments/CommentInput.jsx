@@ -31,7 +31,7 @@ function CommentInput({ readyOnly, setReadOnly, idComment, text }) {
   }
 
   if (readyOnly) {
-    return <p className={"grow rounded bg-gray-100 p-1"}>{text}</p>;
+    return <p className={"grow rounded p-1"}>{text}</p>;
   }
   return (
     <form

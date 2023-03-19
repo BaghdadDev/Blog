@@ -20,12 +20,9 @@ function NewPost() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-  const refEditor = useRef(undefined);
   const [errorStory, setErrorStory] = useState("");
 
-  const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST, {
-    refetchQueries: [{ query: GET_POSTS }],
-  });
+  const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST);
 
   function getStoryField() {
     setErrorStory("");

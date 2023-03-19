@@ -78,6 +78,43 @@ export const GET_POST_BY_ID = gql`
   }
 `;
 
+export const UPDATE_POST = gql`
+  mutation UpdatePost($idPost: ID!, $postInput: PostInput!) {
+    updatePost(idPost: $idPost, postInput: $postInput) {
+      _id
+      title
+      story
+      user {
+        _id
+        firstName
+        lastName
+        photo {
+          filename
+          contentType
+          data
+        }
+      }
+      picture {
+        filename
+        contentType
+        data
+      }
+      likes {
+        _id
+        lastName
+        firstName
+        photo {
+          _id
+          filename
+          contentType
+          data
+        }
+      }
+      nbrComments
+    }
+  }
+`;
+
 export const TOGGLE_LIKE_POST = gql`
   mutation toggleLikePost($idPost: ID!, $idUser: ID!) {
     toggleLikePost(idPost: $idPost, idUser: $idUser)

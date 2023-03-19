@@ -5,16 +5,16 @@ type Post {
     user: User!
     picture: File!
     likes: [User!]!
-    nbrLikes: Int!
     comments: [Comment!]!
+    nbrLikes: Int!
     nbrComments: Int!
 }
 
 input PostInput {
-    title: String!
-    story: String!
-    user: ID!
-    picture: Upload!
+    title: String
+    story: String
+    user: ID
+    picture: Upload
 }
 
 type Subscription {
