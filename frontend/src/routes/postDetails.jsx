@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import apolloClient from "../config/apollo-client.jsx";
+import { RxUpdate } from "react-icons/rx";
 
 import {
-  DISLIKED_POST_SUB,
   GET_POST_BY_ID,
-  GET_POSTS,
-  LIKED_POST_SUB,
   TOGGLE_LIKE_POST,
+  TOGGLED_LIKE_POST_SUB,
+  UPDATE_POST_PICTURE,
+  UPDATED_POST_PICTURE_SUB,
 } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
@@ -38,6 +38,9 @@ function PostDetails() {
   const [toggleLikePost, { loading: loadingToggleLikePost }] =
     useMutation(TOGGLE_LIKE_POST);
 
+  const [updatePostPicture, { loading: loadingPostPicture }] =
+    useMutation(UPDATE_POST_PICTURE);
+
   async function handleToggleLikePost() {
     try {
       await toggleLikePost({
@@ -48,79 +51,79 @@ function PostDetails() {
     }
   }
 
+  async function handleUpdatePostPicture(e) {
+    const file = e.target.files[0];
+    console.log(file);
+    try {
+      const res = await updatePostPicture({
+        variables: { idPost: postId, picture: file },
+      });
+      console.log(res);
+    } catch (errorUpdatePostPicture) {
+      console.log(errorUpdatePostPicture);
+    }
+  }
+
   function subscribeToCreatedComment() {
     subscribeToMore({
       document: CREATED_COMMENT_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
+        const createdComment = subscriptionData.data.createdComment;
+        console.log(createdComment);
         return Object.assign({}, prev, {
           getPostById: {
             ...prev.getPostById,
-            nbrComments: prev.getPostById.nbrComments + 1,
+            comments: [
+              { _id: createdComment._id },
+              ...prev.getPostById.comments,
+            ],
           },
         });
       },
     });
   }
 
-  function subscribeToLikedPost() {
+  function subscribeToUpdatedPostPicture() {
     subscribeToMore({
-      document: LIKED_POST_SUB,
+      document: UPDATED_POST_PICTURE_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const { getPosts: posts } = apolloClient.readQuery({
-          query: GET_POSTS,
-        });
-        const postLiked = posts.find((post) => post._id === postId);
-        const newNbrLikes = postLiked.nbrLikes + 1;
-        const copyPosts = [...posts];
-        copyPosts.splice(
-          posts.findIndex((post) => post._id === postId),
-          1,
-          { ...postLiked, nbrLikes: newNbrLikes }
-        );
-        apolloClient.writeQuery({
-          query: GET_POSTS,
-          data: {
-            getPosts: [...copyPosts],
-          },
-        });
-        const user = subscriptionData.data.likedPost;
+        const newPostPicture = subscriptionData.data.updatedPostPicture;
         return Object.assign({}, prev, {
           getPostById: {
             ...prev.getPostById,
-            likes: [...prev.getPostById.likes, user],
+            picture: newPostPicture,
           },
         });
       },
     });
   }
 
-  function subscribeToDislikedPost() {
+  function subscribeToToggledLikePost() {
     subscribeToMore({
-      document: DISLIKED_POST_SUB,
+      document: TOGGLED_LIKE_POST_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        apolloClient.cache.updateQuery({ query: GET_POSTS }, (data) => {
-          const indexPost = data.getPosts.findIndex((p) => p._id === postId);
-          if (indexPost === -1) return { getPosts: [...data.getPosts] };
-          let posts = [...data.getPosts];
-          let post = { ...posts[indexPost] };
-          post.nbrLikes--;
-          posts.splice(indexPost, 1, post);
-          return { getPosts: [...posts] };
-        });
-        const idUser = subscriptionData.data.dislikedPost;
-        const filteredLikes = prev.getPostById.likes.filter(
-          (like) => like._id !== idUser
-        );
+        const { _id: idUserToggledLike } =
+          subscriptionData.data.toggledLikePost;
+        const copyPost = { ...prev.getPostById };
+        const copyLikes = [...copyPost.likes];
+        if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
+          copyLikes.splice(
+            copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
+            1
+          );
+        } else {
+          copyLikes.push({ _id: idUserToggledLike });
+        }
         return Object.assign({}, prev, {
           getPostById: {
             ...prev.getPostById,
-            likes: [...filteredLikes],
+            likes: copyLikes,
           },
         });
       },
@@ -128,9 +131,9 @@ function PostDetails() {
   }
 
   useEffect(() => {
-    subscribeToCreatedComment();
-    subscribeToLikedPost();
-    subscribeToDislikedPost();
+    // subscribeToCreatedComment();
+    subscribeToUpdatedPostPicture();
+    subscribeToToggledLikePost();
   }, []);
 
   if (loadingPost)
@@ -192,13 +195,38 @@ function PostDetails() {
           ) : undefined}
         </div>
       </div>
+      <div className={"relative w-full overflow-hidden"}>
+        {loadingPostPicture ? (
+          <div
+            className={
+              "absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center bg-black opacity-50"
+            }
+          >
+            <OvalLoader />
+          </div>
+        ) : undefined}
+        {user._id === post.user._id ? (
+          <label>
+            <RxUpdate
+              className={
+                "absolute top-2 right-2 h-4 w-4 rounded-full transition-all hover:cursor-pointer md:h-7 md:w-7 md:bg-gray-50 md:bg-opacity-50 md:p-1 hover:md:bg-opacity-100"
+              }
+            />
+            <input
+              type={"file"}
+              className={"hidden"}
+              onChange={handleUpdatePostPicture}
+            />
+          </label>
+        ) : undefined}
+        <img
+          src={`data:${post.picture.contentType};base64,${post.picture.data}`}
+          alt={post.picture.filename}
+          className={"rounded"}
+        />
+      </div>
 
       <p className={"text-center text-2xl font-semibold"}>{post.title}</p>
-      <img
-        src={`data:${post.picture.contentType};base64,${post.picture.data}`}
-        alt={post.picture.filename}
-        className={"rounded"}
-      />
       <div className={"mx-2 shadow"}>
         <TextEditor readOnly={true} initValue={post.story} />
       </div>
@@ -208,7 +236,7 @@ function PostDetails() {
           <span>Likes</span>
         </p>
         <p className={"flex items-center gap-x-1"}>
-          <span>{post.nbrComments}</span>
+          <span>{post.comments.length}</span>
           <span>Comments</span>
         </p>
       </div>

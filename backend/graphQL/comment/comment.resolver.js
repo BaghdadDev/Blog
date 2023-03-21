@@ -11,10 +11,11 @@ const Query = {
       const comments = await CommentModel.find({ post: idPost })
         .populate({
           path: "user",
-          select: "_id firstName lastName photo",
+          select: "-password",
           populate: { path: "photo" },
         })
         .populate({ path: "post", select: "_id" })
+        .populate({ path: "likes", select: "_id" })
         .sort({ createdAt: -1 });
       if (!comments || comments.length === 0) {
         return new GraphQLError("There are no comments for this post", {
@@ -52,9 +53,11 @@ const Mutation = {
       const commentCreated = await CommentModel.findById(comment._id)
         .populate({
           path: "user",
+          select: "-password",
           populate: { path: "photo" },
         })
-        .populate({ path: "post", select: "_id" });
+        .populate({ path: "post", select: "_id" })
+        .populate({ path: "likes", select: "_id" });
       // Return the new comment for subscription
       await pubSub.publish("CREATED_COMMENT", {
         createdComment: commentCreated,

@@ -1,28 +1,17 @@
 import { gql } from "@apollo/client";
+import { CORE_COMMENT_FIELDS } from "./fragments.jsx";
 
+// QUERIES ----------------------------------------------------------------
 export const GET_COMMENTS = gql`
+  ${CORE_COMMENT_FIELDS}
   query GetComments($idPost: ID!) {
     getComments(idPost: $idPost) {
-      _id
-      comment
-      post {
-        _id
-      }
-      user {
-        _id
-        firstName
-        lastName
-        photo {
-          filename
-          contentType
-          data
-        }
-      }
-      likes
+      ...CoreCommentFields
     }
   }
 `;
 
+// MUTATIONS ----------------------------------------------------------------
 export const CREATE_COMMENT = gql`
   mutation createComment($commentInput: CommentInput!) {
     createComment(commentInput: $commentInput) {
@@ -55,26 +44,12 @@ export const TOGGLE_LIKE_COMMENT = gql`
   }
 `;
 
+// SUBSCRIPTIONS ----------------------------------------------------
 export const CREATED_COMMENT_SUB = gql`
+  ${CORE_COMMENT_FIELDS}
   subscription CreatedComment($idPost: ID!) {
     createdComment(idPost: $idPost) {
-      _id
-      comment
-      post {
-        _id
-      }
-      user {
-        _id
-        firstName
-        lastName
-        photo {
-          _id
-          filename
-          contentType
-          data
-        }
-      }
-      likes
+      ...CoreCommentFields
     }
   }
 `;
@@ -97,22 +72,7 @@ export const TOGGLED_LIKE_COMMENT_SUB = gql`
 export const UPDATED_COMMENT_SUB = gql`
   subscription UpdatedComment($idComment: ID!) {
     updatedComment(idComment: $idComment) {
-      _id
-      comment
-      post {
-        _id
-      }
-      user {
-        _id
-        firstName
-        lastName
-        photo {
-          filename
-          contentType
-          data
-        }
-      }
-      likes
+      ...CoreCommentFields
     }
   }
 `;

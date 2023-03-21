@@ -36,18 +36,23 @@ function Comment({ comment, subscribeToMore }) {
         if (!subscriptionData.data) return prev;
         const { idUser: idUserToggled, id: idComment } =
           subscriptionData.data.toggledLikeComment;
-        console.log(idUserToggled);
-        console.log(idComment);
         const indexComment = prev.getComments.findIndex(
           (c) => c._id === idComment
         );
         let likesCopy;
-        if (prev.getComments[indexComment].likes.includes(idUserToggled)) {
+        if (
+          prev.getComments[indexComment].likes.find(
+            ({ _id }) => _id === idUserToggled
+          )
+        ) {
           likesCopy = prev.getComments[indexComment].likes.filter(
-            (idUserLike) => idUserLike !== idUserToggled
+            ({ _id: idUserLike }) => idUserLike !== idUserToggled
           );
         } else {
-          likesCopy = [...prev.getComments[indexComment].likes, idUserToggled];
+          likesCopy = [
+            ...prev.getComments[indexComment].likes,
+            { _id: idUserToggled },
+          ];
         }
         let commentsCopy = [...prev.getComments];
         commentsCopy[indexComment] = {
@@ -113,8 +118,9 @@ function Comment({ comment, subscribeToMore }) {
                 }
                 onClick={handleToggleLikeComment}
               >
-                {comment.likes.findIndex((userId) => userId === user._id) ===
-                -1 ? (
+                {comment.likes.findIndex(
+                  ({ _id: userId }) => userId === user._id
+                ) === -1 ? (
                   <AiOutlineHeart className={"h-4 w-4 text-red-800"} />
                 ) : (
                   <AiFillHeart className={"h-4 w-4 text-red-800"} />

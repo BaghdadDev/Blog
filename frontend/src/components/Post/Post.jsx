@@ -41,11 +41,11 @@ function Post({ post }) {
         }
       >
         <p className={"flex items-center gap-x-1"}>
-          <span>{post.nbrLikes}</span>
+          <span>{post.likes.length}</span>
           <span>Likes</span>
         </p>
         <p className={"flex items-center gap-x-1"}>
-          <span>{post.nbrComments}</span>
+          <span>{post.comments.length}</span>
           <span>Comments</span>
         </p>
       </div>

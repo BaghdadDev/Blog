@@ -3,7 +3,7 @@ type Comment {
     user: User!
     post: Post!
     comment: String!
-    likes: [ID!]!
+    likes: [User!]!
 }
 
 input CommentInput {

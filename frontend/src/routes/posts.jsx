@@ -18,7 +18,8 @@ function Posts() {
       document: CREATED_POST_SUB,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newPost = subscriptionData.data.postCreated;
+        const newPost = subscriptionData.data.createdPost;
+        console.log(newPost);
         return Object.assign({}, prev, {
           getPosts: [newPost, ...prev.getPosts],
         });

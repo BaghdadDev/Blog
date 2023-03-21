@@ -4,6 +4,8 @@ const PostModel = require("../../models/PostModel");
 const UserModel = require("../../models/UserModel");
 const storeFile = require("../../utils/storeFile");
 const CommentModel = require("../../models/CommentModel");
+const FileModel = require("../../models/FileModel.js");
+
 const pubSub = require("../../config/PubSub.js");
 
 const Query = {
@@ -13,6 +15,8 @@ const Query = {
       const posts = await PostModel.find()
         .populate({ path: "user", populate: { path: "photo" } })
         .populate({ path: "picture" })
+        .populate({ path: "likes", select: "_id" })
+        .populate({ path: "comments", select: "_id" })
         .sort({ createdAt: -1 });
       if (!posts || posts.length === 0)
         return new GraphQLError("There is no post available", {
@@ -20,10 +24,6 @@ const Query = {
         });
       return posts.map((post) => ({
         ...post._doc,
-        nbrLikes: post.likes.length,
-        likes: undefined,
-        nbrComments: post.comments.length,
-        comments: undefined,
       }));
     } catch (errorGetPosts) {
       console.log("Something went wrong during Get Posts", errorGetPosts);
@@ -40,17 +40,16 @@ const Query = {
         .populate({ path: "picture" })
         .populate({
           path: "likes",
-          select: "_id firstName lastName photo",
+          select: "-password",
           populate: { path: "photo" },
-        });
+        })
+        .populate({ path: "comments", select: "_id" });
       if (!post)
         return new GraphQLError("There is no Post with Id: " + idPost, {
           extensions: { code: "NOT-FOUND" },
         });
       return {
         ...post._doc,
-        comments: undefined,
-        nbrComments: post.comments.length,
       };
     } catch (errorGetPostById) {
       console.log(
@@ -96,17 +95,19 @@ const Mutation = {
       // Retrieve the new post with populate
       const newPost = await PostModel.findById(createdPost._id)
         .populate({ path: "user", populate: { path: "photo" } })
-        .populate({ path: "picture" });
+        .populate({ path: "picture" })
+        .populate({
+          path: "likes",
+          select: "-password",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "comments", select: "_id" });
       // Return the new post for subscription
       await pubSub.publish("CREATED_POST", {
-        postCreated: {
-          ...newPost._doc,
-          nbrComments: newPost.comments.length,
-          nbrLikes: newPost.likes.length,
-        },
+        createdPost: newPost,
       });
       // Return the new post for resolver
-      return { ...newPost._doc };
+      return newPost;
     } catch (errorCreatePost) {
       console.log("Something went wrong during Create Post", errorCreatePost);
       return new GraphQLError("Something went wrong during Create Post", {
@@ -126,17 +127,63 @@ const Mutation = {
         return new GraphQLError("Your are not allowed to update this post", {
           extensions: { code: "NOT-ALLOWED" },
         });
+      // Store the file
+      const file = await storeFile(postInput.picture.file);
       const { _doc: post } = await PostModel.findOneAndUpdate(
         { _id: idPost },
-        { ...postInput },
+        { ...postInput, picture: file._id },
         { new: true }
-      );
-      return { ...post };
+      )
+        .populate({ path: "picture" })
+        .populate({ path: "likes", populate: { path: "photo" } })
+        .populate({ path: "user", populate: { path: "photo" } });
+      return {
+        ...post,
+        comments: undefined,
+        nbrComments: post.comments.length,
+      };
     } catch (errorUpdatePost) {
       console.log("Something went wrong during Update Post", errorUpdatePost);
       return new GraphQLError("Something went wrong during Update Post", {
         extensions: { code: "ERROR-SERVER" },
       });
+    }
+  },
+  updatePostPicture: async (_, { idPost, picture, idUser }) => {
+    console.log("resolver: updatePostPicture");
+    try {
+      const ifExists = await PostModel.findById(idPost);
+      if (!ifExists)
+        return new GraphQLError("There is no post with id: " + idPost, {
+          extensions: { code: "NOT-FOUND" },
+        });
+      if (!ifExists.user.equals(idUser))
+        return new GraphQLError("Your are not allowed to update this post", {
+          extensions: { code: "NOT-ALLOWED" },
+        });
+      // Delete the older picture
+      await FileModel.findOneAndDelete({ _id: ifExists.picture });
+      // Store the new picture
+      const file = await storeFile(picture.file);
+      // Update the id picture for the post
+      await PostModel.findByIdAndUpdate(idPost, { picture: file._id });
+      // Publish the subscription
+      await pubSub.publish("UPDATED_POST_PICTURE", {
+        updatedPostPicture: file,
+      });
+      // Return
+      return file;
+    } catch (errorUpdatePostPicture) {
+      console.log(
+        "Something went wrong during Update Post Picture",
+        errorUpdatePostPicture
+      );
+      return new GraphQLError(
+        "Something went wrong during Update Post Picture",
+        {
+          extensions: { code: "ERROR-SERVER" },
+        }
+      );
     }
   },
   toggleLikePost: async (_, { idPost, idUser }) => {
@@ -148,27 +195,20 @@ const Mutation = {
           extensions: { code: "NOT-FOUND" },
         });
       }
-      let updatedLikes;
       if (post.likes.findIndex((userId) => userId.equals(idUser)) !== -1) {
         await PostModel.findOneAndUpdate(
           { _id: idPost },
           { $pull: { likes: idUser } }
         );
-        await pubSub.publish("DISLIKED_POST", {
-          dislikedPost: idUser,
-        });
       } else {
         await PostModel.findOneAndUpdate(
           { _id: idPost },
           { $push: { likes: idUser } }
         );
-        const user = await UserModel.findById(idUser).populate({
-          path: "photo",
-        });
-        await pubSub.publish("LIKED_POST", {
-          likedPost: { ...user._doc },
-        });
       }
+      await pubSub.publish("TOGGLED_LIKE_POST", {
+        toggledLikePost: { _id: idUser },
+      });
       return true;
     } catch (errorToggleLikePost) {
       console.log(
@@ -211,17 +251,17 @@ const Mutation = {
 };
 
 const Subscription = {
-  postCreated: {
+  createdPost: {
     subscribe: () => pubSub.asyncIterator(["CREATED_POST"]),
-  },
-  likedPost: {
-    subscribe: () => pubSub.asyncIterator(["LIKED_POST"]),
-  },
-  dislikedPost: {
-    subscribe: () => pubSub.asyncIterator(["DISLIKED_POST"]),
   },
   deletedPost: {
     subscribe: () => pubSub.asyncIterator(["DELETED_POST"]),
+  },
+  updatedPostPicture: {
+    subscribe: () => pubSub.asyncIterator(["UPDATED_POST_PICTURE"]),
+  },
+  toggledLikePost: {
+    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_POST"]),
   },
 };
 

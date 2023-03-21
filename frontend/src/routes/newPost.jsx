@@ -56,7 +56,6 @@ function NewPost() {
       user: user._id,
       picture: data.files[0],
     };
-    console.log(postInput);
     try {
       await createPost({ variables: { postInput } });
       navigate(PATH.ROOT);

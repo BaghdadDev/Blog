@@ -44,9 +44,11 @@ function IndexComments({ idPost }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const createdComment = subscriptionData.data.createdComment;
-        const copyPrev = prev?.getComments ? prev.getComments : [];
+        const copyComments = prev?.getComments
+          ? [createdComment, ...prev.getComments]
+          : [createdComment];
         return Object.assign({}, prev, {
-          getComments: [createdComment, ...copyPrev],
+          getComments: copyComments,
         });
       },
     });
@@ -63,7 +65,7 @@ function IndexComments({ idPost }) {
           (comment) => comment._id !== idDeletedComment
         );
         return Object.assign({}, prev, {
-          getComments: [...filteredComments],
+          getComments: filteredComments,
         });
       },
     });

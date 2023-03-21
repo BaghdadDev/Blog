@@ -1,44 +1,27 @@
 import { gql } from "@apollo/client";
+import { CORE_USER_FIELDS } from "./fragments.jsx";
 
 export const SIGN_UP = gql`
+  ${CORE_USER_FIELDS}
   mutation signUp($userInput: UserInput!) {
     signUp(userInput: $userInput) {
-      _id
-      username
-      email
-      firstName
-      lastName
+      ...CoreUserFields
       token {
         accessToken
         expiresAccessToken
-      }
-      photo {
-        _id
-        filename
-        contentType
-        data
       }
     }
   }
 `;
 
 export const SIGN_IN = gql`
+  ${CORE_USER_FIELDS}
   mutation signIn($usernameOrEmail: String!, $password: String!) {
     signIn(usernameOrEmail: $usernameOrEmail, password: $password) {
-      _id
-      username
-      email
-      firstName
-      lastName
+      ...CoreUserFields
       token {
         accessToken
         expiresAccessToken
-      }
-      photo {
-        _id
-        filename
-        contentType
-        data
       }
     }
   }

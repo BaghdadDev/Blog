@@ -48,23 +48,6 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
             "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-white text-sm italic shadow-xl"
           }
         >
-          <Link
-            to={
-              PATH.EDIT_POST.split(":postId")[0] +
-              idPost +
-              PATH.EDIT_POST.split(":postId")[1]
-            }
-          >
-            <p
-              className={
-                "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
-              }
-            >
-              <AiFillEdit className={"h-4 w-4 text-blue-800"} />
-              <span>Edit</span>
-            </p>
-          </Link>
-
           <p
             className={
               "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"

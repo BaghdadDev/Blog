@@ -6,8 +6,6 @@ type Post {
     picture: File!
     likes: [User!]!
     comments: [Comment!]!
-    nbrLikes: Int!
-    nbrComments: Int!
 }
 
 input PostInput {
@@ -18,9 +16,9 @@ input PostInput {
 }
 
 type Subscription {
-    postCreated: Post!
-    likedPost(idPost: ID!): User!
-    dislikedPost(idPost: ID!): ID!
+    createdPost: Post!
+    toggledLikePost(idPost: ID!): User!
+    updatedPostPicture(idPost: ID!): File!
     deletedPost: ID!
 }
 
@@ -33,6 +31,7 @@ type Query {
 type Mutation {
     createPost(postInput: PostInput!): Post!
     updatePost(idPost: ID!, postInput: PostInput!): Post!
+    updatePostPicture(idPost: ID!, picture: Upload!): File!
     toggleLikePost(idPost: ID!, idUser: ID!): Boolean!
     deletePost(idPost: ID!): ID!
 }
