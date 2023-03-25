@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { CREATE_POST, GET_POSTS } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import TextEditor from "../components/TextEditor";
 import PATH from "../utils/route-path.jsx";
+import apolloClient from "../config/apollo-client.jsx";
 
 function NewPost() {
   const { user } = useUserContext();
@@ -22,7 +23,17 @@ function NewPost() {
   } = useForm();
   const [errorStory, setErrorStory] = useState("");
 
-  const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST);
+  const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST, {
+    onCompleted: ({ createPost: newPost }) => {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const posts = Array.isArray(dataCache?.getPosts)
+          ? dataCache.getPosts
+          : [];
+        return { getPosts: [newPost, ...posts] };
+      });
+      navigate(PATH.ROOT);
+    },
+  });
 
   function getStoryField() {
     setErrorStory("");
@@ -58,7 +69,6 @@ function NewPost() {
     };
     try {
       await createPost({ variables: { postInput } });
-      navigate(PATH.ROOT);
     } catch (err) {}
   }
 

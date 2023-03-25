@@ -62,6 +62,12 @@ const Mutation = {
       await pubSub.publish("CREATED_COMMENT", {
         createdComment: commentCreated,
       });
+      await pubSub.publish("TOGGLED_COMMENT_POST", {
+        toggledCommentPost: {
+          _id: commentCreated._id,
+          post: { _id: commentCreated.post._id },
+        },
+      });
       return commentCreated;
     } catch (errorCreateComment) {
       console.log(`Something went wrong creating comment.`, errorCreateComment);
@@ -91,6 +97,9 @@ const Mutation = {
       );
       await pubSub.publish("DELETED_COMMENT", {
         deletedComment: idComment,
+      });
+      await pubSub.publish("TOGGLED_COMMENT_POST", {
+        toggledCommentPost: { _id: comment._id, post: { _id: comment.post } },
       });
       return { _id: idComment };
     } catch (errorDeleteComment) {
@@ -124,7 +133,7 @@ const Mutation = {
         );
       }
       await pubSub.publish("TOGGLED_LIKE_COMMENT", {
-        toggledLikeComment: { idUser: idUser, id: commentUpdated._id },
+        toggledLikeComment: { _id: idComment, user: { _id: idUser } },
       });
       return commentUpdated;
     } catch (errorToggleLikeComment) {
@@ -178,6 +187,9 @@ const Subscription = {
   },
   toggledLikeComment: {
     subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_COMMENT"]),
+  },
+  toggledCommentPost: {
+    subscribe: () => pubSub.asyncIterator(["TOGGLED_COMMENT_POST"]),
   },
 };
 

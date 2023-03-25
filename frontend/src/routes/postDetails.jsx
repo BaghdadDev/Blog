@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { RxUpdate } from "react-icons/rx";
 
 import {
+  DELETED_POST_DETAILS_SUB,
   GET_POST_BY_ID,
+  GET_POSTS,
   TOGGLE_LIKE_POST,
-  TOGGLED_LIKE_POST_SUB,
+  TOGGLED_LIKE_POST_DETAILS_SUB,
   UPDATE_POST_PICTURE,
   UPDATED_POST_PICTURE_SUB,
 } from "../gql/post.jsx";
@@ -17,14 +19,17 @@ import TextEditor from "../components/TextEditor/index.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comments";
 import { useUserContext } from "../context/userContext.jsx";
-import { CREATED_COMMENT_SUB } from "../gql/comment.jsx";
 import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
+import apolloClient from "../config/apollo-client.jsx";
+import PATH from "../utils/route-path.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
 
   const { user } = useUserContext();
+
+  const navigate = useNavigate();
 
   const [loadingDeletingPost, setLoadingDeletingPost] = useState(false);
 
@@ -58,31 +63,9 @@ function PostDetails() {
       const res = await updatePostPicture({
         variables: { idPost: postId, picture: file },
       });
-      console.log(res);
     } catch (errorUpdatePostPicture) {
       console.log(errorUpdatePostPicture);
     }
-  }
-
-  function subscribeToCreatedComment() {
-    subscribeToMore({
-      document: CREATED_COMMENT_SUB,
-      variables: { idPost: postId },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const createdComment = subscriptionData.data.createdComment;
-        console.log(createdComment);
-        return Object.assign({}, prev, {
-          getPostById: {
-            ...prev.getPostById,
-            comments: [
-              { _id: createdComment._id },
-              ...prev.getPostById.comments,
-            ],
-          },
-        });
-      },
-    });
   }
 
   function subscribeToUpdatedPostPicture() {
@@ -102,14 +85,14 @@ function PostDetails() {
     });
   }
 
-  function subscribeToToggledLikePost() {
+  function subscribeToToggledLikePostDetails() {
     subscribeToMore({
-      document: TOGGLED_LIKE_POST_SUB,
+      document: TOGGLED_LIKE_POST_DETAILS_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const { _id: idUserToggledLike } =
-          subscriptionData.data.toggledLikePost;
+          subscriptionData.data.toggledLikePostDetails;
         const copyPost = { ...prev.getPostById };
         const copyLikes = [...copyPost.likes];
         if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
@@ -130,10 +113,32 @@ function PostDetails() {
     });
   }
 
+  function subscribeToDeletedPostDetails() {
+    subscribeToMore({
+      document: DELETED_POST_DETAILS_SUB,
+      variables: { idPost: postId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const idDeletedPost = subscriptionData.data.deletedPostDetails;
+        apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+          if (!dataCache?.getPosts) return { getPosts: [] };
+          const filteredPosts = dataCache.getPosts.filter(
+            (post) => post._id !== idDeletedPost
+          );
+          return { getPosts: filteredPosts };
+        });
+        Object.assign({}, prev, {
+          getPostById: undefined,
+        });
+        navigate(PATH.ROOT);
+      },
+    });
+  }
+
   useEffect(() => {
-    // subscribeToCreatedComment();
     subscribeToUpdatedPostPicture();
-    subscribeToToggledLikePost();
+    subscribeToToggledLikePostDetails();
+    subscribeToDeletedPostDetails();
   }, []);
 
   if (loadingPost)
@@ -153,15 +158,6 @@ function PostDetails() {
         "relative my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2"
       }
     >
-      {loadingDeletingPost ? (
-        <div
-          className={
-            "absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center bg-gray-400 bg-opacity-50"
-          }
-        >
-          <OvalLoader size={40} />
-        </div>
-      ) : undefined}
       <div className={"flex w-full items-center justify-between px-2"}>
         <div className={"flex items-center gap-x-2"}>
           <Avatar {...post.user.photo} />
@@ -188,10 +184,14 @@ function PostDetails() {
             )}
           </div>
           {user._id === post.user._id ? (
-            <OptionsPostDetails
-              idPost={postId}
-              setLoadingDeletingPost={setLoadingDeletingPost}
-            />
+            loadingDeletingPost ? (
+              <OvalLoader />
+            ) : (
+              <OptionsPostDetails
+                idPost={postId}
+                setLoadingDeletingPost={setLoadingDeletingPost}
+              />
+            )
           ) : undefined}
         </div>
       </div>

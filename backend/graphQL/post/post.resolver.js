@@ -206,8 +206,11 @@ const Mutation = {
           { $push: { likes: idUser } }
         );
       }
+      await pubSub.publish("TOGGLED_LIKE_POST_DETAILS", {
+        toggledLikePostDetails: { _id: idUser },
+      });
       await pubSub.publish("TOGGLED_LIKE_POST", {
-        toggledLikePost: { _id: idUser },
+        toggledLikePost: { _id: idPost, user: { _id: idUser } },
       });
       return true;
     } catch (errorToggleLikePost) {
@@ -240,6 +243,9 @@ const Mutation = {
       await pubSub.publish("DELETED_POST", {
         deletedPost: idPost,
       });
+      await pubSub.publish("DELETED_POST_DETAILS", {
+        deletedPostDetails: idPost,
+      });
       return idPost;
     } catch (errorDeletePost) {
       console.log("Something went wrong during Delete Post", errorDeletePost);
@@ -257,8 +263,14 @@ const Subscription = {
   deletedPost: {
     subscribe: () => pubSub.asyncIterator(["DELETED_POST"]),
   },
+  deletedPostDetails: {
+    subscribe: () => pubSub.asyncIterator(["DELETED_POST_DETAILS"]),
+  },
   updatedPostPicture: {
     subscribe: () => pubSub.asyncIterator(["UPDATED_POST_PICTURE"]),
+  },
+  toggledLikePostDetails: {
+    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_POST_DETAILS"]),
   },
   toggledLikePost: {
     subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_POST"]),

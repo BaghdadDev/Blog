@@ -11,9 +11,12 @@ import {
   CREATED_COMMENT_SUB,
   DELETED_COMMENT_SUB,
   GET_COMMENTS,
+  TOGGLED_LIKE_COMMENT_SUB,
 } from "../../gql/comment.jsx";
 import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
+import apolloClient from "../../config/apollo-client.jsx";
+import { GET_POST_BY_ID } from "../../gql/post.jsx";
 
 function IndexComments({ idPost }) {
   const {
@@ -44,6 +47,26 @@ function IndexComments({ idPost }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const createdComment = subscriptionData.data.createdComment;
+        apolloClient.cache.updateQuery(
+          { query: GET_POST_BY_ID, variables: { idPost: idPost } },
+          (dataCache) => {
+            const prevComments = Array.isArray(dataCache?.getPostById?.comments)
+              ? dataCache.getPostById.comments
+              : [];
+            return {
+              getPostById: {
+                ...dataCache.getPostById,
+                comments: [
+                  {
+                    __typename: createdComment.__typename,
+                    _id: createdComment._id,
+                  },
+                  ...prevComments,
+                ],
+              },
+            };
+          }
+        );
         const copyComments = prev?.getComments
           ? [createdComment, ...prev.getComments]
           : [createdComment];
@@ -61,6 +84,20 @@ function IndexComments({ idPost }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const idDeletedComment = subscriptionData.data.deletedComment;
+        apolloClient.cache.updateQuery(
+          { query: GET_POST_BY_ID, variables: { idPost: idPost } },
+          (dataCache) => {
+            const filteredComments = dataCache.getPostById.comments.filter(
+              (comment) => comment._id !== idDeletedComment
+            );
+            return {
+              getPostById: {
+                ...dataCache.getPostById,
+                comments: filteredComments,
+              },
+            };
+          }
+        );
         const filteredComments = prev.getComments.filter(
           (comment) => comment._id !== idDeletedComment
         );
@@ -71,9 +108,47 @@ function IndexComments({ idPost }) {
     });
   }
 
+  function handleSubscribeToggledLikeComment() {
+    subscribeToMore({
+      document: TOGGLED_LIKE_COMMENT_SUB,
+      variables: { idPost: idPost },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const {
+          _id: idComment,
+          user: { _id: idUserToggled },
+        } = subscriptionData.data.toggledLikeComment;
+        console.log("Toggled like comment");
+        const indexComment = prev.getComments.findIndex(
+          (c) => c._id === idComment
+        );
+        const copyLikes = Array.isArray(prev.getComments?.likes)
+          ? [...prev.getComments.likes]
+          : [];
+        if (copyLikes.find((like) => like?._id === idUserToggled)) {
+          copyLikes.splice(
+            copyLikes.findIndex((like) => like._id === idUserToggled),
+            1
+          );
+        } else {
+          copyLikes.push({ __typename: "User", _id: idUserToggled });
+        }
+        let commentsCopy = [...prev.getComments];
+        commentsCopy[indexComment] = {
+          ...prev.getComments[indexComment],
+          likes: copyLikes,
+        };
+        return Object.assign({}, prev, {
+          getComments: commentsCopy,
+        });
+      },
+    });
+  }
+
   useEffect(() => {
     handleSubscribeToCreatedComment();
     handleSubscribeToDeletedComment();
+    handleSubscribeToggledLikeComment();
   }, []);
 
   async function handleSubmitComment(data) {

@@ -64,6 +64,12 @@ export const DELETED_POST_SUB = gql`
   }
 `;
 
+export const DELETED_POST_DETAILS_SUB = gql`
+  subscription DeletedPostDetails($idPost: ID!) {
+    deletedPostDetails(idPost: $idPost)
+  }
+`;
+
 export const UPDATED_POST_PICTURE_SUB = gql`
   ${CORE_POST_FIELDS}
   subscription UpdatedPostPicture($idPost: ID!) {
@@ -73,10 +79,21 @@ export const UPDATED_POST_PICTURE_SUB = gql`
   }
 `;
 
-export const TOGGLED_LIKE_POST_SUB = gql`
-  subscription ToggledLikePost($idPost: ID!) {
-    toggledLikePost(idPost: $idPost) {
+export const TOGGLED_LIKE_POST_DETAILS_SUB = gql`
+  subscription ToggledLikePostDetails($idPost: ID!) {
+    toggledLikePostDetails(idPost: $idPost) {
       _id
+    }
+  }
+`;
+
+export const TOGGLED_LIKE_POST_SUB = gql`
+  subscription ToggledLikePost {
+    toggledLikePost {
+      _id
+      user {
+        _id
+      }
     }
   }
 `;

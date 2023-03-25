@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillDelete } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 
 import useOutsideClick from "../Hook/useOutsideClick.jsx";
 import { DELETE_POST } from "../../gql/post.jsx";
-import { Link, useNavigate } from "react-router-dom";
-import PATH from "../../utils/route-path.jsx";
 
 function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const ref = useOutsideClick(() => setOpen(false));
@@ -20,7 +17,6 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
     setLoadingDeletingPost(true);
     try {
       await deletePost({ variables: { idPost: idPost } });
-      navigate(PATH.ROOT);
     } catch (errorDeletePost) {
       console.log(errorDeletePost);
     }

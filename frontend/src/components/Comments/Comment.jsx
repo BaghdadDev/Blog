@@ -28,44 +28,6 @@ function Comment({ comment, subscribeToMore }) {
     }
   }
 
-  function handleSubscribeToggledLikeComment() {
-    subscribeToMore({
-      document: TOGGLED_LIKE_COMMENT_SUB,
-      variables: { idComment: comment._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const { idUser: idUserToggled, id: idComment } =
-          subscriptionData.data.toggledLikeComment;
-        const indexComment = prev.getComments.findIndex(
-          (c) => c._id === idComment
-        );
-        let likesCopy;
-        if (
-          prev.getComments[indexComment].likes.find(
-            ({ _id }) => _id === idUserToggled
-          )
-        ) {
-          likesCopy = prev.getComments[indexComment].likes.filter(
-            ({ _id: idUserLike }) => idUserLike !== idUserToggled
-          );
-        } else {
-          likesCopy = [
-            ...prev.getComments[indexComment].likes,
-            { _id: idUserToggled },
-          ];
-        }
-        let commentsCopy = [...prev.getComments];
-        commentsCopy[indexComment] = {
-          ...prev.getComments[indexComment],
-          likes: likesCopy,
-        };
-        return Object.assign({}, prev, {
-          getComments: [...commentsCopy],
-        });
-      },
-    });
-  }
-
   function handleSubscribeUpdatedComment() {
     subscribeToMore({
       document: UPDATED_COMMENT_SUB,
@@ -86,7 +48,6 @@ function Comment({ comment, subscribeToMore }) {
   }
 
   useEffect(() => {
-    handleSubscribeToggledLikeComment();
     handleSubscribeUpdatedComment();
   }, []);
 
