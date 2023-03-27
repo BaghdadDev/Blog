@@ -8,6 +8,7 @@ import Posts from "../routes/posts.jsx";
 import SignIn from "../routes/signIn.jsx";
 import SignUp from "../routes/signUp.jsx";
 import NewPost from "../routes/newPost.jsx";
+import EditPost from "../routes/editPost.jsx";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
           {
             path: PATH.POST_DETAILS,
             element: <PostDetails />,
+          },
+          {
+            path: PATH.EDIT_POST,
+            element: <EditPost />,
             // loader: contactLoader,
             // action: contactAction,
           },

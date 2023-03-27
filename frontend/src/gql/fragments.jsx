@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-const CORE_FILE_FIELDS = gql`
+export const CORE_FILE_FIELDS = gql`
   fragment CoreFileFields on File {
     _id
     filename

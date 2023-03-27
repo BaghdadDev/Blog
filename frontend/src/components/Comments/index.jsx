@@ -12,6 +12,7 @@ import {
   DELETED_COMMENT_SUB,
   GET_COMMENTS,
   TOGGLED_LIKE_COMMENT_SUB,
+  UPDATED_COMMENT_SUB,
 } from "../../gql/comment.jsx";
 import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
@@ -108,7 +109,7 @@ function IndexComments({ idPost }) {
     });
   }
 
-  function handleSubscribeToggledLikeComment() {
+  function handleSubscribeToToggledLikeComment() {
     subscribeToMore({
       document: TOGGLED_LIKE_COMMENT_SUB,
       variables: { idPost: idPost },
@@ -118,14 +119,13 @@ function IndexComments({ idPost }) {
           _id: idComment,
           user: { _id: idUserToggled },
         } = subscriptionData.data.toggledLikeComment;
-        console.log("Toggled like comment");
         const indexComment = prev.getComments.findIndex(
           (c) => c._id === idComment
         );
-        const copyLikes = Array.isArray(prev.getComments?.likes)
-          ? [...prev.getComments.likes]
+        const copyLikes = Array.isArray(prev.getComments[indexComment]?.likes)
+          ? [...prev.getComments[indexComment].likes]
           : [];
-        if (copyLikes.find((like) => like?._id === idUserToggled)) {
+        if (copyLikes.find((like) => like._id === idUserToggled)) {
           copyLikes.splice(
             copyLikes.findIndex((like) => like._id === idUserToggled),
             1
@@ -145,10 +145,30 @@ function IndexComments({ idPost }) {
     });
   }
 
+  function handleSubscribeToUpdatedComment() {
+    subscribeToMore({
+      document: UPDATED_COMMENT_SUB,
+      variables: { idPost: idPost },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const updatedComment = subscriptionData.data.updatedComment;
+        const indexComment = prev.getComments.findIndex(
+          (c) => c._id === updatedComment._id
+        );
+        let commentsCopy = [...prev.getComments];
+        commentsCopy[indexComment] = updatedComment;
+        return Object.assign({}, prev, {
+          getComments: commentsCopy,
+        });
+      },
+    });
+  }
+
   useEffect(() => {
     handleSubscribeToCreatedComment();
     handleSubscribeToDeletedComment();
-    handleSubscribeToggledLikeComment();
+    handleSubscribeToToggledLikeComment();
+    handleSubscribeToUpdatedComment();
   }, []);
 
   async function handleSubmitComment(data) {

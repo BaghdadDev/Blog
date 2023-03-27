@@ -72,8 +72,9 @@ export const TOGGLED_LIKE_COMMENT_SUB = gql`
 `;
 
 export const UPDATED_COMMENT_SUB = gql`
-  subscription UpdatedComment($idComment: ID!) {
-    updatedComment(idComment: $idComment) {
+  ${CORE_COMMENT_FIELDS}
+  subscription UpdatedComment($idPost: ID!) {
+    updatedComment(idPost: $idPost) {
       ...CoreCommentFields
     }
   }

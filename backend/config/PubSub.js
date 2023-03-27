@@ -25,9 +25,9 @@ const options = {
   },
 };
 
-module.exports = new RedisPubSub({
-  publisher: new Redis(options),
-  subscriber: new Redis(options),
-});
+// module.exports = new RedisPubSub({
+//   publisher: new Redis(options),
+//   subscriber: new Redis(options),
+// });
 
-// module.exports = new PubSub();
+module.exports = new PubSub();

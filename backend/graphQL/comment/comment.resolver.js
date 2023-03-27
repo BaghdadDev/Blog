@@ -160,12 +160,17 @@ const Mutation = {
         { ...commentInput },
         { new: true }
       )
-        .populate({ path: "user", populate: { path: "photo" } })
-        .populate({ path: "post", select: "_id" });
+        .populate({
+          path: "user",
+          select: "-password",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "post", select: "_id" })
+        .populate({ path: "likes", select: "_id" });
       await pubSub.publish("UPDATED_COMMENT", {
-        updatedComment: { ...commentUpdated._doc },
+        updatedComment: commentUpdated,
       });
-      return { ...commentUpdated._doc };
+      return commentUpdated;
     } catch (errorUpdateComment) {
       console.log(`Something went wrong Updating Comment.`, errorUpdateComment);
       return new GraphQLError(`Something went wrong Updating Comment.`, {

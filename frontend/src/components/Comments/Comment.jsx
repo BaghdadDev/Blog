@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
 
 import Avatar from "../Avatar.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import OptionsComment from "./OptionsComment.jsx";
-import {
-  TOGGLE_LIKE_COMMENT,
-  TOGGLED_LIKE_COMMENT_SUB,
-  UPDATED_COMMENT_SUB,
-} from "../../gql/comment.jsx";
+import { TOGGLE_LIKE_COMMENT } from "../../gql/comment.jsx";
 import CommentInput from "./CommentInput.jsx";
 
 function Comment({ comment, subscribeToMore }) {
@@ -28,29 +24,6 @@ function Comment({ comment, subscribeToMore }) {
     }
   }
 
-  function handleSubscribeUpdatedComment() {
-    subscribeToMore({
-      document: UPDATED_COMMENT_SUB,
-      variables: { idComment: comment._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const updatedComment = subscriptionData.data.updatedComment;
-        const indexComment = prev.getComments.findIndex(
-          (c) => c._id === updatedComment._id
-        );
-        let commentsCopy = [...prev.getComments];
-        commentsCopy[indexComment] = { ...updatedComment };
-        return Object.assign({}, prev, {
-          getComments: [...commentsCopy],
-        });
-      },
-    });
-  }
-
-  useEffect(() => {
-    handleSubscribeUpdatedComment();
-  }, []);
-
   return (
     <div
       className={
@@ -67,11 +40,13 @@ function Comment({ comment, subscribeToMore }) {
         />
         {readOnly ? (
           <>
-            <OptionsComment
-              idComment={comment._id}
-              idPost={comment.post._id}
-              setReadyOnly={setReadOnly}
-            />
+            {comment.user._id === user._id ? (
+              <OptionsComment
+                idComment={comment._id}
+                idPost={comment.post._id}
+                setReadyOnly={setReadOnly}
+              />
+            ) : undefined}
             <div className={"flex items-center gap-x-1"}>
               <div
                 className={

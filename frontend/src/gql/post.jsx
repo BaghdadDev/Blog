@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { CORE_POST_FIELDS } from "./fragments.jsx";
+import { CORE_POST_FIELDS, CORE_FILE_FIELDS } from "./fragments.jsx";
 
 // QUERIES ----------------------------------------------------------------
 export const GET_POSTS = gql`
@@ -71,7 +71,7 @@ export const DELETED_POST_DETAILS_SUB = gql`
 `;
 
 export const UPDATED_POST_PICTURE_SUB = gql`
-  ${CORE_POST_FIELDS}
+  ${CORE_FILE_FIELDS}
   subscription UpdatedPostPicture($idPost: ID!) {
     updatedPostPicture(idPost: $idPost) {
       ...CoreFileFields

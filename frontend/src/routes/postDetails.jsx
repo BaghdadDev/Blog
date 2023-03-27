@@ -58,7 +58,6 @@ function PostDetails() {
 
   async function handleUpdatePostPicture(e) {
     const file = e.target.files[0];
-    console.log(file);
     try {
       const res = await updatePostPicture({
         variables: { idPost: postId, picture: file },

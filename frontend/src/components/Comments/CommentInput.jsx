@@ -1,8 +1,8 @@
 import React from "react";
-import CustomInput from "../Custom/CustomInput.jsx";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useMutation } from "@apollo/client";
+
 import { UPDATE_COMMENT } from "../../gql/comment";
 import OvalLoader from "../OvalLoader.jsx";
 

@@ -47,9 +47,10 @@ TextEditor.propTypes = {
   error: PropTypes.string,
   initValue: PropTypes.string,
   readOnly: PropTypes.bool,
+  setValue: PropTypes.func,
 };
 
-function TextEditor({ placeholder, error, initValue, readOnly }) {
+function TextEditor({ placeholder, error, initValue, readOnly, setValue }) {
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -73,6 +74,7 @@ function TextEditor({ placeholder, error, initValue, readOnly }) {
         );
         if (isAstChange) {
           localStorage.setItem("draft", serialize(value));
+          setValue(serialize(value));
         }
       }}
     >
