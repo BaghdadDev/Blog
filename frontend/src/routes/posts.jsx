@@ -5,6 +5,7 @@ import {
   DELETED_POST_SUB,
   GET_POSTS,
   TOGGLED_LIKE_POST_SUB,
+  UPDATED_POST_SUB,
 } from "../gql/post.jsx";
 import Post from "../components/post/Post.jsx";
 import { useQuery } from "@apollo/client";
@@ -117,11 +118,30 @@ function Posts() {
     });
   }
 
+  function subscribeToUpdatedPost() {
+    subscribeToMore({
+      document: UPDATED_POST_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const updatedPost = subscriptionData.data.updatedPost;
+        const indexPost = prev.getPosts.findIndex(
+          (post) => post._id === updatedPost._id
+        );
+        let copyPosts = [...prev.getPosts];
+        copyPosts[indexPost] = updatedPost;
+        return Object.assign({}, prev, {
+          getPosts: copyPosts,
+        });
+      },
+    });
+  }
+
   useEffect(() => {
     subscribeToCreatedPost();
     subscribeToDeletedPost();
     subscribeToToggledLikePost();
     subscribeToToggledCommentPost();
+    subscribeToUpdatedPost();
   }, []);
 
   if (loadingGetPosts) return <SkeletonPosts />;

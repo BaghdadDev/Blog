@@ -115,9 +115,9 @@ const Mutation = {
       });
     }
   },
-  updatePost: async (_, { idPost, postInput, idUser }) => {
+  updatePostText: async (_, { idPost, postInput, idUser }) => {
     try {
-      console.log("Resolver: updatePost");
+      console.log("Resolver: updatePostText");
       const ifExists = await PostModel.findById(idPost);
       if (!ifExists)
         return new GraphQLError("There is no post with id: " + idPost, {
@@ -127,21 +127,22 @@ const Mutation = {
         return new GraphQLError("Your are not allowed to update this post", {
           extensions: { code: "NOT-ALLOWED" },
         });
-      // Store the file
-      const file = await storeFile(postInput.picture.file);
-      const { _doc: post } = await PostModel.findOneAndUpdate(
+      const updatedPost = await PostModel.findOneAndUpdate(
         { _id: idPost },
-        { ...postInput, picture: file._id },
+        { ...postInput },
         { new: true }
       )
         .populate({ path: "picture" })
-        .populate({ path: "likes", populate: { path: "photo" } })
-        .populate({ path: "user", populate: { path: "photo" } });
-      return {
-        ...post,
-        comments: undefined,
-        nbrComments: post.comments.length,
-      };
+        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({ path: "likes", select: "_id" })
+        .populate({ path: "comments", select: "_id" });
+      await pubSub.publish("UPDATED_POST_TEXT", {
+        updatedPostText: updatedPost,
+      });
+      await pubSub.publish("UPDATED_POST", {
+        updatedPost: updatedPost,
+      });
+      return updatedPost;
     } catch (errorUpdatePost) {
       console.log("Something went wrong during Update Post", errorUpdatePost);
       return new GraphQLError("Something went wrong during Update Post", {
@@ -166,10 +167,27 @@ const Mutation = {
       // Store the new picture
       const file = await storeFile(picture.file);
       // Update the id picture for the post
-      await PostModel.findByIdAndUpdate(idPost, { picture: file._id });
+      const updatedPost = await PostModel.findByIdAndUpdate(
+        idPost,
+        {
+          picture: file._id,
+        },
+        { new: true }
+      )
+        .populate({ path: "picture" })
+        .populate({
+          path: "user",
+          select: "-password",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "likes", select: "_id" })
+        .populate({ path: "comments", select: "_id" });
       // Publish the subscription
       await pubSub.publish("UPDATED_POST_PICTURE", {
         updatedPostPicture: file,
+      });
+      await pubSub.publish("UPDATED_POST", {
+        updatedPost: updatedPost,
       });
       // Return
       return file;
@@ -254,6 +272,34 @@ const Mutation = {
       });
     }
   },
+  searchPosts: async (_, { search }) => {
+    console.log("Resolver: deletePost");
+    try {
+      const regex = new RegExp(search, "i");
+      const posts = await PostModel.find({
+        $or: [{ story: { $regex: regex } }, { title: { $regex: regex } }],
+      })
+        .populate({ path: "picture" })
+        .populate({
+          path: "user",
+          select: "-password",
+          populate: { path: "photo" },
+        })
+        .populate({ path: "likes", select: "_id" })
+        .populate({ path: "comments", select: "_id" });
+      if (posts.length === 0) {
+        return new GraphQLError("No posts found", {
+          extensions: { code: "NOT-FOUND" },
+        });
+      }
+      return posts;
+    } catch (errorSearchPost) {
+      console.log("Something went wrong during Search Posts", errorSearchPost);
+      return new GraphQLError("Something went wrong during Search Posts", {
+        extensions: { code: "ERROR-SERVER" },
+      });
+    }
+  },
 };
 
 const Subscription = {
@@ -265,6 +311,12 @@ const Subscription = {
   },
   deletedPostDetails: {
     subscribe: () => pubSub.asyncIterator(["DELETED_POST_DETAILS"]),
+  },
+  updatedPost: {
+    subscribe: () => pubSub.asyncIterator(["UPDATED_POST"]),
+  },
+  updatedPostText: {
+    subscribe: () => pubSub.asyncIterator(["UPDATED_POST_TEXT"]),
   },
   updatedPostPicture: {
     subscribe: () => pubSub.asyncIterator(["UPDATED_POST_PICTURE"]),

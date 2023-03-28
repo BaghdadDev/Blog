@@ -5,6 +5,7 @@ const UserModel = require("../models/UserModel");
 
 async function authenticationMiddleware(resolve, root, args, context, info) {
   try {
+    // return await resolve(root, args, context, info);
     const accessToken =
       context.headers.authorization &&
       String(context.headers.authorization).split(" ")[1];

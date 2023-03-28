@@ -19,6 +19,8 @@ type Subscription {
     createdPost: Post!
     toggledLikePostDetails(idPost: ID!): User!
     toggledLikePost: Post!
+    updatedPost: Post!
+    updatedPostText(idPost: ID!): Post!
     updatedPostPicture(idPost: ID!): File!
     deletedPost: ID!
     deletedPostDetails(idPost: ID!): ID!
@@ -32,8 +34,9 @@ type Query {
 
 type Mutation {
     createPost(postInput: PostInput!): Post!
-    updatePost(idPost: ID!, postInput: PostInput!): Post!
+    updatePostText(idPost: ID!, postInput: PostInput!): Post!
     updatePostPicture(idPost: ID!, picture: Upload!): File!
     toggleLikePost(idPost: ID!, idUser: ID!): Boolean!
     deletePost(idPost: ID!): ID!
+    searchPosts(search: String!): [Post!]!
 }

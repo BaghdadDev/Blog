@@ -7,6 +7,7 @@ import PATH from "../../utils/route-path.jsx";
 import HeaderDropDown from "./HeaderDropDown.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import CustomButton from "../Custom/CustomButton.jsx";
+import Search from "./Search/index.jsx";
 
 function Header() {
   const { user } = useUserContext();
@@ -20,20 +21,7 @@ function Header() {
       }
     >
       <Link to={PATH.ROOT}>Blog Logo</Link>
-      <form
-        className={
-          "absolute left-1/2 flex w-1/3 -translate-x-1/2 items-center rounded-lg bg-gray-200 p-2"
-        }
-      >
-        <AiOutlineSearch className={"mr-2 h-4 w-4"} />
-        <input
-          type={"text"}
-          placeholder={"Search post..."}
-          className={
-            "h-full w-full bg-transparent outline-none placeholder:italic"
-          }
-        />
-      </form>
+      <Search />
       {!user ? (
         location.pathname !== PATH.SIGN_IN &&
         location.pathname !== PATH.SIGN_UP ? (

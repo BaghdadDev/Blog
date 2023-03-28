@@ -6,7 +6,7 @@ import PATH from "../../utils/route-path.jsx";
 import { Link } from "react-router-dom";
 
 function Post({ post }) {
-  function textToString(value) {
+  function storyToString(value) {
     return JSON.parse(value)
       .map((n) => Node.string(n))
       .join(" ");
@@ -34,7 +34,7 @@ function Post({ post }) {
         />
       </Link>
       <p className={"pl-2 font-semibold"}>{post.title}</p>
-      <p className={"w-full truncate px-2"}>{textToString(post.story)}</p>
+      <p className={"w-full truncate px-2"}>{storyToString(post.story)}</p>
       <div
         className={
           "flex w-full select-none items-center justify-end gap-x-2 px-2 italic "

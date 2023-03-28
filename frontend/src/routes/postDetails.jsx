@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { RxUpdate } from "react-icons/rx";
 
 import {
   DELETED_POST_DETAILS_SUB,
@@ -10,8 +9,8 @@ import {
   GET_POSTS,
   TOGGLE_LIKE_POST,
   TOGGLED_LIKE_POST_DETAILS_SUB,
-  UPDATE_POST_PICTURE,
   UPDATED_POST_PICTURE_SUB,
+  UPDATED_POST_TEXT_SUB,
 } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
@@ -42,9 +41,6 @@ function PostDetails() {
 
   const [toggleLikePost, { loading: loadingToggleLikePost }] =
     useMutation(TOGGLE_LIKE_POST);
-
-  const [updatePostPicture, { loading: loadingPostPicture }] =
-    useMutation(UPDATE_POST_PICTURE);
 
   async function handleToggleLikePost() {
     try {
@@ -134,10 +130,25 @@ function PostDetails() {
     });
   }
 
+  function subscribeToUpdatedPostText() {
+    subscribeToMore({
+      document: UPDATED_POST_TEXT_SUB,
+      variables: { idPost: postId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const updatedPostText = subscriptionData.data.updatedPostText;
+        Object.assign({}, prev, {
+          getPostById: updatedPostText,
+        });
+      },
+    });
+  }
+
   useEffect(() => {
     subscribeToUpdatedPostPicture();
     subscribeToToggledLikePostDetails();
     subscribeToDeletedPostDetails();
+    subscribeToUpdatedPostText();
   }, []);
 
   if (loadingPost)
@@ -195,29 +206,6 @@ function PostDetails() {
         </div>
       </div>
       <div className={"relative w-full overflow-hidden"}>
-        {loadingPostPicture ? (
-          <div
-            className={
-              "absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center bg-black opacity-50"
-            }
-          >
-            <OvalLoader />
-          </div>
-        ) : undefined}
-        {user._id === post.user._id ? (
-          <label>
-            <RxUpdate
-              className={
-                "absolute top-2 right-2 h-4 w-4 rounded-full transition-all hover:cursor-pointer md:h-7 md:w-7 md:bg-gray-50 md:bg-opacity-50 md:p-1 hover:md:bg-opacity-100"
-              }
-            />
-            <input
-              type={"file"}
-              className={"hidden"}
-              onChange={handleUpdatePostPicture}
-            />
-          </label>
-        ) : undefined}
         <img
           src={`data:${post.picture.contentType};base64,${post.picture.data}`}
           alt={post.picture.filename}

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { GET_POST_BY_ID, UPDATE_POST_PICTURE } from "../gql/post.jsx";
-import { useParams } from "react-router-dom";
+import {
+  GET_POST_BY_ID,
+  UPDATE_POST_PICTURE,
+  UPDATE_POST_TEXT,
+} from "../gql/post.jsx";
+import { useNavigate, useParams } from "react-router-dom";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import OvalLoader from "../components/OvalLoader.jsx";
 import { RxUpdate } from "react-icons/rx";
@@ -10,8 +14,11 @@ import { useUserContext } from "../context/userContext.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import { useForm } from "react-hook-form";
 import TextEditor from "../components/TextEditor/index.jsx";
+import apolloClient from "../config/apollo-client.jsx";
+import PATH from "../utils/route-path.jsx";
 
 function EditPost() {
+  const navigate = useNavigate();
   const { postId } = useParams();
   const { user } = useUserContext();
   const [story, setStory] = useState({ value: undefined, error: undefined });
@@ -34,7 +41,36 @@ function EditPost() {
   });
 
   const [updatePostPicture, { loading: loadingUpdatePostPicture }] =
-    useMutation(UPDATE_POST_PICTURE);
+    useMutation(UPDATE_POST_PICTURE, {
+      onCompleted: (res) => {
+        apolloClient.cache.updateQuery(
+          { query: GET_POST_BY_ID, variables: { idPost: postId } },
+          (dataCache) => {
+            return {
+              getPostById: {
+                ...dataCache.getPostById,
+                picture: res.updatePostPicture,
+              },
+            };
+          }
+        );
+      },
+    });
+
+  const [updatePostText, { loading: loadingUpdatePostText }] = useMutation(
+    UPDATE_POST_TEXT,
+    {
+      onCompleted: (res) => {
+        apolloClient.cache.updateQuery(
+          { query: GET_POST_BY_ID, variables: { idPost: postId } },
+          (dataCache) => {
+            return { getPostById: res.updatePostText };
+          }
+        );
+        navigate(PATH.POST_DETAILS.split(":postId")[0] + postId);
+      },
+    }
+  );
 
   async function handleUpdatePostPicture(e) {
     const file = e.target.files[0];
@@ -56,7 +92,7 @@ function EditPost() {
     );
   }
 
-  async function handleSubmitUpdatePost(data) {
+  async function handleSubmitUpdatePostText(data) {
     setStory((prev) => ({ ...prev, error: undefined }));
     if (!checkIfStoryIsEmpty(JSON.parse(story.value))) {
       setStory((prev) => ({
@@ -69,8 +105,10 @@ function EditPost() {
       title: data.title,
       story: story.value,
     };
-    console.log(postInput);
     try {
+      await updatePostText({
+        variables: { idPost: postId, postInput: postInput },
+      });
     } catch (errorSubmittingUpdatePost) {
       console.log(errorSubmittingUpdatePost);
     }
@@ -131,7 +169,7 @@ function EditPost() {
         className={
           "flex flex-col items-center justify-center rounded-lg bg-gray-300 p-2"
         }
-        onSubmit={handleSubmit(handleSubmitUpdatePost)}
+        onSubmit={handleSubmit(handleSubmitUpdatePostText)}
       >
         <CustomInput
           name={"title"}
@@ -150,7 +188,7 @@ function EditPost() {
         </div>
 
         <button type={"submit"} className={"btn-form"}>
-          {isSubmitting ? <OvalLoader /> : "Save"}
+          {isSubmitting || loadingUpdatePostText ? <OvalLoader /> : "Save"}
         </button>
       </form>
     </div>

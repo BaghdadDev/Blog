@@ -33,11 +33,19 @@ export const DELETE_POST = gql`
     deletePost(idPost: $idPost)
   }
 `;
-
+export const UPDATE_POST_TEXT = gql`
+  ${CORE_POST_FIELDS}
+  mutation UpdatePostText($idPost: ID!, $postInput: PostInput!) {
+    updatePostText(idPost: $idPost, postInput: $postInput) {
+      ...CorePostFields
+    }
+  }
+`;
 export const UPDATE_POST_PICTURE = gql`
+  ${CORE_FILE_FIELDS}
   mutation UpdatePostPicture($idPost: ID!, $picture: Upload!) {
     updatePostPicture(idPost: $idPost, picture: $picture) {
-      _id
+      ...CoreFileFields
     }
   }
 `;
@@ -45,6 +53,15 @@ export const UPDATE_POST_PICTURE = gql`
 export const TOGGLE_LIKE_POST = gql`
   mutation toggleLikePost($idPost: ID!, $idUser: ID!) {
     toggleLikePost(idPost: $idPost, idUser: $idUser)
+  }
+`;
+
+export const SEARCH_POSTS = gql`
+  ${CORE_POST_FIELDS}
+  mutation SearchPosts($search: String!) {
+    searchPosts(search: $search) {
+      ...CorePostFields
+    }
   }
 `;
 
@@ -70,11 +87,29 @@ export const DELETED_POST_DETAILS_SUB = gql`
   }
 `;
 
+export const UPDATED_POST_TEXT_SUB = gql`
+  ${CORE_POST_FIELDS}
+  subscription UpdatedPostText($idPost: ID!) {
+    updatedPostText(idPost: $idPost) {
+      ...CorePostFields
+    }
+  }
+`;
+
 export const UPDATED_POST_PICTURE_SUB = gql`
   ${CORE_FILE_FIELDS}
   subscription UpdatedPostPicture($idPost: ID!) {
     updatedPostPicture(idPost: $idPost) {
       ...CoreFileFields
+    }
+  }
+`;
+
+export const UPDATED_POST_SUB = gql`
+  ${CORE_POST_FIELDS}
+  subscription UpdatedPost {
+    updatedPost {
+      ...CorePostFields
     }
   }
 `;
