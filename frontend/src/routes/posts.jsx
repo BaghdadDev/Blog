@@ -137,11 +137,11 @@ function Posts() {
   }
 
   useEffect(() => {
-    subscribeToCreatedPost();
-    subscribeToDeletedPost();
-    subscribeToToggledLikePost();
-    subscribeToToggledCommentPost();
-    subscribeToUpdatedPost();
+    // subscribeToCreatedPost();
+    // subscribeToDeletedPost();
+    // subscribeToToggledLikePost();
+    // subscribeToToggledCommentPost();
+    // subscribeToUpdatedPost();
   }, []);
 
   if (loadingGetPosts) return <SkeletonPosts />;
@@ -152,7 +152,8 @@ function Posts() {
     <div className={"flex w-full flex-col items-center px-2 py-2 md:mx-0"}>
       <div className={"flex w-full max-w-2xl flex-col items-center gap-y-2"}>
         {dataGetPosts.getPosts.map((post) => (
-          <Post key={post._id} post={post} />
+          // <Post key={post._id} post={post} />
+          <p key={post._id}>{post.title}</p>
         ))}
       </div>
     </div>

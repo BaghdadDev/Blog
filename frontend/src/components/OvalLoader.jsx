@@ -14,6 +14,7 @@ function OvalLoader({ size }) {
       secondaryColor="#e5e7eb"
       strokeWidth={3}
       strokeWidthSecondary={3}
+      data-testid={"loading-oval"}
     />
   );
 }

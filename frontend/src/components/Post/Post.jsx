@@ -12,6 +12,8 @@ function Post({ post }) {
       .join(" ");
   }
 
+  // console.log(post);
+
   return (
     <div
       className={
