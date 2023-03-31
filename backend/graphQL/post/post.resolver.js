@@ -7,6 +7,7 @@ const CommentModel = require("../../models/CommentModel");
 const FileModel = require("../../models/FileModel.js");
 
 const pubSub = require("../../config/PubSub.js");
+const { withFilter } = require("graphql-subscriptions");
 
 const Query = {
   getPosts: async () => {
@@ -133,12 +134,13 @@ const Mutation = {
         { new: true }
       )
         .populate({ path: "picture" })
-        .populate({ path: "user", populate: { path: "photo" } })
+        .populate({
+          path: "user",
+          select: "-password",
+          populate: { path: "photo" },
+        })
         .populate({ path: "likes", select: "_id" })
         .populate({ path: "comments", select: "_id" });
-      await pubSub.publish("UPDATED_POST_TEXT", {
-        updatedPostText: updatedPost,
-      });
       await pubSub.publish("UPDATED_POST", {
         updatedPost: updatedPost,
       });
@@ -183,9 +185,6 @@ const Mutation = {
         .populate({ path: "likes", select: "_id" })
         .populate({ path: "comments", select: "_id" });
       // Publish the subscription
-      await pubSub.publish("UPDATED_POST_PICTURE", {
-        updatedPostPicture: file,
-      });
       await pubSub.publish("UPDATED_POST", {
         updatedPost: updatedPost,
       });
@@ -224,11 +223,8 @@ const Mutation = {
           { $push: { likes: idUser } }
         );
       }
-      await pubSub.publish("TOGGLED_LIKE_POST_DETAILS", {
-        toggledLikePostDetails: { _id: idUser },
-      });
       await pubSub.publish("TOGGLED_LIKE_POST", {
-        toggledLikePost: { _id: idPost, user: { _id: idUser } },
+        toggledLikePost: { _id: idUser, idPost: post._id },
       });
       return true;
     } catch (errorToggleLikePost) {
@@ -259,10 +255,7 @@ const Mutation = {
       await CommentModel.deleteMany({ post: idPost });
       await PostModel.findOneAndDelete({ _id: idPost });
       await pubSub.publish("DELETED_POST", {
-        deletedPost: idPost,
-      });
-      await pubSub.publish("DELETED_POST_DETAILS", {
-        deletedPostDetails: idPost,
+        deletedPost: postExists._id,
       });
       return idPost;
     } catch (errorDeletePost) {
@@ -307,25 +300,30 @@ const Subscription = {
     subscribe: () => pubSub.asyncIterator(["CREATED_POST"]),
   },
   deletedPost: {
-    subscribe: () => pubSub.asyncIterator(["DELETED_POST"]),
-  },
-  deletedPostDetails: {
-    subscribe: () => pubSub.asyncIterator(["DELETED_POST_DETAILS"]),
-  },
-  updatedPost: {
-    subscribe: () => pubSub.asyncIterator(["UPDATED_POST"]),
-  },
-  updatedPostText: {
-    subscribe: () => pubSub.asyncIterator(["UPDATED_POST_TEXT"]),
-  },
-  updatedPostPicture: {
-    subscribe: () => pubSub.asyncIterator(["UPDATED_POST_PICTURE"]),
-  },
-  toggledLikePostDetails: {
-    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_POST_DETAILS"]),
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("DELETED_POST"),
+      (payload, variables) => {
+        return payload.deletedPost.equals(variables.idPost);
+      }
+    ),
   },
   toggledLikePost: {
-    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_POST"]),
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("TOGGLED_LIKE_POST"),
+      (payload, variables) => {
+        console.log(payload.toggledLikePost);
+        console.log(variables);
+        return payload.toggledLikePost.idPost.equals(variables.idPost);
+      }
+    ),
+  },
+  updatedPost: {
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("UPDATED_POST"),
+      (payload, variables) => {
+        return payload.updatedPost._id.equals(variables.idPost);
+      }
+    ),
   },
 };
 

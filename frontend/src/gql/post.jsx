@@ -4,7 +4,7 @@ import { CORE_POST_FIELDS, CORE_FILE_FIELDS } from "./fragments.jsx";
 // QUERIES ----------------------------------------------------------------
 export const GET_POSTS = gql`
   ${CORE_POST_FIELDS}
-  query getPosts {
+  query GetPosts {
     getPosts {
       ...CorePostFields
     }
@@ -76,14 +76,25 @@ export const CREATED_POST_SUB = gql`
 `;
 
 export const DELETED_POST_SUB = gql`
-  subscription DeletedPost {
-    deletedPost
+  subscription DeletedPost($idPost: ID!) {
+    deletedPost(idPost: $idPost)
   }
 `;
 
-export const DELETED_POST_DETAILS_SUB = gql`
-  subscription DeletedPostDetails($idPost: ID!) {
-    deletedPostDetails(idPost: $idPost)
+export const TOGGLED_LIKE_POST_SUB = gql`
+  subscription ToggledLikePost($idPost: ID!) {
+    toggledLikePost(idPost: $idPost) {
+      _id
+    }
+  }
+`;
+
+export const UPDATED_POST_SUB = gql`
+  ${CORE_POST_FIELDS}
+  subscription UpdatedPost($idPost: ID!) {
+    updatedPost(idPost: $idPost) {
+      ...CorePostFields
+    }
   }
 `;
 
@@ -101,34 +112,6 @@ export const UPDATED_POST_PICTURE_SUB = gql`
   subscription UpdatedPostPicture($idPost: ID!) {
     updatedPostPicture(idPost: $idPost) {
       ...CoreFileFields
-    }
-  }
-`;
-
-export const UPDATED_POST_SUB = gql`
-  ${CORE_POST_FIELDS}
-  subscription UpdatedPost {
-    updatedPost {
-      ...CorePostFields
-    }
-  }
-`;
-
-export const TOGGLED_LIKE_POST_DETAILS_SUB = gql`
-  subscription ToggledLikePostDetails($idPost: ID!) {
-    toggledLikePostDetails(idPost: $idPost) {
-      _id
-    }
-  }
-`;
-
-export const TOGGLED_LIKE_POST_SUB = gql`
-  subscription ToggledLikePost {
-    toggledLikePost {
-      _id
-      user {
-        _id
-      }
     }
   }
 `;

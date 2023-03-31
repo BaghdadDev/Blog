@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, Slate, useSlate, withReact } from "slate-react";
 import {
@@ -40,6 +40,7 @@ const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
 TextEditor.defaultProps = {
   readOnly: false,
   initValue: "",
+  nameDraft: "textEditor-draft",
 };
 
 TextEditor.propTypes = {
@@ -48,21 +49,33 @@ TextEditor.propTypes = {
   initValue: PropTypes.string,
   readOnly: PropTypes.bool,
   setValue: PropTypes.func,
+  nameDraft: PropTypes.string,
 };
 
-function TextEditor({ placeholder, error, initValue, readOnly, setValue }) {
+function TextEditor({
+  placeholder,
+  error,
+  initValue,
+  readOnly,
+  setValue,
+  nameDraft,
+}) {
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
   const initialValue = (initValue && deserialize(initValue)) ||
-    localStorage.getItem("draft") ||
-    deserialize(localStorage.getItem("draft")) || [
+    (localStorage.getItem(nameDraft) &&
+      deserialize(localStorage.getItem(nameDraft))) || [
       {
         type: "paragraph",
         children: [{ text: "" }],
       },
     ];
+
+  // useEffect(() => {
+  //   console.log(initialValue);
+  // }, [initialValue]);
 
   return (
     <Slate
@@ -73,8 +86,9 @@ function TextEditor({ placeholder, error, initValue, readOnly, setValue }) {
           (op) => "set_selection" !== op.type
         );
         if (isAstChange) {
-          localStorage.setItem("draft", serialize(value));
-          setValue(serialize(value));
+          const serializedValue = serialize(value);
+          localStorage.setItem(nameDraft, serializedValue);
+          setValue(serializedValue);
         }
       }}
     >
@@ -133,7 +147,6 @@ const serialize = (value) => {
 };
 
 const deserialize = (string) => {
-  // localStorage.setItem("draft", string);
   return JSON.parse(string);
 };
 

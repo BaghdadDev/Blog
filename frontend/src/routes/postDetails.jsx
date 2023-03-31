@@ -4,19 +4,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 import {
-  DELETED_POST_DETAILS_SUB,
+  DELETED_POST_SUB,
   GET_POST_BY_ID,
   GET_POSTS,
   TOGGLE_LIKE_POST,
-  TOGGLED_LIKE_POST_DETAILS_SUB,
+  TOGGLED_LIKE_POST_SUB,
   UPDATED_POST_PICTURE_SUB,
+  UPDATED_POST_SUB,
   UPDATED_POST_TEXT_SUB,
 } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
-import TextEditor from "../components/TextEditor/index.jsx";
+import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
-import Comments from "../components/Comments";
+import Comments from "../components/Comments/Comments.jsx";
 import { useUserContext } from "../context/userContext.jsx";
 import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
@@ -52,51 +53,24 @@ function PostDetails() {
     }
   }
 
-  async function handleUpdatePostPicture(e) {
-    const file = e.target.files[0];
-    try {
-      const res = await updatePostPicture({
-        variables: { idPost: postId, picture: file },
-      });
-    } catch (errorUpdatePostPicture) {
-      console.log(errorUpdatePostPicture);
-    }
-  }
-
-  function subscribeToUpdatedPostPicture() {
+  function subscribeToToggledLikePost() {
     subscribeToMore({
-      document: UPDATED_POST_PICTURE_SUB,
-      variables: { idPost: postId },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const newPostPicture = subscriptionData.data.updatedPostPicture;
-        return Object.assign({}, prev, {
-          getPostById: {
-            ...prev.getPostById,
-            picture: newPostPicture,
-          },
-        });
-      },
-    });
-  }
-
-  function subscribeToToggledLikePostDetails() {
-    subscribeToMore({
-      document: TOGGLED_LIKE_POST_DETAILS_SUB,
+      document: TOGGLED_LIKE_POST_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const { _id: idUserToggledLike } =
-          subscriptionData.data.toggledLikePostDetails;
-        const copyPost = { ...prev.getPostById };
-        const copyLikes = [...copyPost.likes];
+          subscriptionData.data.toggledLikePost;
+        const copyLikes = Array.isArray(prev.getPostById.likes)
+          ? [...prev.getPostById.likes]
+          : [];
         if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
           copyLikes.splice(
             copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
             1
           );
         } else {
-          copyLikes.push({ _id: idUserToggledLike });
+          copyLikes.push({ __typename: "User", _id: idUserToggledLike });
         }
         return Object.assign({}, prev, {
           getPostById: {
@@ -108,13 +82,13 @@ function PostDetails() {
     });
   }
 
-  function subscribeToDeletedPostDetails() {
+  function subscribeToDeletedPost() {
     subscribeToMore({
-      document: DELETED_POST_DETAILS_SUB,
+      document: DELETED_POST_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const idDeletedPost = subscriptionData.data.deletedPostDetails;
+        const idDeletedPost = subscriptionData.data.deletedPost;
         apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
           if (!dataCache?.getPosts) return { getPosts: [] };
           const filteredPosts = dataCache.getPosts.filter(
@@ -130,25 +104,24 @@ function PostDetails() {
     });
   }
 
-  function subscribeToUpdatedPostText() {
+  function subscribeToUpdatedPost() {
     subscribeToMore({
-      document: UPDATED_POST_TEXT_SUB,
+      document: UPDATED_POST_SUB,
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const updatedPostText = subscriptionData.data.updatedPostText;
-        Object.assign({}, prev, {
-          getPostById: updatedPostText,
+        const postUpdated = subscriptionData.data.updatedPost;
+        return Object.assign({}, prev, {
+          getPostById: postUpdated,
         });
       },
     });
   }
 
   useEffect(() => {
-    subscribeToUpdatedPostPicture();
-    subscribeToToggledLikePostDetails();
-    subscribeToDeletedPostDetails();
-    subscribeToUpdatedPostText();
+    subscribeToDeletedPost();
+    subscribeToToggledLikePost();
+    subscribeToUpdatedPost();
   }, []);
 
   if (loadingPost)
@@ -212,7 +185,6 @@ function PostDetails() {
           className={"rounded"}
         />
       </div>
-
       <p className={"text-center text-2xl font-semibold"}>{post.title}</p>
       <div className={"mx-2 shadow"}>
         <TextEditor readOnly={true} initValue={post.story} />

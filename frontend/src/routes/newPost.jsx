@@ -9,7 +9,7 @@ import OvalLoader from "../components/OvalLoader.jsx";
 import { useUserContext } from "../context/userContext.jsx";
 import { CREATE_POST, GET_POSTS } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
-import TextEditor from "../components/TextEditor";
+import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import PATH from "../utils/route-path.jsx";
 import apolloClient from "../config/apollo-client.jsx";
 
@@ -21,7 +21,7 @@ function NewPost() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-  const [errorStory, setErrorStory] = useState("");
+  const [story, setStory] = useState({ value: undefined, error: undefined });
 
   const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST, {
     onCompleted: ({ createPost: newPost }) => {
@@ -31,39 +31,32 @@ function NewPost() {
           : [];
         return { getPosts: [newPost, ...posts] };
       });
+      localStorage.removeItem(`textEditor-draft-${user._id}`);
       navigate(PATH.ROOT);
     },
   });
 
-  function getStoryField() {
-    setErrorStory("");
-    if (localStorage.getItem("draft")) {
-      const objStory = JSON.parse(localStorage.getItem("draft"));
-      if (
-        objStory.length === 1 &&
-        Object.entries(objStory[0]).length === 2 &&
-        objStory[0].type === "paragraph" &&
-        Object.entries(objStory[0].children[0]).length === 1 &&
-        objStory[0].children[0].text === ""
-      ) {
-        setErrorStory("Please, fill a story");
-        return false;
-      } else {
-        const story = localStorage.getItem("draft");
-        localStorage.removeItem("draft");
-        return story;
-      }
-    }
-    setErrorStory("Please, fill a story");
-    return false;
+  function checkIfStoryIsEmpty(objStory) {
+    return !(
+      objStory.length === 1 &&
+      Object.entries(objStory[0]).length === 2 &&
+      objStory[0].type === "paragraph" &&
+      objStory[0].children[0].text === ""
+    );
   }
 
   async function handleSubmitNewPost(data) {
-    const story = getStoryField();
-    if (!story) return;
+    setStory((prev) => ({ ...prev, error: undefined }));
+    if (!checkIfStoryIsEmpty(JSON.parse(story.value))) {
+      setStory((prev) => ({
+        ...prev,
+        error: "Please, don't fill your story",
+      }));
+      return;
+    }
     const postInput = {
       title: data.title,
-      story,
+      story: story.value,
       user: user._id,
       picture: data.files[0],
     };
@@ -99,7 +92,9 @@ function NewPost() {
       />
       <TextEditor
         placeholder={"Type your story or whatever you want ;)"}
-        error={errorStory}
+        error={story.error}
+        nameDraft={`textEditor-draft-${user._id}`}
+        setValue={(value) => setStory((prev) => ({ ...prev, value: value }))}
       />
 
       <button type={"submit"} className={"btn-form"}>

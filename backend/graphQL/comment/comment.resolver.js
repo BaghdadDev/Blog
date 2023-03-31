@@ -3,6 +3,7 @@ const { GraphQLError } = require("graphql");
 const CommentModel = require("../../models/CommentModel.js");
 const PostModel = require("../../models/PostModel.js");
 const pubSub = require("../../config/PubSub.js");
+const { withFilter } = require("graphql-subscriptions");
 
 const Query = {
   getComments: async (_, { idPost }) => {
@@ -62,12 +63,6 @@ const Mutation = {
       await pubSub.publish("CREATED_COMMENT", {
         createdComment: commentCreated,
       });
-      await pubSub.publish("TOGGLED_COMMENT_POST", {
-        toggledCommentPost: {
-          _id: commentCreated._id,
-          post: { _id: commentCreated.post._id },
-        },
-      });
       return commentCreated;
     } catch (errorCreateComment) {
       console.log(`Something went wrong creating comment.`, errorCreateComment);
@@ -97,9 +92,6 @@ const Mutation = {
       );
       await pubSub.publish("DELETED_COMMENT", {
         deletedComment: idComment,
-      });
-      await pubSub.publish("TOGGLED_COMMENT_POST", {
-        toggledCommentPost: { _id: comment._id, post: { _id: comment.post } },
       });
       return { _id: idComment };
     } catch (errorDeleteComment) {
@@ -133,7 +125,7 @@ const Mutation = {
         );
       }
       await pubSub.publish("TOGGLED_LIKE_COMMENT", {
-        toggledLikeComment: { _id: idComment, user: { _id: idUser } },
+        toggledLikeComment: { _id: idUser, idComment: commentUpdated._id },
       });
       return commentUpdated;
     } catch (errorToggleLikeComment) {
@@ -191,10 +183,12 @@ const Subscription = {
     subscribe: () => pubSub.asyncIterator(["DELETED_COMMENT"]),
   },
   toggledLikeComment: {
-    subscribe: () => pubSub.asyncIterator(["TOGGLED_LIKE_COMMENT"]),
-  },
-  toggledCommentPost: {
-    subscribe: () => pubSub.asyncIterator(["TOGGLED_COMMENT_POST"]),
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("TOGGLED_LIKE_COMMENT"),
+      (payload, variables) => {
+        return payload.toggledLikeComment.idComment.equals(variables.idComment);
+      }
+    ),
   },
 };
 

@@ -17,13 +17,9 @@ input PostInput {
 
 type Subscription {
     createdPost: Post!
-    toggledLikePostDetails(idPost: ID!): User!
-    toggledLikePost: Post!
-    updatedPost: Post!
-    updatedPostText(idPost: ID!): Post!
-    updatedPostPicture(idPost: ID!): File!
-    deletedPost: ID!
-    deletedPostDetails(idPost: ID!): ID!
+    deletedPost(idPost: ID!): ID!
+    toggledLikePost(idPost: ID!): User!
+    updatedPost(idPost: ID!): Post!
 }
 
 type Query {

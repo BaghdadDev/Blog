@@ -14,10 +14,10 @@ input CommentInput {
 
 type Subscription {
     createdComment(idPost: ID!): Comment!
-    updatedComment(idPost: ID!): Comment!
     deletedComment(idPost: ID!): ID!
-    toggledLikeComment(idPost: ID!): Comment!
-    toggledCommentPost: Comment!
+    toggledLikeComment(idComment: ID!): User!
+
+    updatedComment(idPost: ID!): Comment!
 }
 
 type Query {

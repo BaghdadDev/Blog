@@ -7,7 +7,7 @@ import PATH from "../../utils/route-path.jsx";
 import HeaderDropDown from "./HeaderDropDown.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import CustomButton from "../Custom/CustomButton.jsx";
-import Search from "./Search/index.jsx";
+import Search from "./Search/Search.jsx";
 
 function Header() {
   const { user } = useUserContext();

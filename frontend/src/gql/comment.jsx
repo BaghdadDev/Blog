@@ -61,12 +61,9 @@ export const DELETED_COMMENT_SUB = gql`
 `;
 
 export const TOGGLED_LIKE_COMMENT_SUB = gql`
-  subscription ToggledLikeComment($idPost: ID!) {
-    toggledLikeComment(idPost: $idPost) {
+  subscription ToggledLikeComment($idComment: ID!) {
+    toggledLikeComment(idComment: $idComment) {
       _id
-      user {
-        _id
-      }
     }
   }
 `;
@@ -76,17 +73,6 @@ export const UPDATED_COMMENT_SUB = gql`
   subscription UpdatedComment($idPost: ID!) {
     updatedComment(idPost: $idPost) {
       ...CoreCommentFields
-    }
-  }
-`;
-
-export const TOGGLED_COMMENT_POST_SUB = gql`
-  subscription ToggledCommentPost {
-    toggledCommentPost {
-      _id
-      post {
-        _id
-      }
     }
   }
 `;

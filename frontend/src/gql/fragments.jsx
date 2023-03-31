@@ -28,12 +28,13 @@ export const CORE_COMMENT_FIELDS = gql`
   fragment CoreCommentFields on Comment {
     _id
     comment
-    post {
-      _id
-    }
     user {
       ...CoreUserFields
     }
+    post {
+      _id
+    }
+
     likes {
       _id
     }

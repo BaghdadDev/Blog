@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { RxUpdate } from "react-icons/rx";
 
 import {
   GET_POST_BY_ID,
   UPDATE_POST_PICTURE,
   UPDATE_POST_TEXT,
 } from "../gql/post.jsx";
-import { useNavigate, useParams } from "react-router-dom";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import OvalLoader from "../components/OvalLoader.jsx";
-import { RxUpdate } from "react-icons/rx";
 import { useUserContext } from "../context/userContext.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
-import { useForm } from "react-hook-form";
-import TextEditor from "../components/TextEditor/index.jsx";
+import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import apolloClient from "../config/apollo-client.jsx";
 import PATH from "../utils/route-path.jsx";
 
@@ -67,6 +67,7 @@ function EditPost() {
             return { getPostById: res.updatePostText };
           }
         );
+        localStorage.removeItem(`textEditor-draft-${user._id}`);
         navigate(PATH.POST_DETAILS.split(":postId")[0] + postId);
       },
     }
@@ -181,6 +182,7 @@ function EditPost() {
           <TextEditor
             initValue={post.story}
             error={story.error}
+            nameDraft={`textEditor-draft-${user._id}`}
             setValue={(value) =>
               setStory((prev) => ({ ...prev, value: value }))
             }

@@ -1,51 +1,89 @@
 import { MockedProvider } from "@apollo/client/testing";
-import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Routes, Route, BrowserRouter } from "react-router-dom";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
 import { GET_POSTS } from "../gql/post.jsx";
-import { mockedPosts } from "./mockedData/mockedPost.jsx";
+import { mockedPosts } from "./mockedData/Post/mockedPost.jsx";
 import Posts from "../routes/posts.jsx";
 import Post from "../components/Post/Post.jsx";
+import { GraphQLError } from "graphql/error/index.js";
 
-const mocks = [
+const mockedData = [
   {
     request: { query: GET_POSTS },
-    result: { data: { getPosts: [...mockedPosts] } },
+    result: { data: { getPosts: mockedPosts } },
+  },
+];
+
+const mockedNetworkError = [
+  {
+    request: { query: GET_POSTS },
+    error: new Error("An error occurred"),
+  },
+];
+
+const mockedGraphQLError = [
+  {
+    request: { query: GET_POSTS },
+    result: {
+      errors: [new GraphQLError("Something went wrong during Get Posts")],
+    },
   },
 ];
 
 describe("Posts Component", () => {
-  // it("Post Component should render without error", () => {
-  // render(
-  //   <BrowserRouter>
-  //     <Post post={mockedPosts[0]} />
-  //   </BrowserRouter>
-  // );
-  //   const title = screen.getByText(/Brothers/i);
-  //   const altImg = screen.getAllByAltText(/filename*/i);
-  //   expect(title).toBeInTheDocument();
-  //   expect(altImg.length).toBe(2);
-  // });
-
-  it("Posts Component should render without error", async () => {
+  it("Post Component should render without error", () => {
     render(
-      <MockedProvider mocks={mocks} addTypename={false}>
+      <MemoryRouter initialEntries={["/"]}>
+        <Post post={mockedPosts[0]} />
+      </MemoryRouter>
+    );
+    // Title loaded
+    expect(screen.getByText(/Brothers/i)).toBeInTheDocument();
+    // Photo loaded
+    expect(screen.getByAltText(/picture-filename*/i)).toBeInTheDocument();
+  });
+
+  it("Should render posts list", async () => {
+    render(
+      <MockedProvider mocks={mockedData} addTypename={true}>
         <MemoryRouter initialEntries={["/"]}>
           <Posts />
         </MemoryRouter>
       </MockedProvider>
     );
+    // Loading state
+    expect(await screen.findByTestId(/loading-skeleton/i)).toBeInTheDocument();
+    // Data loaded successfully
+    expect(await screen.findByText(/brothers/i)).toBeInTheDocument();
+    expect(await screen.findByText(/motivation/i)).toBeInTheDocument();
+  });
 
-    await waitFor(() => {
-      screen.debug();
-      expect(screen.getByTestId("loading-skeleton")).toBeInTheDocument();
+  describe("Should show error UI", async () => {
+    it("Network Error", async () => {
+      render(
+        <MockedProvider mocks={mockedNetworkError} addTypename={false}>
+          <MemoryRouter initialEntries={["/"]}>
+            <Posts />
+          </MemoryRouter>
+        </MockedProvider>
+      );
+      expect(await screen.findByText(/An error occurred/i)).toBeInTheDocument();
     });
-
-    // const title = getByText(/brothers/i);
-    // expect(title).toBeInTheDocument();
-    // await waitFor(() => {
-    //   const title = screen.getByText(/brother/i);
-    //   expect(title).toBeInTheDocument();
-    // });
+    it("GraphQL Error", async () => {
+      render(
+        <MockedProvider mocks={mockedGraphQLError} addTypename={false}>
+          <MemoryRouter initialEntries={["/"]}>
+            <Posts />
+          </MemoryRouter>
+        </MockedProvider>
+      );
+      // expect(
+      //   await screen.findByTestId(/loading-skeleton/i)
+      // ).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Something went wrong during Get Posts/i)
+      ).toBeInTheDocument();
+    });
   });
 });

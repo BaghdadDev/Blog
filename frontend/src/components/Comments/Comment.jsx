@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
 
 import Avatar from "../Avatar.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import OptionsComment from "./OptionsComment.jsx";
-import { TOGGLE_LIKE_COMMENT } from "../../gql/comment.jsx";
+import {
+  TOGGLE_LIKE_COMMENT,
+  TOGGLED_LIKE_COMMENT_SUB,
+  UPDATED_COMMENT_SUB,
+} from "../../gql/comment.jsx";
 import CommentInput from "./CommentInput.jsx";
 
-function Comment({ comment, subscribeToMore }) {
+function Comment({ comment, subscribeToGetComments }) {
   const { user } = useUserContext();
 
   const [readOnly, setReadOnly] = useState(true);
@@ -23,6 +27,44 @@ function Comment({ comment, subscribeToMore }) {
       console.log(errorToggleLikeComment);
     }
   }
+
+  function subToggledLikeComment() {
+    subscribeToGetComments({
+      document: TOGGLED_LIKE_COMMENT_SUB,
+      variables: { idComment: comment._id },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const { _id: idUserToggledLikeComment } =
+          subscriptionData.data.toggledLikeComment;
+        const indexComment = prev.getComments.findIndex(
+          ({ _id }) => _id === comment._id
+        );
+        let copyLikes = Array.isArray(prev.getComments[indexComment].likes)
+          ? [...prev.getComments[indexComment].likes]
+          : [];
+        const indexUserLiked = copyLikes.findIndex(
+          (like) => like?._id === idUserToggledLikeComment
+        );
+        if (indexUserLiked !== -1) {
+          copyLikes.splice(indexUserLiked, 1);
+        } else {
+          copyLikes.push({ __typename: "User", _id: idUserToggledLikeComment });
+        }
+        let copyComments = [...prev.getComments];
+        copyComments[indexComment] = {
+          ...prev.getComments[indexComment],
+          likes: copyLikes,
+        };
+        return Object.assign({}, prev, {
+          getComments: copyComments,
+        });
+      },
+    });
+  }
+
+  useEffect(() => {
+    subToggledLikeComment();
+  }, []);
 
   return (
     <div

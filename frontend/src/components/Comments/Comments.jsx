@@ -51,28 +51,23 @@ function IndexComments({ idPost }) {
         apolloClient.cache.updateQuery(
           { query: GET_POST_BY_ID, variables: { idPost: idPost } },
           (dataCache) => {
-            const prevComments = Array.isArray(dataCache?.getPostById?.comments)
-              ? dataCache.getPostById.comments
+            const copyComments = Array.isArray(dataCache.getPostById.comments)
+              ? [...dataCache.getPostById.comments]
               : [];
+            copyComments.push(createdComment);
             return {
               getPostById: {
                 ...dataCache.getPostById,
-                comments: [
-                  {
-                    __typename: createdComment.__typename,
-                    _id: createdComment._id,
-                  },
-                  ...prevComments,
-                ],
+                comments: copyComments,
               },
             };
           }
         );
-        const copyComments = prev?.getComments
+        const comments = Array.isArray(prev.getComments)
           ? [createdComment, ...prev.getComments]
           : [createdComment];
         return Object.assign({}, prev, {
-          getComments: copyComments,
+          getComments: comments,
         });
       },
     });
@@ -109,42 +104,6 @@ function IndexComments({ idPost }) {
     });
   }
 
-  function handleSubscribeToToggledLikeComment() {
-    subscribeToMore({
-      document: TOGGLED_LIKE_COMMENT_SUB,
-      variables: { idPost: idPost },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const {
-          _id: idComment,
-          user: { _id: idUserToggled },
-        } = subscriptionData.data.toggledLikeComment;
-        const indexComment = prev.getComments.findIndex(
-          (c) => c._id === idComment
-        );
-        const copyLikes = Array.isArray(prev.getComments[indexComment]?.likes)
-          ? [...prev.getComments[indexComment].likes]
-          : [];
-        if (copyLikes.find((like) => like._id === idUserToggled)) {
-          copyLikes.splice(
-            copyLikes.findIndex((like) => like._id === idUserToggled),
-            1
-          );
-        } else {
-          copyLikes.push({ __typename: "User", _id: idUserToggled });
-        }
-        let commentsCopy = [...prev.getComments];
-        commentsCopy[indexComment] = {
-          ...prev.getComments[indexComment],
-          likes: copyLikes,
-        };
-        return Object.assign({}, prev, {
-          getComments: commentsCopy,
-        });
-      },
-    });
-  }
-
   function handleSubscribeToUpdatedComment() {
     subscribeToMore({
       document: UPDATED_COMMENT_SUB,
@@ -167,7 +126,6 @@ function IndexComments({ idPost }) {
   useEffect(() => {
     handleSubscribeToCreatedComment();
     handleSubscribeToDeletedComment();
-    handleSubscribeToToggledLikeComment();
     handleSubscribeToUpdatedComment();
   }, []);
 
@@ -228,7 +186,7 @@ function IndexComments({ idPost }) {
           <Comment
             key={comment._id}
             comment={comment}
-            subscribeToMore={subscribeToMore}
+            subscribeToGetComments={subscribeToMore}
           />
         ))}
       </div>
