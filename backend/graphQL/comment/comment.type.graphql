@@ -16,8 +16,7 @@ type Subscription {
     createdComment(idPost: ID!): Comment!
     deletedComment(idPost: ID!): ID!
     toggledLikeComment(idComment: ID!): User!
-
-    updatedComment(idPost: ID!): Comment!
+    updatedComment(idComment: ID!): Comment!
 }
 
 type Query {

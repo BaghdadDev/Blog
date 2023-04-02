@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { Node } from "slate";
+import { Link } from "react-router-dom";
 
 import Avatar from "../Avatar.jsx";
 import PATH from "../../utils/route-path.jsx";
-import { Link } from "react-router-dom";
 import {
   DELETED_POST_SUB,
   TOGGLED_LIKE_POST_SUB,

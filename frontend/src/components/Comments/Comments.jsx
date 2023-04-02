@@ -11,8 +11,6 @@ import {
   CREATED_COMMENT_SUB,
   DELETED_COMMENT_SUB,
   GET_COMMENTS,
-  TOGGLED_LIKE_COMMENT_SUB,
-  UPDATED_COMMENT_SUB,
 } from "../../gql/comment.jsx";
 import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
@@ -41,7 +39,7 @@ function IndexComments({ idPost }) {
   const [createComment, { loading: loadingCreateComment }] =
     useMutation(CREATE_COMMENT);
 
-  function handleSubscribeToCreatedComment() {
+  function subCreatedComment() {
     subscribeToMore({
       document: CREATED_COMMENT_SUB,
       variables: { idPost: idPost },
@@ -73,7 +71,7 @@ function IndexComments({ idPost }) {
     });
   }
 
-  function handleSubscribeToDeletedComment() {
+  function subDeletedComment() {
     subscribeToMore({
       document: DELETED_COMMENT_SUB,
       variables: { idPost: idPost },
@@ -81,7 +79,7 @@ function IndexComments({ idPost }) {
         if (!subscriptionData.data) return prev;
         const idDeletedComment = subscriptionData.data.deletedComment;
         apolloClient.cache.updateQuery(
-          { query: GET_POST_BY_ID, variables: { idPost: idPost } },
+          { query: GET_POST_BY_ID, variables: { idPost: comment.post._id } },
           (dataCache) => {
             const filteredComments = dataCache.getPostById.comments.filter(
               (comment) => comment._id !== idDeletedComment
@@ -104,29 +102,9 @@ function IndexComments({ idPost }) {
     });
   }
 
-  function handleSubscribeToUpdatedComment() {
-    subscribeToMore({
-      document: UPDATED_COMMENT_SUB,
-      variables: { idPost: idPost },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const updatedComment = subscriptionData.data.updatedComment;
-        const indexComment = prev.getComments.findIndex(
-          (c) => c._id === updatedComment._id
-        );
-        let commentsCopy = [...prev.getComments];
-        commentsCopy[indexComment] = updatedComment;
-        return Object.assign({}, prev, {
-          getComments: commentsCopy,
-        });
-      },
-    });
-  }
-
   useEffect(() => {
-    handleSubscribeToCreatedComment();
-    handleSubscribeToDeletedComment();
-    handleSubscribeToUpdatedComment();
+    subCreatedComment();
+    subDeletedComment();
   }, []);
 
   async function handleSubmitComment(data) {

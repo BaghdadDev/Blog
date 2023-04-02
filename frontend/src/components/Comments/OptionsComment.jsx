@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 
 import useOutsideClick from "../Hook/useOutsideClick.jsx";
 import { DELETE_COMMENT } from "../../gql/comment.jsx";
-import { GET_POST_BY_ID } from "../../gql/post.jsx";
 import OvalLoader from "../OvalLoader.jsx";
 
 function OptionsComment({ idComment, idPost, setReadyOnly }) {
@@ -13,14 +12,8 @@ function OptionsComment({ idComment, idPost, setReadyOnly }) {
 
   const ref = useOutsideClick(() => setOpen(false));
 
-  const [deleteComment, { loading: loadingDeleteComment }] = useMutation(
-    DELETE_COMMENT,
-    {
-      refetchQueries: [
-        { query: GET_POST_BY_ID, variables: { idPost: idPost } },
-      ],
-    }
-  );
+  const [deleteComment, { loading: loadingDeleteComment }] =
+    useMutation(DELETE_COMMENT);
 
   async function handleDeleteComment() {
     try {
