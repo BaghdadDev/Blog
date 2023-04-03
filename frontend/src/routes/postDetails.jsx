@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -9,16 +9,14 @@ import {
   GET_POSTS,
   TOGGLE_LIKE_POST,
   TOGGLED_LIKE_POST_SUB,
-  UPDATED_POST_PICTURE_SUB,
   UPDATED_POST_SUB,
-  UPDATED_POST_TEXT_SUB,
 } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comments/Comments.jsx";
-import { useUserContext } from "../context/userContext.jsx";
+import { UserContext, useUserContext } from "../context/userContext.jsx";
 import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import apolloClient from "../config/apollo-client.jsx";
@@ -27,7 +25,8 @@ import PATH from "../utils/route-path.jsx";
 function PostDetails() {
   const { postId } = useParams();
 
-  const { user } = useUserContext();
+  // const { user } = useUserContext();
+  const userContext = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -46,7 +45,7 @@ function PostDetails() {
   async function handleToggleLikePost() {
     try {
       await toggleLikePost({
-        variables: { idPost: postId, idUser: user._id },
+        variables: { idPost: postId, idUser: userContext?.user._id },
       });
     } catch (errorToggleLikePost) {
       console.log(errorToggleLikePost);
@@ -150,33 +149,36 @@ function PostDetails() {
             {post.user.lastName.toUpperCase()}
           </p>
         </div>
-        <div className={"flex items-center gap-x-2"}>
-          <div
-            className={`rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 ${
-              loadingToggleLikePost
-                ? "pointer-events-none"
-                : "pointer-events-auto"
-            }`}
-            onClick={handleToggleLikePost}
-          >
-            {post.likes.findIndex(({ _id: userId }) => userId === user._id) ===
-            -1 ? (
-              <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
-            ) : (
-              <AiFillHeart className={"h-6 w-6 text-red-800"} />
-            )}
+        {userContext ? (
+          <div className={"flex items-center gap-x-2"}>
+            <div
+              className={`rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 ${
+                loadingToggleLikePost
+                  ? "pointer-events-none"
+                  : "pointer-events-auto"
+              }`}
+              onClick={handleToggleLikePost}
+            >
+              {post.likes.findIndex(
+                ({ _id: userId }) => userId === userContext?.user._id
+              ) === -1 ? (
+                <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
+              ) : (
+                <AiFillHeart className={"h-6 w-6 text-red-800"} />
+              )}
+            </div>
+            {userContext?.user._id === post.user._id ? (
+              loadingDeletingPost ? (
+                <OvalLoader />
+              ) : (
+                <OptionsPostDetails
+                  idPost={postId}
+                  setLoadingDeletingPost={setLoadingDeletingPost}
+                />
+              )
+            ) : undefined}
           </div>
-          {user._id === post.user._id ? (
-            loadingDeletingPost ? (
-              <OvalLoader />
-            ) : (
-              <OptionsPostDetails
-                idPost={postId}
-                setLoadingDeletingPost={setLoadingDeletingPost}
-              />
-            )
-          ) : undefined}
-        </div>
+        ) : undefined}
       </div>
       <div className={"relative w-full overflow-hidden"}>
         <img

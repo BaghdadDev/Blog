@@ -1,5 +1,5 @@
 import mockedPicture from "./mockedPicture.jsx";
-import mockedUser from "./mockedUser.jsx";
+import mockedUser from "../mockedUser.jsx";
 
 export const mockedPosts = [
   {

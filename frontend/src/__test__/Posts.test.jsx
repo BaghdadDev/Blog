@@ -1,24 +1,43 @@
 import { createContext } from "react";
 import { MockedProvider } from "@apollo/client/testing";
-import { render, screen, findByText } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom";
 
-import { CREATED_POST_SUB, GET_POSTS } from "../gql/post.jsx";
+import { CREATED_POST_SUB, GET_POST_BY_ID, GET_POSTS } from "../gql/post.jsx";
 import { mockedPosts } from "./mockedData/Post/mockedPost.jsx";
 import Posts from "../routes/posts.jsx";
 import Post from "../components/Post/Post.jsx";
 import { GraphQLError } from "graphql/error/index.js";
 import PostDetails from "../routes/postDetails.jsx";
 import PATH from "../utils/route-path.jsx";
-import mockedUser from "./mockedData/Post/mockedUser.jsx";
+import mockedUser from "./mockedData/mockedUser.jsx";
+import { GET_COMMENTS } from "../gql/comment.jsx";
+import { mockedComment } from "./mockedData/mockedComment.jsx";
 
 const MockedUserContext = createContext();
 
-const mockedData = {
+const mockedGetPosts = {
   request: { query: GET_POSTS },
   result: { data: { getPosts: mockedPosts } },
 };
+
+const mockedGetPostById = {
+  request: {
+    query: GET_POST_BY_ID,
+    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+  },
+  result: { data: { getPostById: mockedPosts[0] } },
+};
+
+const mockedGetComments = {
+  request: {
+    query: GET_COMMENTS,
+    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+  },
+  result: { data: { getComments: mockedComment } },
+};
+
 const mockedNetworkError = [
   {
     request: { query: GET_POSTS },
@@ -65,7 +84,7 @@ describe("Posts Component", () => {
 
   it("Should render posts list", async () => {
     render(
-      <MockedProvider mocks={[mockedData]} addTypename={true}>
+      <MockedProvider mocks={[mockedGetPosts]} addTypename={true}>
         <MemoryRouter initialEntries={["/"]}>
           <Posts />
         </MemoryRouter>
@@ -106,24 +125,26 @@ describe("Posts Component", () => {
 
   it("Should navigate to Post Details page when click on the link", async () => {
     const value = { user: mockedUser };
+    const user = userEvent.setup();
+
     render(
-      <MockedProvider mocks={[mockedData]} addTypename={true}>
-        <MockedUserContext.Provider value={value}>
-          <MemoryRouter initialEntries={["/"]}>
-            <Routes>
-              <Route path={PATH.ROOT} element={<Posts />} />
-              <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
-            </Routes>
-          </MemoryRouter>
-        </MockedUserContext.Provider>
+      <MockedProvider
+        mocks={[mockedGetPosts, mockedGetPostById, mockedGetComments]}
+        addTypename={true}
+      >
+        {/*<MockedUserContext.Provider value={value}>*/}
+        <BrowserRouter>
+          <Routes>
+            <Route path={PATH.ROOT} element={<Posts />} />
+            <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
+          </Routes>
+        </BrowserRouter>
+        {/*</MockedUserContext.Provider>*/}
       </MockedProvider>
     );
-    const user = userEvent.setup();
     const linkPostDetails = (await screen.findAllByRole("link"))[0];
     await user.click(linkPostDetails);
-    expect(window.location.href).not.toBe(PATH.ROOT);
-    console.log("Logging ----------------------------------");
-    console.log(linkPostDetails);
-    console.log(window.location.href);
+    expect(await screen.findByText(/brothers/i)).toBeInTheDocument();
+    expect(await screen.findByText(/this is amazing/i)).toBeInTheDocument();
   });
 });

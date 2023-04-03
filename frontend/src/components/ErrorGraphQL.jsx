@@ -11,6 +11,7 @@ function ErrorGraphQl({ errorGraphQL, className }) {
   return (
     <div
       className={`rounded bg-red-300 p-2 font-semibold italic opacity-90 ${className}`}
+      data-testid={"error-data"}
     >
       <p className={"text-xs"}>{errorMessage} !</p>
     </div>

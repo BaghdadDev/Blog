@@ -2,12 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import PATH from "../utils/route-path.jsx";
 
-const UserContext = createContext(undefined);
-
 const keyStorage = "userBlog";
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState(undefined);
+export const UserContext = createContext(undefined);
+
+export function UserProvider({ children, initialValue }) {
+  const [user, setUser] = useState(initialValue ?? undefined);
 
   function persistUser(dataUser) {
     localStorage.setItem(keyStorage, JSON.stringify(dataUser));

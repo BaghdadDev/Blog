@@ -2,7 +2,10 @@ import React from "react";
 
 function SkeletonPostDetails() {
   return (
-    <div className={"mb-4 flex w-full animate-pulse flex-col gap-y-2"}>
+    <div
+      className={"mb-4 flex w-full animate-pulse flex-col gap-y-2"}
+      data-testid={"loading-skeleton-post-details"}
+    >
       <div className={"flex items-center gap-x-2"}>
         <div className={"h-16 w-16 rounded-full bg-gray-50"}></div>
         <div className={"h-4 w-56 rounded-full bg-gray-50"}></div>

@@ -18,9 +18,7 @@ import apolloClient from "../../config/apollo-client.jsx";
 import { GET_POST_BY_ID } from "../../gql/post.jsx";
 
 function IndexComments({ idPost }) {
-  const {
-    user: { _id: idUser, photo: photoUser },
-  } = useUserContext();
+  const userContext = useUserContext();
 
   const {
     register,
@@ -110,7 +108,7 @@ function IndexComments({ idPost }) {
   async function handleSubmitComment(data) {
     try {
       const commentInput = {
-        user: idUser,
+        user: userContext?.user?._id,
         post: idPost,
         comment: data.commentText,
       };
@@ -141,24 +139,29 @@ function IndexComments({ idPost }) {
         "mb-16 flex w-full flex-col items-center justify-center px-2 text-xs md:text-sm"
       }
     >
-      <div className={"mb-4 flex w-full items-center gap-x-2"}>
-        <Avatar {...photoUser} />
-        <form
-          className={"flex grow items-center rounded-lg bg-gray-100 shadow-lg"}
-          onSubmit={handleSubmit(handleSubmitComment)}
-        >
-          <CustomInput
-            name={"commentText"}
-            errors={errors}
-            register={register}
-            placeholder={"Write your comment here !"}
-            className={"!bg-transparent"}
-          />
-          <button type={"submit"} className={"hidden"}>
-            <BiSend className={"h-6 w-6 text-blue-800"} />
-          </button>
-        </form>
-      </div>
+      {userContext ? (
+        <div className={"mb-4 flex w-full items-center gap-x-2"}>
+          <Avatar {...userContext.user?.photo} />
+          <form
+            className={
+              "flex grow items-center rounded-lg bg-gray-100 shadow-lg"
+            }
+            onSubmit={handleSubmit(handleSubmitComment)}
+          >
+            <CustomInput
+              name={"commentText"}
+              errors={errors}
+              register={register}
+              placeholder={"Write your comment here !"}
+              className={"!bg-transparent"}
+            />
+            <button type={"submit"} className={"hidden"}>
+              <BiSend className={"h-6 w-6 text-blue-800"} />
+            </button>
+          </form>
+        </div>
+      ) : undefined}
+
       <div className={"w-3/4"}>
         {comments?.map((comment) => (
           <Comment

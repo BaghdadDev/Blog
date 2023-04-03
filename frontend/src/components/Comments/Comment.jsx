@@ -13,7 +13,7 @@ import {
 import CommentInput from "./CommentInput.jsx";
 
 function Comment({ comment, subscribeToGetComments }) {
-  const { user } = useUserContext();
+  const userContext = useUserContext();
 
   const [readOnly, setReadOnly] = useState(true);
 
@@ -105,7 +105,7 @@ function Comment({ comment, subscribeToGetComments }) {
         />
         {readOnly ? (
           <>
-            {comment.user._id === user._id ? (
+            {comment.user._id === userContext?.user._id ? (
               <OptionsComment
                 idComment={comment._id}
                 idPost={comment.post._id}
@@ -120,7 +120,7 @@ function Comment({ comment, subscribeToGetComments }) {
                 onClick={handleToggleLikeComment}
               >
                 {comment.likes.findIndex(
-                  ({ _id: userId }) => userId === user._id
+                  ({ _id: userId }) => userId === userContext?.user._id
                 ) === -1 ? (
                   <AiOutlineHeart
                     className={"pointer-events-none h-4 w-4 text-red-800"}
