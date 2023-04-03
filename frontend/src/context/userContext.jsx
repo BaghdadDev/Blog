@@ -21,8 +21,10 @@ export function UserProvider({ children, initialValue }) {
   }
 
   useEffect(() => {
-    const userFromStorageString = localStorage.getItem(keyStorage);
-    if (userFromStorageString) {
+    if (initialValue) setUser(initialValue);
+    else {
+      const userFromStorageString = localStorage.getItem(keyStorage);
+      if (!userFromStorageString) return;
       const userFromStorageJson = JSON.parse(userFromStorageString);
       if (
         Date.now() - parseInt(userFromStorageJson.token.expiresAccessToken) >

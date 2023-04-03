@@ -14,6 +14,7 @@ import PATH from "../utils/route-path.jsx";
 import mockedUser from "./mockedData/mockedUser.jsx";
 import { GET_COMMENTS } from "../gql/comment.jsx";
 import { mockedComment } from "./mockedData/mockedComment.jsx";
+import { UserProvider } from "../context/userContext";
 
 const MockedUserContext = createContext();
 
@@ -132,19 +133,22 @@ describe("Posts Component", () => {
         mocks={[mockedGetPosts, mockedGetPostById, mockedGetComments]}
         addTypename={true}
       >
-        {/*<MockedUserContext.Provider value={value}>*/}
-        <BrowserRouter>
-          <Routes>
-            <Route path={PATH.ROOT} element={<Posts />} />
-            <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
-          </Routes>
-        </BrowserRouter>
-        {/*</MockedUserContext.Provider>*/}
+        <UserProvider initialValue={value}>
+          <BrowserRouter>
+            <Routes>
+              <Route path={PATH.ROOT} element={<Posts />} />
+              <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
+            </Routes>
+          </BrowserRouter>
+        </UserProvider>
       </MockedProvider>
     );
     const linkPostDetails = (await screen.findAllByRole("link"))[0];
     await user.click(linkPostDetails);
     expect(await screen.findByText(/brothers/i)).toBeInTheDocument();
     expect(await screen.findByText(/this is amazing/i)).toBeInTheDocument();
+    expect(
+      await screen.findByPlaceholderText(/write your comment here !/i)
+    ).toBeInTheDocument();
   });
 });

@@ -24,6 +24,7 @@ import PATH from "../utils/route-path.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
+  // return <div data-testid="my-element">ID: {postId}</div>;
 
   // const { user } = useUserContext();
   const userContext = useContext(UserContext);
