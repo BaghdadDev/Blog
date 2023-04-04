@@ -1,70 +1,22 @@
-import { createContext } from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 
-import { CREATED_POST_SUB, GET_POST_BY_ID, GET_POSTS } from "../gql/post.jsx";
-import { mockedPosts } from "./mockedData/Post/mockedPost.jsx";
+import mockedPosts from "./mockedData/Post/mockedPosts.jsx";
 import Posts from "../routes/posts.jsx";
 import Post from "../components/Post/Post.jsx";
-import { GraphQLError } from "graphql/error/index.js";
 import PostDetails from "../routes/postDetails.jsx";
 import PATH from "../utils/route-path.jsx";
 import mockedUser from "./mockedData/mockedUser.jsx";
-import { GET_COMMENTS } from "../gql/comment.jsx";
-import { mockedComment } from "./mockedData/mockedComment.jsx";
 import { UserProvider } from "../context/userContext";
-
-const MockedUserContext = createContext();
-
-const mockedGetPosts = {
-  request: { query: GET_POSTS },
-  result: { data: { getPosts: mockedPosts } },
-};
-
-const mockedGetPostById = {
-  request: {
-    query: GET_POST_BY_ID,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
-  },
-  result: { data: { getPostById: mockedPosts[0] } },
-};
-
-const mockedGetComments = {
-  request: {
-    query: GET_COMMENTS,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
-  },
-  result: { data: { getComments: mockedComment } },
-};
-
-const mockedNetworkError = [
-  {
-    request: { query: GET_POSTS },
-    error: new Error("An error occurred"),
-  },
-];
-
-const mockedGraphQLError = [
-  {
-    request: { query: GET_POSTS },
-    result: {
-      errors: [new GraphQLError("Something went wrong during Get Posts")],
-    },
-  },
-];
-
-const mockedSubscription = {
-  request: {
-    query: CREATED_POST_SUB,
-  },
-  result: {
-    data: {
-      createdPost: mockedPosts[0],
-    },
-  },
-};
+import {
+  mockedGetPostById,
+  mockedGetPosts,
+  mockedPostsGraphQLError,
+  mockedPostsNetworkError,
+} from "./mockedGraphQL/post.jsx";
+import { mockedGetComments } from "./mockedGraphQL/comment.jsx";
 
 describe("Posts Component", () => {
   it("Post Component should render without error", () => {
@@ -83,7 +35,7 @@ describe("Posts Component", () => {
     expect(screen.getByAltText(/picture-filename*/i)).toBeInTheDocument();
   });
 
-  it("Should render posts list", async () => {
+  it("Render two mocked posts", async () => {
     render(
       <MockedProvider mocks={[mockedGetPosts]} addTypename={true}>
         <MemoryRouter initialEntries={["/"]}>
@@ -93,7 +45,7 @@ describe("Posts Component", () => {
     );
     // Loading state
     expect(screen.getByTestId(/loading-skeleton/i)).toBeInTheDocument();
-    // Data loaded successfully
+    // Data results
     expect(await screen.findByText(/brothers/i)).toBeInTheDocument();
     expect(await screen.findByText(/motivation/i)).toBeInTheDocument();
   });
@@ -101,7 +53,7 @@ describe("Posts Component", () => {
   describe("Should show error UI", async () => {
     it("Network Error", async () => {
       render(
-        <MockedProvider mocks={mockedNetworkError} addTypename={false}>
+        <MockedProvider mocks={mockedPostsNetworkError} addTypename={false}>
           <MemoryRouter initialEntries={["/"]}>
             <Posts />
           </MemoryRouter>
@@ -111,7 +63,7 @@ describe("Posts Component", () => {
     });
     it("GraphQL Error", async () => {
       render(
-        <MockedProvider mocks={mockedGraphQLError} addTypename={true}>
+        <MockedProvider mocks={mockedPostsGraphQLError} addTypename={true}>
           <MemoryRouter initialEntries={["/"]}>
             <Posts />
           </MemoryRouter>
@@ -124,22 +76,20 @@ describe("Posts Component", () => {
     });
   });
 
-  it("Should navigate to Post Details page when click on the link", async () => {
-    const value = { user: mockedUser };
+  it("Navigate to Post Details", async () => {
     const user = userEvent.setup();
-
     render(
       <MockedProvider
         mocks={[mockedGetPosts, mockedGetPostById, mockedGetComments]}
         addTypename={true}
       >
-        <UserProvider initialValue={value}>
-          <BrowserRouter>
+        <UserProvider initialValue={mockedUser}>
+          <MemoryRouter initialEntries={["/"]} initialIndex={0}>
             <Routes>
               <Route path={PATH.ROOT} element={<Posts />} />
               <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
             </Routes>
-          </BrowserRouter>
+          </MemoryRouter>
         </UserProvider>
       </MockedProvider>
     );

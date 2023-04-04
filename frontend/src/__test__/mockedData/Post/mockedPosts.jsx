@@ -1,7 +1,7 @@
 import mockedPicture from "./mockedPicture.jsx";
 import mockedUser from "../mockedUser.jsx";
 
-export const mockedPosts = [
+export default [
   {
     __typename: "Post",
     _id: "6421c6a966b1bb36d7d3879c",
@@ -11,10 +11,10 @@ export const mockedPosts = [
     picture: mockedPicture,
     user: mockedUser,
     likes: [
-      { _id: "6404efbef08e39e56aa7c4af" },
-      { _id: "6401e882f8231e3015e93054" },
+      { __typename: "User", _id: "6404efbef08e39e56aa7c4af" },
+      { __typename: "User", _id: "6401e882f8231e3015e93054" },
     ],
-    comments: [{ _id: "6421c6c666b1bb36d7d387b1" }],
+    comments: [{ __typename: "Comment", _id: "6421c6c666b1bb36d7d387b1" }],
   },
   {
     __typename: "Post",
@@ -25,9 +25,9 @@ export const mockedPosts = [
     picture: mockedPicture,
     user: mockedUser,
     likes: [
-      { _id: "6404efbef08e39e56aa7c4af" },
-      { _id: "6401e882f8231e3015e93054" },
+      { __typename: "User", _id: "6404efbef08e39e56aa7c4af" },
+      { __typename: "User", _id: "6401e882f8231e3015e93054" },
     ],
-    comments: [{ _id: "6421c6c666b1bb36d7d387b1" }],
+    comments: [{ __typename: "Comment", _id: "6421c6c666b1bb36d7d387b1" }],
   },
 ];

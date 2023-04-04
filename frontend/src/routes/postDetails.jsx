@@ -24,12 +24,12 @@ import PATH from "../utils/route-path.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
-  // return <div data-testid="my-element">ID: {postId}</div>;
 
-  // const { user } = useUserContext();
   const userContext = useContext(UserContext);
 
   const navigate = useNavigate();
+
+  const [optimisticLike, setOptimisticLike] = useState(false);
 
   const [loadingDeletingPost, setLoadingDeletingPost] = useState(false);
 
@@ -44,6 +44,7 @@ function PostDetails() {
     useMutation(TOGGLE_LIKE_POST);
 
   async function handleToggleLikePost() {
+    setOptimisticLike((prev) => !prev);
     try {
       await toggleLikePost({
         variables: { idPost: postId, idUser: userContext?.user._id },
@@ -65,11 +66,13 @@ function PostDetails() {
           ? [...prev.getPostById.likes]
           : [];
         if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
+          setOptimisticLike(false);
           copyLikes.splice(
             copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
             1
           );
         } else {
+          setOptimisticLike(true);
           copyLikes.push({ __typename: "User", _id: idUserToggledLike });
         }
         return Object.assign({}, prev, {
@@ -124,6 +127,18 @@ function PostDetails() {
     subscribeToUpdatedPost();
   }, []);
 
+  useEffect(() => {
+    if (
+      dataPost?.getPostById.likes.findIndex(
+        (like) => like?._id === userContext?.user._id
+      ) === -1
+    ) {
+      setOptimisticLike(false);
+    } else {
+      setOptimisticLike(true);
+    }
+  }, [dataPost]);
+
   if (loadingPost)
     return (
       <div className={"my-2 min-h-screen w-full max-w-2xl"}>
@@ -158,17 +173,16 @@ function PostDetails() {
                   ? "pointer-events-none"
                   : "pointer-events-auto"
               }`}
+              data-testid={"button-toggleLikePost"}
               onClick={handleToggleLikePost}
             >
-              {post.likes.findIndex(
-                ({ _id: userId }) => userId === userContext?.user._id
-              ) === -1 ? (
+              {!optimisticLike ? (
                 <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
               ) : (
                 <AiFillHeart className={"h-6 w-6 text-red-800"} />
               )}
             </div>
-            {userContext?.user._id === post.user._id ? (
+            {userContext.user._id === post.user._id ? (
               loadingDeletingPost ? (
                 <OvalLoader />
               ) : (
@@ -193,14 +207,8 @@ function PostDetails() {
         <TextEditor readOnly={true} initValue={post.story} />
       </div>
       <div className={"mx-2 flex items-center gap-x-2 self-end text-sm italic"}>
-        <p className={"flex items-center gap-x-1"}>
-          <span>{post.likes.length}</span>
-          <span>Likes</span>
-        </p>
-        <p className={"flex items-center gap-x-1"}>
-          <span>{post.comments.length}</span>
-          <span>Comments</span>
-        </p>
+        <p>{post.likes.length} Likes</p>
+        <p>{post.comments.length} Comments</p>
       </div>
       <div className={"mt-2 mb-4 flex items-center gap-x-4 self-center"}>
         <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>

@@ -37,6 +37,7 @@ function Posts() {
 
   return (
     <div className={"flex w-full flex-col items-center px-2 py-2 md:mx-0"}>
+      <p>Posts List</p>
       <div className={"flex w-full max-w-2xl flex-col items-center gap-y-2"}>
         {dataGetPosts.getPosts.map((post) => (
           <Post

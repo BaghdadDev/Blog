@@ -7,7 +7,7 @@ const keyStorage = "userBlog";
 export const UserContext = createContext(undefined);
 
 export function UserProvider({ children, initialValue }) {
-  const [user, setUser] = useState(initialValue ?? undefined);
+  const [user, setUser] = useState(undefined);
 
   function persistUser(dataUser) {
     localStorage.setItem(keyStorage, JSON.stringify(dataUser));
@@ -21,17 +21,18 @@ export function UserProvider({ children, initialValue }) {
   }
 
   useEffect(() => {
-    if (initialValue) setUser(initialValue);
-    else {
-      const userFromStorageString = localStorage.getItem(keyStorage);
-      if (!userFromStorageString) return;
-      const userFromStorageJson = JSON.parse(userFromStorageString);
-      if (
-        Date.now() - parseInt(userFromStorageJson.token.expiresAccessToken) >
-        60 * 1000
-      ) {
-        setUser(userFromStorageJson);
-      }
+    if (initialValue) {
+      setUser(initialValue);
+      return;
+    }
+    const userFromStorageString = localStorage.getItem(keyStorage);
+    if (!userFromStorageString) return;
+    const userFromStorageJson = JSON.parse(userFromStorageString);
+    if (
+      Date.now() - parseInt(userFromStorageJson.token.expiresAccessToken) >
+      60 * 1000
+    ) {
+      setUser(userFromStorageJson);
     }
   }, []);
 
