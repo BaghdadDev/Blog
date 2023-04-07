@@ -46,14 +46,14 @@ export const mockedPostsGraphQLError = [
 export const mockedPostDetailsNetworkError = {
   request: {
     query: GET_POST_BY_ID,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+    variables: { idPost: mockedPosts[0]._id },
   },
   error: new Error("An error occurred"),
 };
 export const mockedPostDetailsGraphQLError = {
   request: {
     query: GET_POST_BY_ID,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+    variables: { idPost: mockedPosts[0]._id },
   },
   result: {
     errors: [
@@ -66,7 +66,7 @@ export const mockedPostDetailsGraphQLError = {
 export const mockedToggleLikePost = {
   request: {
     query: TOGGLE_LIKE_POST,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c", idUser: mockedUser._id },
+    variables: { idPost: mockedPosts[0]._id, idUser: mockedUser._id },
   },
   result: { data: { toggleLikePost: {} } },
 };
@@ -74,7 +74,7 @@ export const mockedToggleLikePost = {
 export const mockedSubToggledLikePost = {
   request: {
     query: TOGGLED_LIKE_POST_SUB,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+    variables: { idPost: mockedPosts[0]._id },
   },
   result: { data: { toggledLikePost: { _id: mockedUser._id } } },
 };
@@ -83,7 +83,7 @@ export const mockedSubToggledLikePost = {
 export const mockedDeletePost = {
   request: {
     query: DELETE_POST,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+    variables: { idPost: mockedPosts[0]._id },
   },
   result: { data: { deletePost: {} } },
 };
@@ -93,5 +93,5 @@ export const mockedSubDeletedPost = {
     query: DELETED_POST_SUB,
     variables: { idPost: "6421c6a966b1bb36d7d3879c" },
   },
-  result: { data: { deletedPost: "6421c6a966b1bb36d7d3879c" } },
+  result: { data: { deletedPost: { _id: "6421c6a966b1bb36d7d3879c" } } },
 };

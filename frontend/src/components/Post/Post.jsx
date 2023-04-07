@@ -27,7 +27,7 @@ function Post({ post, subscribeToGetPosts }) {
       variables: { idPost: post._id },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const idDeletedPost = subscriptionData.data.deletedPost;
+        const idDeletedPost = subscriptionData.data.deletedPost._id;
         const filteredPosts = prev.getPosts.filter(
           (post) => post._id !== idDeletedPost
         );

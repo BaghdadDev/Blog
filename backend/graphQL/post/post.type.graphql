@@ -17,7 +17,7 @@ input PostInput {
 
 type Subscription {
     createdPost: Post!
-    deletedPost(idPost: ID!): ID!
+    deletedPost(idPost: ID!): Post!
     toggledLikePost(idPost: ID!): User!
     updatedPost(idPost: ID!): Post!
 }

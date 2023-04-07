@@ -77,7 +77,9 @@ export const CREATED_POST_SUB = gql`
 
 export const DELETED_POST_SUB = gql`
   subscription DeletedPost($idPost: ID!) {
-    deletedPost(idPost: $idPost)
+    deletedPost(idPost: $idPost) {
+      _id
+    }
   }
 `;
 

@@ -91,7 +91,7 @@ function PostDetails() {
       variables: { idPost: postId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const idDeletedPost = subscriptionData.data.deletedPost;
+        const idDeletedPost = subscriptionData.data.deletedPost._id;
         apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
           if (!dataCache?.getPosts) return { getPosts: [] };
           const filteredPosts = dataCache.getPosts.filter(
@@ -102,7 +102,7 @@ function PostDetails() {
         Object.assign({}, prev, {
           getPostById: undefined,
         });
-        navigate(PATH.ROOT);
+        // navigate(PATH.ROOT);
       },
     });
   }

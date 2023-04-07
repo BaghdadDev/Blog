@@ -16,6 +16,7 @@ import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
 import apolloClient from "../../config/apollo-client.jsx";
 import { GET_POST_BY_ID } from "../../gql/post.jsx";
+import SkeletonComments from "../Skeleton/SkeletonComments.jsx";
 
 function IndexComments({ idPost }) {
   const userContext = useUserContext();
@@ -119,7 +120,12 @@ function IndexComments({ idPost }) {
     }
   }
 
-  if (loadingGetComments) return <p>Loading Comments ...</p>;
+  if (loadingGetComments)
+    return (
+      <div className={"w-ful flex items-center justify-center"}>
+        <SkeletonComments />
+      </div>
+    );
 
   if (errorGetComments) {
     if (errorGetComments?.graphQLErrors[0]?.extensions?.code !== "NOT-FOUND") {

@@ -255,7 +255,7 @@ const Mutation = {
       await CommentModel.deleteMany({ post: idPost });
       await PostModel.findOneAndDelete({ _id: idPost });
       await pubSub.publish("DELETED_POST", {
-        deletedPost: postExists._id,
+        deletedPost: { _id: postExists._id },
       });
       return idPost;
     } catch (errorDeletePost) {
@@ -303,7 +303,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_POST"),
       (payload, variables) => {
-        return payload.deletedPost.equals(variables.idPost);
+        return payload.deletedPost._id.equals(variables.idPost);
       }
     ),
   },
