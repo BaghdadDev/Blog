@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet, useNavigation } from "react-router-dom";
+
 import Header from "./Header.jsx";
 
 export default function RootLayout() {

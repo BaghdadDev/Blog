@@ -1,4 +1,4 @@
-import RoutLayout from "../components/Layout/RootLayout.jsx";
+import RootLayout from "../components/Layout/RootLayout.jsx";
 import { createBrowserRouter } from "react-router-dom";
 
 import PATH from "../utils/route-path.jsx";
@@ -13,7 +13,7 @@ import EditPost from "../routes/editPost.jsx";
 const router = createBrowserRouter([
   {
     path: PATH.ROOT,
-    element: <RoutLayout />,
+    element: <RootLayout />,
     errorElement: <ErrorPage />,
     // loader: rootLoader,
     // action: rootAction,

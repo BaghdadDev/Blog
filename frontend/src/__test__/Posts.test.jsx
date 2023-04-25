@@ -53,7 +53,7 @@ describe("Posts Component", () => {
   describe("Should show error UI", async () => {
     it("Network Error", async () => {
       render(
-        <MockedProvider mocks={mockedPostsNetworkError} addTypename={false}>
+        <MockedProvider mocks={mockedPostsNetworkError} addTypename={true}>
           <MemoryRouter initialEntries={["/"]}>
             <Posts />
           </MemoryRouter>
@@ -77,11 +77,11 @@ describe("Posts Component", () => {
   });
 
   it("Navigate to Post Details", async () => {
-    const user = userEvent.setup();
+    // const user = userEvent.setup();
     render(
       <MockedProvider
         mocks={[mockedGetPosts, mockedGetPostById, mockedGetComments]}
-        addTypename={true}
+        addTypename={false}
       >
         <UserProvider initialValue={mockedUser}>
           <MemoryRouter initialEntries={["/"]} initialIndex={0}>
@@ -94,7 +94,7 @@ describe("Posts Component", () => {
       </MockedProvider>
     );
     const linkPostDetails = (await screen.findAllByRole("link"))[0];
-    await user.click(linkPostDetails);
+    userEvent.click(linkPostDetails);
     expect(await screen.findByText(/brothers/i)).toBeInTheDocument();
     expect(await screen.findByText(/this is amazing/i)).toBeInTheDocument();
     expect(

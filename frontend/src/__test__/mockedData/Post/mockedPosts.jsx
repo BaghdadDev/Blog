@@ -28,6 +28,6 @@ export default [
       { __typename: "User", _id: "6404efbef08e39e56aa7c4af" },
       { __typename: "User", _id: "6401e882f8231e3015e93054" },
     ],
-    comments: [],
+    comments: [{ __typename: "Comment", _id: mockedComments[1]._id }],
   },
 ];

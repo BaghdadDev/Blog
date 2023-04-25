@@ -99,21 +99,3 @@ export const UPDATED_POST_SUB = gql`
     }
   }
 `;
-
-export const UPDATED_POST_TEXT_SUB = gql`
-  ${CORE_POST_FIELDS}
-  subscription UpdatedPostText($idPost: ID!) {
-    updatedPostText(idPost: $idPost) {
-      ...CorePostFields
-    }
-  }
-`;
-
-export const UPDATED_POST_PICTURE_SUB = gql`
-  ${CORE_FILE_FIELDS}
-  subscription UpdatedPostPicture($idPost: ID!) {
-    updatedPostPicture(idPost: $idPost) {
-      ...CoreFileFields
-    }
-  }
-`;

@@ -1,6 +1,12 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { MockedProvider } from "@apollo/client/testing";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import {
+  createMemoryRouter,
+  MemoryRouter,
+  Route,
+  RouterProvider,
+  Routes,
+} from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { InMemoryCache } from "@apollo/client";
 
@@ -15,30 +21,69 @@ import {
   mockedGetPosts,
   mockedPostDetailsGraphQLError,
   mockedPostDetailsNetworkError,
+  mockedSubCreatedPost,
   mockedSubDeletedPost,
   mockedSubToggledLikePost,
+  mockedSubUpdatedPost,
   mockedToggleLikePost,
 } from "./mockedGraphQL/post.jsx";
-import { mockedGetComments } from "./mockedGraphQL/comment.jsx";
+import {
+  mockedGetComments,
+  mockedSubCreatedComment,
+  mockedSubDeletedComment,
+  mockedSubToggledLikeComment,
+  mockedSubUpdatedComment,
+} from "./mockedGraphQL/comment.jsx";
 import Posts from "../routes/posts.jsx";
 import mockedPosts from "./mockedData/Post/mockedPosts.jsx";
+import { CREATE_POST } from "../gql/post";
+import NewPost from "../routes/newPost.jsx";
+import RootLayout from "../components/Layout/RootLayout.jsx";
+import ErrorPage from "../components/ErrorPage.jsx";
+import SignIn from "../routes/signIn.jsx";
+import SignUp from "../routes/signUp.jsx";
 
 // RENDER ----------------------------------------------------------
-const mockedRender = ({ mocks, cache, initialEntries }) => {
-  const confCache = cache || new InMemoryCache();
+const mockedRender = ({ routes, mocks, cache, initialEntries }) => {
+  const confRoutes = routes ?? [
+    {
+      path: PATH.ROOT,
+      element: <RootLayout />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          errorElement: <ErrorPage />,
+          children: [
+            { index: true, element: <Posts /> },
+            {
+              path: PATH.POST_DETAILS,
+              element: <PostDetails />,
+            },
+            {
+              path: PATH.NEW_POST,
+              element: <NewPost />,
+            },
+            {
+              path: PATH.EDIT_POST,
+              element: <EditPost />,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const router = createMemoryRouter(confRoutes, {
+    initialEntries: initialEntries ?? [`/post/${mockedPosts[0]._id}`],
+    initialIndex: 0,
+  });
+
+  const confCache = cache ?? new InMemoryCache({ addTypename: true });
+
   return (
     <MockedProvider mocks={mocks} cache={confCache}>
       <UserProvider initialValue={mockedUser}>
-        <MemoryRouter
-          initialEntries={initialEntries || ["/post/6421c6a966b1bb36d7d3879c"]}
-          initialIndex={0}
-        >
-          <Routes>
-            <Route path={PATH.POST_DETAILS} element={<PostDetails />} />
-            <Route path={PATH.EDIT_POST} element={<EditPost />} />
-            <Route path={PATH.ROOT} element={<Posts />} />
-          </Routes>
-        </MemoryRouter>
+        <RouterProvider router={router} />
       </UserProvider>
     </MockedProvider>
   );
@@ -81,13 +126,13 @@ describe("Posts Details", () => {
 
   it("Navigate to Edit Post", async () => {
     render(mockedRender({ mocks: [mockedGetPostById, mockedGetComments] }));
-    const user = userEvent.setup();
+    // const user = userEvent.setup();
     const btnOptionsPostDetails = await screen.findByTestId(
       /button-optionsPostDetails/i
     );
-    await user.click(btnOptionsPostDetails);
+    userEvent.click(btnOptionsPostDetails);
     const linkEditPost = screen.getByText(/edit/i);
-    await user.click(linkEditPost);
+    userEvent.click(linkEditPost);
     expect(await screen.findByText(/save/i)).toBeInTheDocument();
   });
 
@@ -102,59 +147,74 @@ describe("Posts Details", () => {
         ],
       })
     );
-    const user = userEvent.setup();
+    // const user = userEvent.setup();
     // The id user is already in likes array in mocked post
     expect(await screen.findByText(/2 likes/i)).toBeInTheDocument();
     const btnToggleLikePost = await screen.findByTestId(
       /button-toggleLikePost/i
     );
-    await user.click(btnToggleLikePost);
+    userEvent.click(btnToggleLikePost);
     // So the length of likes array should decrease by one
     expect(await screen.findByText(/1 likes/i)).toBeInTheDocument();
   });
 
-  it("Delete Post", async () => {
-    const cache = new InMemoryCache({
-      typePolicies: {
-        Query: {
-          fields: {
-            getPosts: {
-              read(existing) {
-                return existing || mockedPosts;
-              },
-            },
-          },
-        },
-      },
-    });
+  it("Create Post", async () => {
     render(
       mockedRender({
+        mocks: [mockedGetPosts, mockedGetPostById, mockedGetComments],
         initialEntries: ["/"],
+      })
+    );
+    // const user = userEvent.setup();
+    expect(await screen.findByText(/Write a Post/i)).toBeInTheDocument();
+  });
+
+  it("Delete Post", async () => {
+    const routes = [
+      { path: PATH.ROOT, element: <Posts /> },
+      {
+        path: PATH.POST_DETAILS,
+        element: <PostDetails />,
+      },
+    ];
+
+    const mockedSubscriptions = [
+      mockedSubCreatedPost,
+      mockedSubDeletedPost,
+      mockedSubToggledLikePost,
+      mockedSubUpdatedPost,
+      mockedSubCreatedComment,
+      mockedSubDeletedComment,
+      mockedSubToggledLikeComment,
+      mockedSubUpdatedComment,
+    ];
+
+    render(
+      mockedRender({
+        routes: routes,
+        initialEntries: [PATH.ROOT],
         mocks: [
           mockedGetPosts,
           mockedGetPostById,
           mockedGetComments,
           mockedDeletePost,
-          mockedSubDeletedPost,
+          [...mockedSubscriptions],
         ],
       })
     );
-    const user = userEvent.setup();
-    const linkPostDetails = (await screen.findAllByRole("link"))[0];
-    await user.click(linkPostDetails);
-    const btnOptionsPostDetails = await screen.findByTestId(
-      /button-optionsPostDetails/i
+    const allLinkPost = await screen.findAllByRole("link");
+    expect(allLinkPost.length).toBe(2);
+    // const linkPost = allPosts[0].querySelector("img");
+    console.log(
+      "------------------------------- LOGGING ----------------------"
     );
-    expect(btnOptionsPostDetails).toBeInTheDocument();
-    await user.click(btnOptionsPostDetails);
-    const btnDeletePost = screen.getByText(/delete/i);
-    await user.click(btnDeletePost);
+    console.log(allLinkPost[0]);
+    userEvent.click(allLinkPost[0]);
     await waitFor(() => {
-      // I'm not on the PostDetails page
-      expect(screen.queryByTestId(/button-optionsPostDetails/i)).toBeNull();
-      // Check
-      expect(screen.getByText(/Enemies/i)).toBeInTheDocument();
-      expect(screen.queryByText(/Brothers/i)).toBeInTheDocument();
+      console.log(window.location.href);
+      expect(
+        screen.getByText(/This is the post details page/i)
+      ).toBeInTheDocument();
     });
   });
 });

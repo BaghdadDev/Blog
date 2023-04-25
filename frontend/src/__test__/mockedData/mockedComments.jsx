@@ -12,9 +12,9 @@ export const mockedComments = [
   {
     __typename: "Comment",
     _id: "6408dc8f0c6094c4470a358b",
-    comment: "New Comment",
+    comment: "It sucks",
     user: mockedUser,
-    post: { __typename: "Post", _id: "6421c6a966b1bb36d7d3879c" },
+    post: { __typename: "Post", _id: "6421c6a966b1bb36d7d38999" },
     likes: [],
   },
 ];

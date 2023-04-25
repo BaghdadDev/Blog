@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Node } from "slate";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Avatar from "../Avatar.jsx";
 import PATH from "../../utils/route-path.jsx";
@@ -15,6 +15,8 @@ import {
 } from "../../gql/comment.jsx";
 
 function Post({ post, subscribeToGetPosts }) {
+  const navigate = useNavigate();
+
   function storyToString(value) {
     return JSON.parse(value)
       .map((n) => Node.string(n))
@@ -162,7 +164,9 @@ function Post({ post, subscribeToGetPosts }) {
       className={
         "relative flex w-full flex-col overflow-hidden rounded bg-white"
       }
+      data-testid={`post-test-${post._id}`}
     >
+      <p className={"hidden"}>{post._id}</p>
       <div className={"my-1 flex items-center gap-x-2 pl-2"}>
         <Avatar {...post.user.photo} />
         <p className={"font-semibold"}>
@@ -176,6 +180,10 @@ function Post({ post, subscribeToGetPosts }) {
           src={`data:${post.picture.contentType};base64,${post.picture.data}`}
           alt={post.picture.filename}
           className={"w-full hover:cursor-pointer"}
+          onClick={() =>
+            navigate(PATH.POST_DETAILS.split(":")[0] + `${post._id}`)
+          }
+          aria-label={`post-img`}
         />
       </Link>
       <p className={"pl-2 font-semibold"}>{post.title}</p>

@@ -1,12 +1,14 @@
 import { GraphQLError } from "graphql/error/index.js";
 
 import {
+  CREATED_POST_SUB,
   DELETE_POST,
   DELETED_POST_SUB,
   GET_POST_BY_ID,
   GET_POSTS,
   TOGGLE_LIKE_POST,
   TOGGLED_LIKE_POST_SUB,
+  UPDATED_POST_SUB,
 } from "../../gql/post.jsx";
 import mockedPosts from "../mockedData/Post/mockedPosts.jsx";
 import mockedUser from "../mockedData/mockedUser.jsx";
@@ -21,7 +23,7 @@ export const mockedGetPosts = {
 export const mockedGetPostById = {
   request: {
     query: GET_POST_BY_ID,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
+    variables: { idPost: mockedPosts[0]._id },
   },
   result: { data: { getPostById: mockedPosts[0] } },
 };
@@ -62,7 +64,7 @@ export const mockedPostDetailsGraphQLError = {
   },
 };
 
-// TOGGLE LIKE POST -------------------------------------------------
+// MUTATIONS ------------------------------------------------------
 export const mockedToggleLikePost = {
   request: {
     query: TOGGLE_LIKE_POST,
@@ -70,7 +72,32 @@ export const mockedToggleLikePost = {
   },
   result: { data: { toggleLikePost: {} } },
 };
-// SUBSCRIPTION TOGGLED LIKE POST
+
+export const mockedDeletePost = {
+  request: {
+    query: DELETE_POST,
+    variables: { idPost: mockedPosts[0]._id },
+  },
+  result: { data: { deletePost: {} } },
+};
+
+// SUBSCRIPTIONS ---------------------------------------------
+export const mockedSubCreatedPost = {
+  request: {
+    query: CREATED_POST_SUB,
+    variables: {},
+  },
+  result: { data: { createdPost: mockedPosts[1] } },
+};
+
+export const mockedSubDeletedPost = {
+  request: {
+    query: DELETED_POST_SUB,
+    variables: { idPost: mockedPosts[0]._id },
+  },
+  result: { data: { deletedPost: { _id: mockedPosts[0]._id } } },
+};
+
 export const mockedSubToggledLikePost = {
   request: {
     query: TOGGLED_LIKE_POST_SUB,
@@ -79,19 +106,10 @@ export const mockedSubToggledLikePost = {
   result: { data: { toggledLikePost: { _id: mockedUser._id } } },
 };
 
-// DELETE POST --------------------------------------------------
-export const mockedDeletePost = {
+export const mockedSubUpdatedPost = {
   request: {
-    query: DELETE_POST,
+    query: UPDATED_POST_SUB,
     variables: { idPost: mockedPosts[0]._id },
   },
-  result: { data: { deletePost: {} } },
-};
-// SUBSCRIPTION DELETED POST
-export const mockedSubDeletedPost = {
-  request: {
-    query: DELETED_POST_SUB,
-    variables: { idPost: "6421c6a966b1bb36d7d3879c" },
-  },
-  result: { data: { deletedPost: { _id: "6421c6a966b1bb36d7d3879c" } } },
+  result: { data: { updatedPost: mockedPosts[0] } },
 };

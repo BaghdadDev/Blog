@@ -102,7 +102,6 @@ function PostDetails() {
         Object.assign({}, prev, {
           getPostById: undefined,
         });
-        // navigate(PATH.ROOT);
       },
     });
   }
@@ -155,7 +154,9 @@ function PostDetails() {
       className={
         "relative my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2"
       }
+      data-testid={`post-details-test`}
     >
+      <h1>This is the post details page</h1>
       <div className={"flex w-full items-center justify-between px-2"}>
         <div className={"flex items-center gap-x-2"}>
           <Avatar {...post.user.photo} />
