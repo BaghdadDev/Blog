@@ -66,11 +66,46 @@ export const SEARCH_POSTS = gql`
 `;
 
 // SUBSCRIPTIONS --------------------------------------------------------------
+// export const CREATED_POST_SUB = gql`
+//   ${CORE_POST_FIELDS}
+//   subscription CreatedPost {
+//     createdPost {
+//       ...CorePostFields
+//     }
+//   }
+// `;
+
 export const CREATED_POST_SUB = gql`
-  ${CORE_POST_FIELDS}
   subscription CreatedPost {
     createdPost {
-      ...CorePostFields
+      _id
+      title
+      story
+      picture {
+        _id
+        filename
+        contentType
+        data
+      }
+      user {
+        _id
+        firstName
+        lastName
+        email
+        username
+        photo {
+          _id
+          filename
+          contentType
+          data
+        }
+      }
+      likes {
+        _id
+      }
+      comments {
+        _id
+      }
     }
   }
 `;

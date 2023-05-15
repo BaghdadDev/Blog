@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import { CREATED_POST_SUB, GET_POSTS } from "../gql/post.jsx";
 import Post from "../components/post/Post.jsx";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
+import apolloClient from "../config/apollo-client.jsx";
 
 function Posts() {
   const {
@@ -14,22 +15,19 @@ function Posts() {
     loading: loadingGetPosts,
   } = useQuery(GET_POSTS);
 
-  function subscribeToCreatedPost() {
-    subscribeToMore({
-      document: CREATED_POST_SUB,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const newPost = subscriptionData.data.createdPost;
-        return Object.assign({}, prev, {
-          getPosts: [newPost, ...prev.getPosts],
-        });
-      },
-    });
-  }
+  const { data: dataSubCreatedPost, error: errorSubCreatedPost } =
+    useSubscription(CREATED_POST_SUB);
 
   useEffect(() => {
-    subscribeToCreatedPost();
-  }, []);
+    if (dataSubCreatedPost && !errorSubCreatedPost) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => ({
+        getPosts: [
+          { ...dataSubCreatedPost.createdPost },
+          ...dataCache.getPosts,
+        ],
+      }));
+    }
+  }, [dataSubCreatedPost, errorSubCreatedPost]);
 
   if (loadingGetPosts) return <SkeletonPosts />;
 

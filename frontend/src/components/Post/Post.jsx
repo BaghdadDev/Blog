@@ -6,6 +6,7 @@ import Avatar from "../Avatar.jsx";
 import PATH from "../../utils/route-path.jsx";
 import {
   DELETED_POST_SUB,
+  GET_POSTS,
   TOGGLED_LIKE_POST_SUB,
   UPDATED_POST_SUB,
 } from "../../gql/post.jsx";
@@ -13,49 +14,47 @@ import {
   CREATED_COMMENT_SUB,
   DELETED_COMMENT_SUB,
 } from "../../gql/comment.jsx";
+import { useSubscription } from "@apollo/client";
+import apolloClient from "../../config/apollo-client.jsx";
 
 function Post({ post, subscribeToGetPosts }) {
   const navigate = useNavigate();
 
-  function storyToString(value) {
-    return JSON.parse(value)
-      .map((n) => Node.string(n))
-      .join(" ");
-  }
+  const { data: dataSubDeletedPost, error: errorSubDeletedPost } =
+    useSubscription(DELETED_POST_SUB, { variables: { idPost: post._id } });
 
-  function subscribeToDeletedPost() {
-    subscribeToGetPosts({
-      document: DELETED_POST_SUB,
-      variables: { idPost: post._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const idDeletedPost = subscriptionData.data.deletedPost._id;
-        const filteredPosts = prev.getPosts.filter(
-          (post) => post._id !== idDeletedPost
+  const { data: dataSubToggledLikePost, error: errorSubToggledLikePost } =
+    useSubscription(TOGGLED_LIKE_POST_SUB, { variables: { idPost: post._id } });
+
+  const { data: dataSubUpdatedPost, error: errorSubUpdatedPost } =
+    useSubscription(UPDATED_POST_SUB, { variables: { idPost: post._id } });
+
+  useEffect(() => {
+    if (dataSubDeletedPost && !errorSubDeletedPost) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const updatedPosts = dataCache.getPosts.filter(
+          (post) => post._id !== dataSubDeletedPost.deletedPost._id
         );
-        return Object.assign({}, prev, {
-          getPosts: filteredPosts,
-        });
-      },
-    });
-  }
+        return {
+          getPosts: updatedPosts,
+        };
+      });
+    }
+  }, [dataSubDeletedPost, errorSubDeletedPost]);
 
-  function subscribeToToggledLikePost() {
-    subscribeToGetPosts({
-      document: TOGGLED_LIKE_POST_SUB,
-      variables: { idPost: post._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const { _id: idUserToggledLikePost } =
-          subscriptionData.data.toggledLikePost;
-        const indexPost = prev.getPosts.findIndex(
+  useEffect(() => {
+    if (dataSubToggledLikePost && !errorSubToggledLikePost) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const idUserToggledLikePost =
+          dataSubToggledLikePost.toggledLikePost._id;
+        const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === post._id
         );
-        const copyLikes = Array.isArray(prev.getPosts[indexPost].likes)
-          ? [...prev.getPosts[indexPost].likes]
+        const copyLikes = Array.isArray(dataCache.getPosts[indexPost]?.likes)
+          ? [...dataCache.getPosts[indexPost].likes]
           : [];
         if (
-          prev.getPosts[indexPost].likes.find(
+          dataCache.getPosts[indexPost].likes.find(
             (like) => like._id === idUserToggledLikePost
           )
         ) {
@@ -67,33 +66,30 @@ function Post({ post, subscribeToGetPosts }) {
           copyLikes.push({ __typename: "User", _id: idUserToggledLikePost });
         }
         console.log(copyLikes);
-        let copyPosts = [...prev.getPosts];
+        let copyPosts = [...dataCache.getPosts];
         copyPosts[indexPost] = { ...copyPosts[indexPost], likes: copyLikes };
-        return Object.assign({}, prev, {
+        return {
           getPosts: copyPosts,
-        });
-      },
-    });
-  }
+        };
+      });
+    }
+  }, [dataSubToggledLikePost, errorSubToggledLikePost]);
 
-  function subscribeToUpdatedPost() {
-    subscribeToGetPosts({
-      document: UPDATED_POST_SUB,
-      variables: { idPost: post._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const postUpdated = subscriptionData.data.updatedPost;
-        const indexPost = prev.getPosts.findIndex(
+  useEffect(() => {
+    if (dataSubUpdatedPost && !errorSubUpdatedPost) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const postUpdated = dataSubUpdatedPost.data.updatedPost;
+        const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === postUpdated._id
         );
-        let copyPosts = [...prev.getPosts];
+        let copyPosts = [...dataCache.getPosts];
         copyPosts[indexPost] = postUpdated;
-        return Object.assign({}, prev, {
+        return {
           getPosts: copyPosts,
-        });
-      },
-    });
-  }
+        };
+      });
+    }
+  }, [dataSubUpdatedPost, errorSubUpdatedPost]);
 
   function subscribeToCreatedComment() {
     subscribeToGetPosts({
@@ -151,13 +147,13 @@ function Post({ post, subscribeToGetPosts }) {
     });
   }
 
-  useEffect(() => {
-    subscribeToDeletedPost();
-    subscribeToToggledLikePost();
-    subscribeToUpdatedPost();
-    subscribeToCreatedComment();
-    subscribeToDeletedComment();
-  }, []);
+  // useEffect(() => {
+  //   subscribeToDeletedPost();
+  //   subscribeToToggledLikePost();
+  //   subscribeToUpdatedPost();
+  //   subscribeToCreatedComment();
+  //   subscribeToDeletedComment();
+  // }, []);
 
   return (
     <div
@@ -187,7 +183,11 @@ function Post({ post, subscribeToGetPosts }) {
         />
       </Link>
       <p className={"pl-2 font-semibold"}>{post.title}</p>
-      <p className={"w-full truncate px-2"}>{storyToString(post.story)}</p>
+      <p className={"w-full truncate px-2"}>
+        {JSON.parse(post.story)
+          .map((n) => Node.string(n))
+          .join(" ")}
+      </p>
       <div
         className={
           "flex w-full select-none items-center justify-end gap-x-2 px-2 italic "

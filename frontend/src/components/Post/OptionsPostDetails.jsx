@@ -63,7 +63,7 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
               }
             >
               <AiFillEdit className={"h-4 w-4 text-red-800"} />
-              <span>Edit</span>
+              <span>Edit Post</span>
             </p>
           </Link>
           <p
@@ -73,7 +73,7 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
             onClick={handleDeletePost}
           >
             <AiFillDelete className={"h-4 w-4 text-red-800"} />
-            <span>Delete</span>
+            <span>Delete Post</span>
           </p>
         </div>
       )}

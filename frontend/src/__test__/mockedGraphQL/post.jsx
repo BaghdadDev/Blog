@@ -87,7 +87,7 @@ export const mockedSubCreatedPost = {
     query: CREATED_POST_SUB,
     variables: {},
   },
-  result: { data: { createdPost: mockedPosts[1] } },
+  result: { data: { createdPost: mockedPosts[0] } },
 };
 
 export const mockedSubDeletedPost = {

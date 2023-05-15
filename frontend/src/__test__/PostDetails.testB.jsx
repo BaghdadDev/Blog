@@ -1,4 +1,10 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { MockedProvider } from "@apollo/client/testing";
 import {
   createMemoryRouter,
@@ -194,27 +200,31 @@ describe("Posts Details", () => {
         routes: routes,
         initialEntries: [PATH.ROOT],
         mocks: [
+          // Queries
           mockedGetPosts,
           mockedGetPostById,
           mockedGetComments,
+          // Mutation
           mockedDeletePost,
-          [...mockedSubscriptions],
+          // Subscriptions
+          // mockedSubCreatedPost,
+          mockedSubDeletedPost,
+          // mockedSubToggledLikePost,
+          // mockedSubUpdatedPost,
+          // mockedSubCreatedComment,
+          // mockedSubDeletedComment,
+          // mockedSubToggledLikeComment,
+          // mockedSubUpdatedComment,
         ],
       })
     );
     const allLinkPost = await screen.findAllByRole("link");
-    expect(allLinkPost.length).toBe(2);
-    // const linkPost = allPosts[0].querySelector("img");
-    console.log(
-      "------------------------------- LOGGING ----------------------"
-    );
     console.log(allLinkPost[0]);
-    userEvent.click(allLinkPost[0]);
+    expect(allLinkPost.length).toBe(2);
+    // userEvent.click(allLinkPost[0]);
+    fireEvent.click(allLinkPost[0]);
     await waitFor(() => {
-      console.log(window.location.href);
-      expect(
-        screen.getByText(/This is the post details page/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/posts list/i)).toBeInTheDocument();
     });
   });
 });

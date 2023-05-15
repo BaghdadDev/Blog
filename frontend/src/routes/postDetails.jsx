@@ -16,11 +16,10 @@ import Avatar from "../components/Avatar.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comments/Comments.jsx";
-import { UserContext, useUserContext } from "../context/userContext.jsx";
+import { UserContext } from "../context/userContext.jsx";
 import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import apolloClient from "../config/apollo-client.jsx";
-import PATH from "../utils/route-path.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
