@@ -24,14 +24,13 @@ function NewPost() {
   const [story, setStory] = useState({ value: undefined, error: undefined });
 
   const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST, {
-    onCompleted: ({ createPost: newPost }) => {
+    onCompleted: ({ createPost }) => {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
         const posts = Array.isArray(dataCache?.getPosts)
           ? dataCache.getPosts
           : [];
-        return { getPosts: [newPost, ...posts] };
+        return { getPosts: [createPost, ...posts] };
       });
-      localStorage.removeItem(`textEditor-draft-${user._id}`);
       navigate(PATH.ROOT);
     },
   });

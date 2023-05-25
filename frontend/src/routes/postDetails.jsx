@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
@@ -18,22 +18,18 @@ import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx"
 import Comments from "../components/Comments/Comments.jsx";
 import { UserContext } from "../context/userContext.jsx";
 import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
-import OvalLoader from "../components/OvalLoader.jsx";
 import apolloClient from "../config/apollo-client.jsx";
+import PATH from "../utils/route-path.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
+  const navigate = useNavigate();
 
   const userContext = useContext(UserContext);
 
-  const navigate = useNavigate();
-
   const [optimisticLike, setOptimisticLike] = useState(false);
 
-  const [loadingDeletingPost, setLoadingDeletingPost] = useState(false);
-
   const {
-    subscribeToMore,
     data: dataPost,
     loading: loadingPost,
     error: errorPost,
@@ -41,6 +37,15 @@ function PostDetails() {
 
   const [toggleLikePost, { loading: loadingToggleLikePost }] =
     useMutation(TOGGLE_LIKE_POST);
+
+  const { data: dataSubToggledLikePost, error: errorSubToggledLikePost } =
+    useSubscription(TOGGLED_LIKE_POST_SUB, { variables: { idPost: postId } });
+
+  const { data: dataSubDeletedPost, error: errorSubDeletedPost } =
+    useSubscription(DELETED_POST_SUB, { variables: { idPost: postId } });
+
+  const { data: dataSubUpdatedPost, error: errorSubUpdatedPost } =
+    useSubscription(UPDATED_POST_SUB, { variables: { idPost: postId } });
 
   async function handleToggleLikePost() {
     setOptimisticLike((prev) => !prev);
@@ -53,78 +58,6 @@ function PostDetails() {
     }
   }
 
-  function subscribeToToggledLikePost() {
-    subscribeToMore({
-      document: TOGGLED_LIKE_POST_SUB,
-      variables: { idPost: postId },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const { _id: idUserToggledLike } =
-          subscriptionData.data.toggledLikePost;
-        const copyLikes = Array.isArray(prev.getPostById.likes)
-          ? [...prev.getPostById.likes]
-          : [];
-        if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
-          setOptimisticLike(false);
-          copyLikes.splice(
-            copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
-            1
-          );
-        } else {
-          setOptimisticLike(true);
-          copyLikes.push({ __typename: "User", _id: idUserToggledLike });
-        }
-        return Object.assign({}, prev, {
-          getPostById: {
-            ...prev.getPostById,
-            likes: copyLikes,
-          },
-        });
-      },
-    });
-  }
-
-  function subscribeToDeletedPost() {
-    subscribeToMore({
-      document: DELETED_POST_SUB,
-      variables: { idPost: postId },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const idDeletedPost = subscriptionData.data.deletedPost._id;
-        apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-          if (!dataCache?.getPosts) return { getPosts: [] };
-          const filteredPosts = dataCache.getPosts.filter(
-            (post) => post._id !== idDeletedPost
-          );
-          return { getPosts: filteredPosts };
-        });
-        Object.assign({}, prev, {
-          getPostById: undefined,
-        });
-      },
-    });
-  }
-
-  function subscribeToUpdatedPost() {
-    subscribeToMore({
-      document: UPDATED_POST_SUB,
-      variables: { idPost: postId },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const postUpdated = subscriptionData.data.updatedPost;
-        return Object.assign({}, prev, {
-          getPostById: postUpdated,
-        });
-      },
-    });
-  }
-
-  useEffect(() => {
-    subscribeToDeletedPost();
-    subscribeToToggledLikePost();
-    subscribeToUpdatedPost();
-  }, []);
-
   useEffect(() => {
     if (
       dataPost?.getPostById.likes.findIndex(
@@ -136,6 +69,67 @@ function PostDetails() {
       setOptimisticLike(true);
     }
   }, [dataPost]);
+
+  useEffect(() => {
+    if (dataSubToggledLikePost && !errorSubToggledLikePost) {
+      apolloClient.cache.updateQuery(
+        { query: GET_POST_BY_ID, variables: { idPost: postId } },
+        (dataCache) => {
+          const { _id: idUserToggledLike } =
+            dataSubToggledLikePost.toggledLikePost;
+          const copyLikes = Array.isArray(dataCache.getPostById.likes)
+            ? [...dataCache.getPostById.likes]
+            : [];
+          if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
+            setOptimisticLike(false);
+            copyLikes.splice(
+              copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
+              1
+            );
+          } else {
+            setOptimisticLike(true);
+            copyLikes.push({ __typename: "User", _id: idUserToggledLike });
+          }
+          return {
+            getPostById: {
+              ...dataCache.getPostById,
+              likes: copyLikes,
+            },
+          };
+        }
+      );
+    }
+  }, [dataSubToggledLikePost, errorSubToggledLikePost]);
+
+  useEffect(() => {
+    if (dataSubDeletedPost && !errorSubDeletedPost) {
+      apolloClient.cache.updateQuery(
+        { query: GET_POST_BY_ID, variables: { idPost: postId } },
+        () => null
+      );
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const posts = dataCache.getPosts.filter(
+          (post) => post._id !== dataSubDeletedPost.deletedPost._id
+        );
+        return { getPosts: posts };
+      });
+      navigate(PATH.ROOT);
+    }
+  }, [dataSubDeletedPost, errorSubDeletedPost]);
+
+  useEffect(() => {
+    if (dataSubUpdatedPost && !errorSubUpdatedPost) {
+      apolloClient.cache.updateQuery(
+        { query: GET_POST_BY_ID, variables: { idPost: postId } },
+        (dataCache) => {
+          const postUpdated = dataSubUpdatedPost.updatedPost;
+          return {
+            getPostById: postUpdated,
+          };
+        }
+      );
+    }
+  }, [dataSubUpdatedPost, errorSubUpdatedPost]);
 
   if (loadingPost)
     return (
@@ -155,7 +149,6 @@ function PostDetails() {
       }
       data-testid={`post-details-test`}
     >
-      <h1>This is the post details page</h1>
       <div className={"flex w-full items-center justify-between px-2"}>
         <div className={"flex items-center gap-x-2"}>
           <Avatar {...post.user.photo} />
@@ -183,14 +176,7 @@ function PostDetails() {
               )}
             </div>
             {userContext.user._id === post.user._id ? (
-              loadingDeletingPost ? (
-                <OvalLoader />
-              ) : (
-                <OptionsPostDetails
-                  idPost={postId}
-                  setLoadingDeletingPost={setLoadingDeletingPost}
-                />
-              )
+              <OptionsPostDetails idPost={postId} />
             ) : undefined}
           </div>
         ) : undefined}

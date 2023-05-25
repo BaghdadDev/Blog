@@ -7,26 +7,23 @@ import { Link, useNavigate } from "react-router-dom";
 import useOutsideClick from "../Hook/useOutsideClick.jsx";
 import { DELETE_POST } from "../../gql/post.jsx";
 import PATH from "../../utils/route-path.jsx";
+import OvalLoader from "../OvalLoader.jsx";
 
-function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
+function OptionsPostDetails({ idPost }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const ref = useOutsideClick(() => setOpen(false));
 
-  const [deletePost] = useMutation(DELETE_POST, {
-    onCompleted: () => navigate(PATH.ROOT),
-  });
+  const [deletePost, { loading: loadingDeletePost }] = useMutation(DELETE_POST);
 
   async function handleDeletePost() {
-    setLoadingDeletingPost(true);
+    setOpen((prev) => !prev);
     try {
       await deletePost({ variables: { idPost: idPost } });
     } catch (errorDeletePost) {
       console.log(errorDeletePost);
     }
-    setOpen((prev) => !prev);
-    setLoadingDeletingPost(false);
   }
 
   return (
@@ -34,15 +31,19 @@ function OptionsPostDetails({ idPost, setLoadingDeletingPost }) {
       ref={ref}
       className={"relative flex flex-col items-center justify-center"}
     >
-      <SlOptions
-        className={
-          "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
-        }
-        data-testid={"button-optionsPostDetails"}
-        onClick={(e) => {
-          setOpen((prev) => !prev);
-        }}
-      />
+      {loadingDeletePost ? (
+        <OvalLoader />
+      ) : (
+        <SlOptions
+          className={
+            "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
+          }
+          data-testid={"button-optionsPostDetails"}
+          onClick={(e) => {
+            setOpen((prev) => !prev);
+          }}
+        />
+      )}
 
       {open && (
         <div

@@ -311,8 +311,6 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_POST"),
       (payload, variables) => {
-        console.log(payload.toggledLikePost);
-        console.log(variables);
         return payload.toggledLikePost.idPost.equals(variables.idPost);
       }
     ),

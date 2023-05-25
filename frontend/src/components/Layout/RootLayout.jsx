@@ -1,10 +1,27 @@
-import React from "react";
-import { Outlet, useNavigation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Outlet, useNavigate, useNavigation } from "react-router-dom";
 
 import Header from "./Header.jsx";
+import { useUserContext } from "../../context/userContext.jsx";
+import PATH from "../../utils/route-path.jsx";
+import OvalLoader from "../OvalLoader.jsx";
 
 export default function RootLayout() {
+  const navigate = useNavigate();
   const navigation = useNavigation();
+
+  const userContext = useUserContext();
+
+  useEffect(() => {
+    if (navigation.state !== "loading") {
+      if (!userContext.user) {
+        navigate(PATH.SIGN_IN);
+      } else {
+        navigate(PATH.ROOT);
+      }
+    }
+  }, [navigation.state, userContext.user]);
+
   return (
     <div
       className={
@@ -18,6 +35,7 @@ export default function RootLayout() {
           "opacity-25 transition-opacity delay-200 duration-200"
         }`}
       >
+        {/* {navigation.state === "loading" ? <OvalLoader /> : <Outlet />} */}
         <Outlet />
       </div>
     </div>

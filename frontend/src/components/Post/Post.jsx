@@ -2,51 +2,70 @@ import React, { useEffect } from "react";
 import { Node } from "slate";
 import { Link, useNavigate } from "react-router-dom";
 
-import Avatar from "../Avatar.jsx";
-import PATH from "../../utils/route-path.jsx";
+import { useSubscription } from "@apollo/client";
+import apolloClient from "../../config/apollo-client.jsx";
+import {
+  CREATED_COMMENT_SUB,
+  DELETED_COMMENT_SUB,
+} from "../../gql/comment.jsx";
 import {
   DELETED_POST_SUB,
   GET_POSTS,
   TOGGLED_LIKE_POST_SUB,
   UPDATED_POST_SUB,
 } from "../../gql/post.jsx";
-import {
-  CREATED_COMMENT_SUB,
-  DELETED_COMMENT_SUB,
-} from "../../gql/comment.jsx";
-import { useSubscription } from "@apollo/client";
-import apolloClient from "../../config/apollo-client.jsx";
+import PATH from "../../utils/route-path.jsx";
+import Avatar from "../Avatar.jsx";
 
-function Post({ post, subscribeToGetPosts }) {
+function Post({ post }) {
   const navigate = useNavigate();
 
-  const { data: dataSubDeletedPost, error: errorSubDeletedPost } =
-    useSubscription(DELETED_POST_SUB, { variables: { idPost: post._id } });
-
-  const { data: dataSubToggledLikePost, error: errorSubToggledLikePost } =
-    useSubscription(TOGGLED_LIKE_POST_SUB, { variables: { idPost: post._id } });
-
-  const { data: dataSubUpdatedPost, error: errorSubUpdatedPost } =
-    useSubscription(UPDATED_POST_SUB, { variables: { idPost: post._id } });
-
-  useEffect(() => {
-    if (dataSubDeletedPost && !errorSubDeletedPost) {
+  useSubscription(DELETED_POST_SUB, {
+    variables: { idPost: post._id },
+    onData: ({
+      data: {
+        data: { deletedPost },
+      },
+    }) => {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const updatedPosts = dataCache.getPosts.filter(
-          (post) => post._id !== dataSubDeletedPost.deletedPost._id
+        const filteredPosts = dataCache.getPosts.filter(
+          (post) => post._id !== deletedPost._id
         );
         return {
-          getPosts: updatedPosts,
+          getPosts: filteredPosts,
         };
       });
-    }
-  }, [dataSubDeletedPost, errorSubDeletedPost]);
+    },
+  });
 
-  useEffect(() => {
-    if (dataSubToggledLikePost && !errorSubToggledLikePost) {
+  useSubscription(UPDATED_POST_SUB, {
+    variables: { idPost: post._id },
+    onData: ({
+      data: {
+        data: { updatedPost },
+      },
+    }) => {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const idUserToggledLikePost =
-          dataSubToggledLikePost.toggledLikePost._id;
+        let copyPosts = [...dataCache.getPosts];
+        copyPosts[
+          dataCache.getPosts.findIndex(({ _id }) => _id === updatedPost._id)
+        ] = updatedPost;
+        return {
+          getPosts: copyPosts,
+        };
+      });
+    },
+  });
+
+  useSubscription(TOGGLED_LIKE_POST_SUB, {
+    variables: { idPost: post._id },
+    onData: ({
+      data: {
+        data: { toggledLikePost },
+      },
+    }) => {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const idUserToggledLikePost = toggledLikePost._id;
         const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === post._id
         );
@@ -72,88 +91,66 @@ function Post({ post, subscribeToGetPosts }) {
           getPosts: copyPosts,
         };
       });
-    }
-  }, [dataSubToggledLikePost, errorSubToggledLikePost]);
+    },
+  });
+
+  const { data: dataSubCreatedComment, error: errorSubCreatedComment } =
+    useSubscription(CREATED_COMMENT_SUB, { variables: { idPost: post._id } });
+
+  const { data: dataSubDeletedComment, error: errorSubDeletedComment } =
+    useSubscription(DELETED_COMMENT_SUB, { variables: { idPost: post._id } });
 
   useEffect(() => {
-    if (dataSubUpdatedPost && !errorSubUpdatedPost) {
+    if (dataSubCreatedComment && !errorSubCreatedComment) {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const postUpdated = dataSubUpdatedPost.data.updatedPost;
+        const createdComment = dataSubCreatedComment.createdComment;
         const indexPost = dataCache.getPosts.findIndex(
-          ({ _id }) => _id === postUpdated._id
-        );
-        let copyPosts = [...dataCache.getPosts];
-        copyPosts[indexPost] = postUpdated;
-        return {
-          getPosts: copyPosts,
-        };
-      });
-    }
-  }, [dataSubUpdatedPost, errorSubUpdatedPost]);
-
-  function subscribeToCreatedComment() {
-    subscribeToGetPosts({
-      document: CREATED_COMMENT_SUB,
-      variables: { idPost: post._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const createdComment = subscriptionData.data.createdComment;
-        const indexPost = prev.getPosts.findIndex(
           ({ _id }) => _id === createdComment.post._id
         );
-        const copyComments = Array.isArray(prev.getPosts[indexPost].comments)
-          ? [...prev.getPosts[indexPost].comments]
+        const copyComments = Array.isArray(
+          dataCache.getPosts[indexPost].comments
+        )
+          ? [...dataCache.getPosts[indexPost].comments]
           : [];
         copyComments.push({
           __typename: createdComment.__typename,
           _id: createdComment._id,
         });
-        let copyPosts = [...prev.getPosts];
+        let copyPosts = [...dataCache.getPosts];
         copyPosts[indexPost] = {
-          ...prev.getPosts[indexPost],
+          ...dataCache.getPosts[indexPost],
           comments: copyComments,
         };
-        return Object.assign({}, prev, {
+        return {
           getPosts: copyPosts,
-        });
-      },
-    });
-  }
+        };
+      });
+    }
+  }, [dataSubCreatedComment, errorSubCreatedComment]);
 
-  function subscribeToDeletedComment() {
-    subscribeToGetPosts({
-      document: DELETED_COMMENT_SUB,
-      variables: { idPost: post._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const idDeletedComment = subscriptionData.data.createdComment;
-        const indexPost = prev.getPosts.findIndex(
+  useEffect(() => {
+    if (dataSubDeletedComment && !errorSubDeletedComment) {
+      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        const idDeletedComment = dataSubDeletedComment.deletedComment;
+        const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === post._id
         );
-        const copyComments = [...prev.getPosts[indexPost].comments];
+        const copyComments = [...dataCache.getPosts[indexPost].comments];
         copyComments.splice(
           copyComments.findIndex((comment) => comment._id === idDeletedComment),
           1
         );
-        let copyPosts = [...prev.getPosts];
+        let copyPosts = [...dataCache.getPosts];
         copyPosts[indexPost] = {
-          ...prev.getPosts[indexPost],
+          ...dataCache.getPosts[indexPost],
           comments: copyComments,
         };
-        return Object.assign({}, prev, {
+        return {
           getPosts: copyPosts,
-        });
-      },
-    });
-  }
-
-  // useEffect(() => {
-  //   subscribeToDeletedPost();
-  //   subscribeToToggledLikePost();
-  //   subscribeToUpdatedPost();
-  //   subscribeToCreatedComment();
-  //   subscribeToDeletedComment();
-  // }, []);
+        };
+      });
+    }
+  }, [dataSubDeletedComment, errorSubDeletedComment]);
 
   return (
     <div

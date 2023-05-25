@@ -24,7 +24,7 @@ const authenticationMiddleware = require("./middleware/authentication.js");
 const port = process.env.PORT || process.env.PORT_EXPRESS;
 
 async function mountServer() {
-  // Setting up the connexion with database
+  // Setting up the connection with database
   await connectToDatabase();
 
   // Import graphqlUploadExpressMiddleware

@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import PATH from "../utils/route-path.jsx";
-
 const keyStorage = "userBlog";
 
 export const UserContext = createContext(undefined);
@@ -16,8 +14,7 @@ export function UserProvider({ children, initialValue }) {
 
   function signOut() {
     localStorage.removeItem(keyStorage);
-    window.location.replace(PATH.SIGN_IN);
-    // setUser(undefined);
+    setUser(undefined);
   }
 
   useEffect(() => {

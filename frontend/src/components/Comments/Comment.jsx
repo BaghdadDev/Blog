@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { useMutation } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 
 import Avatar from "../Avatar.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import OptionsComment from "./OptionsComment.jsx";
 import {
+  GET_COMMENTS,
   TOGGLE_LIKE_COMMENT,
   TOGGLED_LIKE_COMMENT_SUB,
   UPDATED_COMMENT_SUB,
 } from "../../gql/comment.jsx";
 import CommentInput from "./CommentInput.jsx";
+import apolloClient from "../../config/apollo-client.jsx";
 
-function Comment({ comment, subscribeToGetComments }) {
+function Comment({ comment }) {
   const userContext = useUserContext();
 
   const [readOnly, setReadOnly] = useState(true);
@@ -20,8 +22,17 @@ function Comment({ comment, subscribeToGetComments }) {
   const [toggleLikeComment, { loading: loadingToggleLikeComment }] =
     useMutation(TOGGLE_LIKE_COMMENT);
 
+  const { data: dataSubToggledLikeComment, error: errorSubToggledLikeComment } =
+    useSubscription(TOGGLED_LIKE_COMMENT_SUB, {
+      variables: { idComment: comment._id },
+    });
+
+  const { data: dataSubUpdatedComment, error: errorSubUpdatedComment } =
+    useSubscription(UPDATED_COMMENT_SUB, {
+      variables: { idComment: comment._id },
+    });
+
   async function handleToggleLikeComment() {
-    console.log("Toggle Like Comment with id: " + comment._id);
     try {
       await toggleLikeComment({ variables: { idComment: comment._id } });
     } catch (errorToggleLikeComment) {
@@ -29,65 +40,63 @@ function Comment({ comment, subscribeToGetComments }) {
     }
   }
 
-  function subToggledLikeComment() {
-    subscribeToGetComments({
-      document: TOGGLED_LIKE_COMMENT_SUB,
-      variables: { idComment: comment._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const { _id: idUserToggledLikeComment } =
-          subscriptionData.data.toggledLikeComment;
-        console.log(idUserToggledLikeComment);
-        const indexComment = prev.getComments.findIndex(
-          ({ _id }) => _id === comment._id
-        );
-        let copyLikes = Array.isArray(prev.getComments[indexComment].likes)
-          ? [...prev.getComments[indexComment].likes]
-          : [];
-        const indexUserLiked = copyLikes.findIndex(
-          (like) => like?._id === idUserToggledLikeComment
-        );
-        if (indexUserLiked !== -1) {
-          copyLikes.splice(indexUserLiked, 1);
-        } else {
-          copyLikes.push({ __typename: "User", _id: idUserToggledLikeComment });
+  useEffect(() => {
+    if (dataSubToggledLikeComment && !errorSubToggledLikeComment) {
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
+        (dataCache) => {
+          const { _id: idUserToggledLikeComment } =
+            dataSubToggledLikeComment.toggledLikeComment;
+          const indexComment = dataCache.getComments.findIndex(
+            ({ _id }) => _id === comment._id
+          );
+          let copyLikes = Array.isArray(
+            dataCache.getComments[indexComment].likes
+          )
+            ? [...dataCache.getComments[indexComment].likes]
+            : [];
+          const indexUserLiked = copyLikes.findIndex(
+            (like) => like?._id === idUserToggledLikeComment
+          );
+          if (indexUserLiked !== -1) {
+            copyLikes.splice(indexUserLiked, 1);
+          } else {
+            copyLikes.push({
+              __typename: "User",
+              _id: idUserToggledLikeComment,
+            });
+          }
+          let copyComments = [...dataCache.getComments];
+          copyComments[indexComment] = {
+            ...dataCache.getComments[indexComment],
+            likes: copyLikes,
+          };
+          return {
+            getComments: copyComments,
+          };
         }
-        console.log(copyLikes);
-        let copyComments = [...prev.getComments];
-        copyComments[indexComment] = {
-          ...prev.getComments[indexComment],
-          likes: copyLikes,
-        };
-        return Object.assign({}, prev, {
-          getComments: copyComments,
-        });
-      },
-    });
-  }
-
-  function subUpdatedComment() {
-    subscribeToGetComments({
-      document: UPDATED_COMMENT_SUB,
-      variables: { idComment: comment._id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const updatedComment = subscriptionData.data.updatedComment;
-        const indexComment = prev.getComments.findIndex(
-          (c) => c._id === updatedComment._id
-        );
-        let commentsCopy = [...prev.getComments];
-        commentsCopy[indexComment] = updatedComment;
-        return Object.assign({}, prev, {
-          getComments: commentsCopy,
-        });
-      },
-    });
-  }
+      );
+    }
+  }, [dataSubToggledLikeComment, errorSubToggledLikeComment]);
 
   useEffect(() => {
-    subToggledLikeComment();
-    subUpdatedComment();
-  }, []);
+    if (dataSubUpdatedComment && !errorSubUpdatedComment) {
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
+        (dataCache) => {
+          const updatedComment = dataSubUpdatedComment.updatedComment;
+          const indexComment = dataCache.getComments.findIndex(
+            (c) => c._id === updatedComment._id
+          );
+          let commentsCopy = [...dataCache.getComments];
+          commentsCopy[indexComment] = updatedComment;
+          return {
+            getComments: commentsCopy,
+          };
+        }
+      );
+    }
+  }, [dataSubUpdatedComment, errorSubUpdatedComment]);
 
   return (
     <div

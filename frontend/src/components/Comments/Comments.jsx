@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BiSend } from "react-icons/bi";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 
 import Avatar from "../Avatar.jsx";
 import CustomInput from "../Custom/CustomInput.jsx";
@@ -15,7 +15,6 @@ import {
 import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
 import apolloClient from "../../config/apollo-client.jsx";
-import { GET_POST_BY_ID } from "../../gql/post.jsx";
 import SkeletonComments from "../Skeleton/SkeletonComments.jsx";
 
 function IndexComments({ idPost }) {
@@ -25,11 +24,10 @@ function IndexComments({ idPost }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
 
   const {
-    subscribeToMore,
     data: dataGetComments,
     loading: loadingGetComments,
     error: errorGetComments,
@@ -38,73 +36,11 @@ function IndexComments({ idPost }) {
   const [createComment, { loading: loadingCreateComment }] =
     useMutation(CREATE_COMMENT);
 
-  function subCreatedComment() {
-    subscribeToMore({
-      document: CREATED_COMMENT_SUB,
-      variables: { idPost: idPost },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const createdComment = subscriptionData.data.createdComment;
-        apolloClient.cache.updateQuery(
-          { query: GET_POST_BY_ID, variables: { idPost: idPost } },
-          (dataCache) => {
-            const copyComments = Array.isArray(dataCache.getPostById.comments)
-              ? [...dataCache.getPostById.comments]
-              : [];
-            copyComments.push(createdComment);
-            return {
-              getPostById: {
-                ...dataCache.getPostById,
-                comments: copyComments,
-              },
-            };
-          }
-        );
-        const comments = Array.isArray(prev.getComments)
-          ? [createdComment, ...prev.getComments]
-          : [createdComment];
-        return Object.assign({}, prev, {
-          getComments: comments,
-        });
-      },
-    });
-  }
+  const { data: dataSubCreatedComment, error: errorSubCreatedComment } =
+    useSubscription(CREATED_COMMENT_SUB, { variables: { idPost } });
 
-  function subDeletedComment() {
-    subscribeToMore({
-      document: DELETED_COMMENT_SUB,
-      variables: { idPost: idPost },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const idDeletedComment = subscriptionData.data.deletedComment;
-        apolloClient.cache.updateQuery(
-          { query: GET_POST_BY_ID, variables: { idPost: comment.post._id } },
-          (dataCache) => {
-            const filteredComments = dataCache.getPostById.comments.filter(
-              (comment) => comment._id !== idDeletedComment
-            );
-            return {
-              getPostById: {
-                ...dataCache.getPostById,
-                comments: filteredComments,
-              },
-            };
-          }
-        );
-        const filteredComments = prev.getComments.filter(
-          (comment) => comment._id !== idDeletedComment
-        );
-        return Object.assign({}, prev, {
-          getComments: filteredComments,
-        });
-      },
-    });
-  }
-
-  useEffect(() => {
-    subCreatedComment();
-    subDeletedComment();
-  }, []);
+  const { data: dataSubDeletedComment, error: errorSubDeletedComment } =
+    useSubscription(DELETED_COMMENT_SUB, { variables: { idPost } });
 
   async function handleSubmitComment(data) {
     try {
@@ -119,6 +55,40 @@ function IndexComments({ idPost }) {
       console.log(errorSubmittingComment);
     }
   }
+
+  useEffect(() => {
+    if (dataSubCreatedComment && !errorSubCreatedComment) {
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost } },
+        (dataCache) => {
+          const createdComment = dataSubCreatedComment.createdComment;
+          const comments = Array.isArray(dataCache?.getComments)
+            ? [createdComment, ...dataCache.getComments]
+            : [createdComment];
+          return {
+            getComments: comments,
+          };
+        }
+      );
+    }
+  }, [dataSubCreatedComment, errorSubCreatedComment]);
+
+  useEffect(() => {
+    if (dataSubDeletedComment && !errorSubDeletedComment) {
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost } },
+        (dataCache) => {
+          const idDeletedComment = dataSubDeletedComment.deletedComment;
+          const filteredComments = dataCache.getComments.filter(
+            (comment) => comment._id !== idDeletedComment
+          );
+          return {
+            getComments: filteredComments,
+          };
+        }
+      );
+    }
+  }, [dataSubDeletedComment, errorSubDeletedComment]);
 
   if (loadingGetComments)
     return (
@@ -170,11 +140,7 @@ function IndexComments({ idPost }) {
 
       <div className={"w-3/4"}>
         {comments?.map((comment) => (
-          <Comment
-            key={comment._id}
-            comment={comment}
-            subscribeToGetComments={subscribeToMore}
-          />
+          <Comment key={comment._id} comment={comment} />
         ))}
       </div>
     </div>

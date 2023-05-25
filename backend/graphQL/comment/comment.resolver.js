@@ -173,7 +173,12 @@ const Mutation = {
 
 const Subscription = {
   createdComment: {
-    subscribe: () => pubSub.asyncIterator(["CREATED_COMMENT"]),
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("CREATED_COMMENT"),
+      (payload, variables) => {
+        return payload.createdComment.post._id.equals(variables.idPost);
+      }
+    ),
   },
   updatedComment: {
     subscribe: withFilter(
@@ -184,17 +189,17 @@ const Subscription = {
     ),
   },
   deletedComment: {
-    subscribe: () => pubSub.asyncIterator(["DELETED_COMMENT"]),
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("DELETED_COMMENT"),
+      (payload, variables) => {
+        return payload.deletedComment.equals(variables.idPost);
+      }
+    ),
   },
   toggledLikeComment: {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_COMMENT"),
       (payload, variables) => {
-        console.log(payload.toggledLikeComment.idComment);
-        console.log(variables.idComment);
-        console.log(
-          payload.toggledLikeComment.idComment.equals(variables.idComment)
-        );
         return payload.toggledLikeComment.idComment.equals(variables.idComment);
       }
     ),

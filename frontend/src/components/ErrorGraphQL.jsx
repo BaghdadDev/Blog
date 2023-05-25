@@ -1,12 +1,11 @@
 import React from "react";
 
 function ErrorGraphQl({ errorGraphQL, className }) {
+  console.log(errorGraphQL);
   const errorMessage =
     errorGraphQL?.graphQLErrors[0]?.message ??
     errorGraphQL?.message ??
     "Something went wrong";
-
-  //absolute top-0 -translate-y-[calc(100%_+_2px)]
 
   return (
     <div

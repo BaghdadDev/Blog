@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useLocation, NavLink } from "react-router-dom";
-import { AiOutlineSearch } from "react-icons/ai";
 import { FaSignInAlt, FaPenFancy } from "react-icons/fa";
 
 import PATH from "../../utils/route-path.jsx";
@@ -21,7 +20,7 @@ function Header() {
       }
     >
       <Link to={PATH.ROOT}>Blog Logo</Link>
-      <Search />
+      {user ? <Search /> : undefined}
       {!user ? (
         location.pathname !== PATH.SIGN_IN &&
         location.pathname !== PATH.SIGN_UP ? (
