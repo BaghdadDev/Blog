@@ -51,7 +51,7 @@ it("Delete Post", async () => {
       mocks: [
         mockedGetPosts,
         mockedGetPostById,
-        // mockedGetComments,
+        mockedGetComments,
         mockedSubCreatedPost,
         mockedDeletePost,
         mockedSubDeletedPost,
@@ -61,16 +61,16 @@ it("Delete Post", async () => {
   let allLinkPost = await screen.findAllByRole("link");
   expect(allLinkPost.length).toBe(2);
   userEvent.click(allLinkPost[0]);
-  // expect(
-  //   await screen.findByText(/This is the post details page/i)
-  // ).toBeInTheDocument();
-  expect(await screen.findByText(/Brothers/i)).toBeInTheDocument();
-  // const btn_options = screen.getByTestId(/button-optionsPostDetails/i);
-  // userEvent.click(btn_options);
-  // const btn_delete = screen.getByText(/Delete Post/i);
-  // expect(btn_delete).toBeInTheDocument();
-  // userEvent.click(btn_delete);
-  // expect(await screen.findByText(/posts list/)).toBeInTheDocument();
+  expect(
+    await screen.findByPlaceholderText(/write your comment here !/i)
+  ).toBeInTheDocument();
+  const btn_options = screen.getByTestId(/button-optionsPostDetails/i);
+  userEvent.click(btn_options);
+  const btn_delete = screen.getByText(/Delete Post/i);
+  expect(btn_delete).toBeInTheDocument();
+  userEvent.click(btn_delete);
+  // allLinkPost = await screen.findAllByRole("link");
+  // expect(allLinkPost.length).toBe(2);
   // expect(screen.getByText(/Enemies/i)).toBeInTheDocument();
   // expect(screen.getByText(/Brothers/i)).toBeInTheDocument();
   // expect(screen.queryByText(/Brothers/i)).toBe(null);
