@@ -73,7 +73,7 @@ function Post({ post }) {
           ? [...dataCache.getPosts[indexPost].likes]
           : [];
         if (
-          dataCache.getPosts[indexPost].likes.find(
+          dataCache.getPosts[indexPost]?.likes.find(
             (like) => like._id === idUserToggledLikePost
           )
         ) {
