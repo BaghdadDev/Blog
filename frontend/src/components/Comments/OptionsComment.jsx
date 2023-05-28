@@ -7,7 +7,7 @@ import useOutsideClick from "../Hook/useOutsideClick.jsx";
 import { DELETE_COMMENT } from "../../gql/comment.jsx";
 import OvalLoader from "../OvalLoader.jsx";
 
-function OptionsComment({ idComment, idPost, setReadyOnly }) {
+function OptionsComment({ idComment, setReadyOnly }) {
   const [open, setOpen] = useState(false);
 
   const ref = useOutsideClick(() => setOpen(false));
@@ -17,7 +17,9 @@ function OptionsComment({ idComment, idPost, setReadyOnly }) {
 
   async function handleDeleteComment() {
     try {
-      await deleteComment({ variables: { idComment: idComment } });
+      await deleteComment({
+        variables: { idComment: idComment },
+      });
     } catch (errorDeleteComment) {
       console.log(errorDeleteComment);
     }

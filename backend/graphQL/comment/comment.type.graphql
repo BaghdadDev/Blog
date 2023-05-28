@@ -14,7 +14,7 @@ input CommentInput {
 
 type Subscription {
     createdComment(idPost: ID!): Comment!
-    deletedComment(idPost: ID!): ID!
+    deletedComment(idPost: ID!): Comment!
     toggledLikeComment(idComment: ID!): User!
     updatedComment(idComment: ID!): Comment!
 }

@@ -72,6 +72,7 @@ const Mutation = {
     }
   },
   deleteComment: async (_, { idUser, idComment }) => {
+    console.log("Resolver: deleteComment");
     try {
       const comment = await CommentModel.findById(idComment);
       if (!comment) {
@@ -90,7 +91,7 @@ const Mutation = {
         { $pull: { comments: idComment } }
       );
       await pubSub.publish("DELETED_COMMENT", {
-        deletedComment: comment._id,
+        deletedComment: { _id: comment._id, idPost: comment.post },
       });
       return { _id: idComment };
     } catch (errorDeleteComment) {
@@ -180,19 +181,11 @@ const Subscription = {
       }
     ),
   },
-  updatedComment: {
-    subscribe: withFilter(
-      () => pubSub.asyncIterator("UPDATED_COMMENT"),
-      (payload, variables) => {
-        return payload.updatedComment._id.equals(variables.idComment);
-      }
-    ),
-  },
   deletedComment: {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_COMMENT"),
       (payload, variables) => {
-        return payload.deletedComment.equals(variables.idPost);
+        return payload.deletedComment.idPost.equals(variables.idPost);
       }
     ),
   },
@@ -201,6 +194,14 @@ const Subscription = {
       () => pubSub.asyncIterator("TOGGLED_LIKE_COMMENT"),
       (payload, variables) => {
         return payload.toggledLikeComment.idComment.equals(variables.idComment);
+      }
+    ),
+  },
+  updatedComment: {
+    subscribe: withFilter(
+      () => pubSub.asyncIterator("UPDATED_COMMENT"),
+      (payload, variables) => {
+        return payload.updatedComment._id.equals(variables.idComment);
       }
     ),
   },

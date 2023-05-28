@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Node } from "slate";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -84,7 +84,6 @@ function Post({ post }) {
         } else {
           copyLikes.push({ __typename: "User", _id: idUserToggledLikePost });
         }
-        console.log(copyLikes);
         let copyPosts = [...dataCache.getPosts];
         copyPosts[indexPost] = { ...copyPosts[indexPost], likes: copyLikes };
         return {
@@ -94,26 +93,24 @@ function Post({ post }) {
     },
   });
 
-  const { data: dataSubCreatedComment, error: errorSubCreatedComment } =
-    useSubscription(CREATED_COMMENT_SUB, { variables: { idPost: post._id } });
-
-  const { data: dataSubDeletedComment, error: errorSubDeletedComment } =
-    useSubscription(DELETED_COMMENT_SUB, { variables: { idPost: post._id } });
-
-  useEffect(() => {
-    if (dataSubCreatedComment && !errorSubCreatedComment) {
+  useSubscription(CREATED_COMMENT_SUB, {
+    variables: { idPost: post._id },
+    onData: ({
+      data: {
+        data: { createdComment },
+      },
+    }) => {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const createdComment = dataSubCreatedComment.createdComment;
         const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === createdComment.post._id
         );
         const copyComments = Array.isArray(
-          dataCache.getPosts[indexPost].comments
+          dataCache.getPosts[indexPost]?.comments
         )
           ? [...dataCache.getPosts[indexPost].comments]
           : [];
         copyComments.push({
-          __typename: createdComment.__typename,
+          __typename: "Comment",
           _id: createdComment._id,
         });
         let copyPosts = [...dataCache.getPosts];
@@ -125,13 +122,18 @@ function Post({ post }) {
           getPosts: copyPosts,
         };
       });
-    }
-  }, [dataSubCreatedComment, errorSubCreatedComment]);
+    },
+  });
 
-  useEffect(() => {
-    if (dataSubDeletedComment && !errorSubDeletedComment) {
+  useSubscription(DELETED_COMMENT_SUB, {
+    variables: { idPost: post._id },
+    onData: ({
+      data: {
+        data: { deletedComment },
+      },
+    }) => {
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const idDeletedComment = dataSubDeletedComment.deletedComment;
+        const idDeletedComment = deletedComment._id;
         const indexPost = dataCache.getPosts.findIndex(
           ({ _id }) => _id === post._id
         );
@@ -149,8 +151,8 @@ function Post({ post }) {
           getPosts: copyPosts,
         };
       });
-    }
-  }, [dataSubDeletedComment, errorSubDeletedComment]);
+    },
+  });
 
   return (
     <div

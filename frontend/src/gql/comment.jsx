@@ -56,7 +56,9 @@ export const CREATED_COMMENT_SUB = gql`
 
 export const DELETED_COMMENT_SUB = gql`
   subscription DeletedComment($idPost: ID!) {
-    deletedComment(idPost: $idPost)
+    deletedComment(idPost: $idPost){
+      _id
+    }
   }
 `;
 

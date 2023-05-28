@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useMutation, useSubscription } from "@apollo/client";
 
@@ -19,39 +19,30 @@ function Comment({ comment }) {
 
   const [readOnly, setReadOnly] = useState(true);
 
+  const [optimisticToggleLikeComment, setOptimisticToggleLikeComment] =
+    useState(
+      () => !!comment?.likes.find(({ _id }) => _id === userContext?.user._id)
+    );
+
   const [toggleLikeComment, { loading: loadingToggleLikeComment }] =
     useMutation(TOGGLE_LIKE_COMMENT);
 
-  const { data: dataSubToggledLikeComment, error: errorSubToggledLikeComment } =
-    useSubscription(TOGGLED_LIKE_COMMENT_SUB, {
-      variables: { idComment: comment._id },
-    });
-
-  const { data: dataSubUpdatedComment, error: errorSubUpdatedComment } =
-    useSubscription(UPDATED_COMMENT_SUB, {
-      variables: { idComment: comment._id },
-    });
-
-  async function handleToggleLikeComment() {
-    try {
-      await toggleLikeComment({ variables: { idComment: comment._id } });
-    } catch (errorToggleLikeComment) {
-      console.log(errorToggleLikeComment);
-    }
-  }
-
-  useEffect(() => {
-    if (dataSubToggledLikeComment && !errorSubToggledLikeComment) {
+  useSubscription(TOGGLED_LIKE_COMMENT_SUB, {
+    variables: { idComment: comment._id },
+    onData: ({
+      data: {
+        data: { toggledLikeComment },
+      },
+    }) => {
       apolloClient.cache.updateQuery(
         { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
         (dataCache) => {
-          const { _id: idUserToggledLikeComment } =
-            dataSubToggledLikeComment.toggledLikeComment;
+          const idUserToggledLikeComment = toggledLikeComment._id;
           const indexComment = dataCache.getComments.findIndex(
             ({ _id }) => _id === comment._id
           );
           let copyLikes = Array.isArray(
-            dataCache.getComments[indexComment].likes
+            dataCache.getComments[indexComment]?.likes
           )
             ? [...dataCache.getComments[indexComment].likes]
             : [];
@@ -76,15 +67,19 @@ function Comment({ comment }) {
           };
         }
       );
-    }
-  }, [dataSubToggledLikeComment, errorSubToggledLikeComment]);
+    },
+  });
 
-  useEffect(() => {
-    if (dataSubUpdatedComment && !errorSubUpdatedComment) {
+  useSubscription(UPDATED_COMMENT_SUB, {
+    variables: { idComment: comment._id },
+    onData: ({
+      data: {
+        data: { updatedComment },
+      },
+    }) => {
       apolloClient.cache.updateQuery(
         { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
         (dataCache) => {
-          const updatedComment = dataSubUpdatedComment.updatedComment;
           const indexComment = dataCache.getComments.findIndex(
             (c) => c._id === updatedComment._id
           );
@@ -95,8 +90,18 @@ function Comment({ comment }) {
           };
         }
       );
+    },
+  });
+
+  async function handleToggleLikeComment() {
+    setOptimisticToggleLikeComment((prev) => !prev);
+    try {
+      await toggleLikeComment({ variables: { idComment: comment._id } });
+    } catch (errorToggleLikeComment) {
+      console.log(errorToggleLikeComment);
+      setOptimisticToggleLikeComment((prev) => !prev);
     }
-  }, [dataSubUpdatedComment, errorSubUpdatedComment]);
+  }
 
   return (
     <div
@@ -128,14 +133,12 @@ function Comment({ comment }) {
                 }`}
                 onClick={handleToggleLikeComment}
               >
-                {comment.likes.findIndex(
-                  ({ _id: userId }) => userId === userContext?.user._id
-                ) === -1 ? (
-                  <AiOutlineHeart
+                {optimisticToggleLikeComment ? (
+                  <AiFillHeart
                     className={"pointer-events-none h-4 w-4 text-red-800"}
                   />
                 ) : (
-                  <AiFillHeart
+                  <AiOutlineHeart
                     className={"pointer-events-none h-4 w-4 text-red-800"}
                   />
                 )}

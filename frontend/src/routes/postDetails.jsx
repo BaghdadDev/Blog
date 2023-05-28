@@ -38,46 +38,18 @@ function PostDetails() {
   const [toggleLikePost, { loading: loadingToggleLikePost }] =
     useMutation(TOGGLE_LIKE_POST);
 
-  const { data: dataSubToggledLikePost, error: errorSubToggledLikePost } =
-    useSubscription(TOGGLED_LIKE_POST_SUB, { variables: { idPost: postId } });
-
-  const { data: dataSubDeletedPost, error: errorSubDeletedPost } =
-    useSubscription(DELETED_POST_SUB, { variables: { idPost: postId } });
-
-  const { data: dataSubUpdatedPost, error: errorSubUpdatedPost } =
-    useSubscription(UPDATED_POST_SUB, { variables: { idPost: postId } });
-
-  async function handleToggleLikePost() {
-    setOptimisticLike((prev) => !prev);
-    try {
-      await toggleLikePost({
-        variables: { idPost: postId, idUser: userContext?.user._id },
-      });
-    } catch (errorToggleLikePost) {
-      console.log(errorToggleLikePost);
-    }
-  }
-
-  useEffect(() => {
-    if (
-      dataPost?.getPostById.likes.findIndex(
-        (like) => like?._id === userContext?.user._id
-      ) === -1
-    ) {
-      setOptimisticLike(false);
-    } else {
-      setOptimisticLike(true);
-    }
-  }, [dataPost]);
-
-  useEffect(() => {
-    if (dataSubToggledLikePost && !errorSubToggledLikePost) {
+  useSubscription(TOGGLED_LIKE_POST_SUB, {
+    variables: { idPost: postId },
+    onData: ({
+      data: {
+        data: { toggledLikePost },
+      },
+    }) => {
       apolloClient.cache.updateQuery(
         { query: GET_POST_BY_ID, variables: { idPost: postId } },
         (dataCache) => {
-          const { _id: idUserToggledLike } =
-            dataSubToggledLikePost.toggledLikePost;
-          const copyLikes = Array.isArray(dataCache.getPostById.likes)
+          const idUserToggledLike = toggledLikePost._id;
+          const copyLikes = Array.isArray(dataCache.getPostById?.likes)
             ? [...dataCache.getPostById.likes]
             : [];
           if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
@@ -98,38 +70,69 @@ function PostDetails() {
           };
         }
       );
-    }
-  }, [dataSubToggledLikePost, errorSubToggledLikePost]);
+    },
+  });
 
-  useEffect(() => {
-    if (dataSubDeletedPost && !errorSubDeletedPost) {
+  useSubscription(DELETED_POST_SUB, {
+    variables: { idPost: postId },
+    onData: ({
+      data: {
+        data: { deletedPost },
+      },
+    }) => {
       apolloClient.cache.updateQuery(
         { query: GET_POST_BY_ID, variables: { idPost: postId } },
         () => null
       );
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
         const posts = dataCache.getPosts.filter(
-          (post) => post._id !== dataSubDeletedPost.deletedPost._id
+          (post) => post._id !== deletedPost._id
         );
         return { getPosts: posts };
       });
       navigate(PATH.ROOT);
-    }
-  }, [dataSubDeletedPost, errorSubDeletedPost]);
+    },
+  });
 
-  useEffect(() => {
-    if (dataSubUpdatedPost && !errorSubUpdatedPost) {
+  useSubscription(UPDATED_POST_SUB, {
+    variables: { idPost: postId },
+    onData: ({
+      data: {
+        data: { updatedPost },
+      },
+    }) => {
       apolloClient.cache.updateQuery(
         { query: GET_POST_BY_ID, variables: { idPost: postId } },
-        (dataCache) => {
-          const postUpdated = dataSubUpdatedPost.updatedPost;
-          return {
-            getPostById: postUpdated,
-          };
-        }
+        () => ({
+          getPostById: updatedPost,
+        })
       );
+    },
+  });
+
+  async function handleToggleLikePost() {
+    setOptimisticLike((prev) => !prev);
+    try {
+      await toggleLikePost({
+        variables: { idPost: postId, idUser: userContext?.user._id },
+      });
+    } catch (errorToggleLikePost) {
+      console.log(errorToggleLikePost);
+      setOptimisticLike((prev) => !prev);
     }
-  }, [dataSubUpdatedPost, errorSubUpdatedPost]);
+  }
+
+  useEffect(() => {
+    if (
+      dataPost?.getPostById.likes.findIndex(
+        (like) => like?._id === userContext?.user._id
+      ) === -1
+    ) {
+      setOptimisticLike(false);
+    } else {
+      setOptimisticLike(true);
+    }
+  }, [dataPost]);
 
   if (loadingPost)
     return (

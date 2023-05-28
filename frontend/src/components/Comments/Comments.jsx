@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BiSend } from "react-icons/bi";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
@@ -36,11 +36,48 @@ function IndexComments({ idPost }) {
   const [createComment, { loading: loadingCreateComment }] =
     useMutation(CREATE_COMMENT);
 
-  const { data: dataSubCreatedComment, error: errorSubCreatedComment } =
-    useSubscription(CREATED_COMMENT_SUB, { variables: { idPost } });
+  useSubscription(CREATED_COMMENT_SUB, {
+    variables: { idPost },
+    onData: ({
+      data: {
+        data: { createdComment },
+      },
+    }) => {
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost } },
+        (dataCache) => {
+          const comments = Array.isArray(dataCache?.getComments)
+            ? [createdComment, ...dataCache.getComments]
+            : [createdComment];
+          return {
+            getComments: comments,
+          };
+        }
+      );
+    },
+  });
 
-  const { data: dataSubDeletedComment, error: errorSubDeletedComment } =
-    useSubscription(DELETED_COMMENT_SUB, { variables: { idPost } });
+  useSubscription(DELETED_COMMENT_SUB, {
+    variables: { idPost },
+    onData: ({
+      data: {
+        data: { deletedComment },
+      },
+    }) => {
+      const idDeletedComment = deletedComment._id;
+      apolloClient.cache.updateQuery(
+        { query: GET_COMMENTS, variables: { idPost } },
+        (dataCache) => {
+          const filteredComments = dataCache.getComments.filter(
+            (comment) => comment._id !== idDeletedComment
+          );
+          return {
+            getComments: filteredComments,
+          };
+        }
+      );
+    },
+  });
 
   async function handleSubmitComment(data) {
     try {
@@ -55,40 +92,6 @@ function IndexComments({ idPost }) {
       console.log(errorSubmittingComment);
     }
   }
-
-  useEffect(() => {
-    if (dataSubCreatedComment && !errorSubCreatedComment) {
-      apolloClient.cache.updateQuery(
-        { query: GET_COMMENTS, variables: { idPost } },
-        (dataCache) => {
-          const createdComment = dataSubCreatedComment.createdComment;
-          const comments = Array.isArray(dataCache?.getComments)
-            ? [createdComment, ...dataCache.getComments]
-            : [createdComment];
-          return {
-            getComments: comments,
-          };
-        }
-      );
-    }
-  }, [dataSubCreatedComment, errorSubCreatedComment]);
-
-  useEffect(() => {
-    if (dataSubDeletedComment && !errorSubDeletedComment) {
-      apolloClient.cache.updateQuery(
-        { query: GET_COMMENTS, variables: { idPost } },
-        (dataCache) => {
-          const idDeletedComment = dataSubDeletedComment.deletedComment;
-          const filteredComments = dataCache.getComments.filter(
-            (comment) => comment._id !== idDeletedComment
-          );
-          return {
-            getComments: filteredComments,
-          };
-        }
-      );
-    }
-  }, [dataSubDeletedComment, errorSubDeletedComment]);
 
   if (loadingGetComments)
     return (
