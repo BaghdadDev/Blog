@@ -70,7 +70,7 @@ export const mockedToggleLikePost = {
     query: TOGGLE_LIKE_POST,
     variables: { idPost: mockedPosts[0]._id, idUser: mockedUser._id },
   },
-  result: { data: { toggleLikePost: {} } },
+  result: { data: { toggleLikePost: true } },
 };
 
 export const mockedDeletePost = {

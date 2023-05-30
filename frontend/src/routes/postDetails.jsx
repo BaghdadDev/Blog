@@ -48,6 +48,7 @@ function PostDetails() {
       apolloClient.cache.updateQuery(
         { query: GET_POST_BY_ID, variables: { idPost: postId } },
         (dataCache) => {
+          if (!dataCache) return;
           const idUserToggledLike = toggledLikePost._id;
           const copyLikes = Array.isArray(dataCache.getPostById?.likes)
             ? [...dataCache.getPostById.likes]
@@ -85,6 +86,7 @@ function PostDetails() {
         () => null
       );
       apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
+        if (!dataCache) return;
         const posts = dataCache.getPosts.filter(
           (post) => post._id !== deletedPost._id
         );
@@ -178,7 +180,7 @@ function PostDetails() {
                 <AiFillHeart className={"h-6 w-6 text-red-800"} />
               )}
             </div>
-            {userContext.user._id === post.user._id ? (
+            {userContext?.user?._id === post.user._id ? (
               <OptionsPostDetails idPost={postId} />
             ) : undefined}
           </div>

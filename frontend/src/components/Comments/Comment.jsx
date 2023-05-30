@@ -21,7 +21,7 @@ function Comment({ comment }) {
 
   const [optimisticToggleLikeComment, setOptimisticToggleLikeComment] =
     useState(
-      () => !!comment?.likes.find(({ _id }) => _id === userContext?.user._id)
+      () => !!comment?.likes.find(({ _id }) => _id === userContext?.user?._id)
     );
 
   const [toggleLikeComment, { loading: loadingToggleLikeComment }] =
@@ -119,7 +119,7 @@ function Comment({ comment }) {
         />
         {readOnly ? (
           <>
-            {comment.user._id === userContext?.user._id ? (
+            {comment.user._id === userContext?.user?._id ? (
               <OptionsComment
                 idComment={comment._id}
                 idPost={comment.post._id}
