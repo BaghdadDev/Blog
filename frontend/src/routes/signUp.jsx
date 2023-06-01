@@ -21,8 +21,7 @@ function SignUp() {
     watch,
   } = useForm();
 
-  const [signUp, { loading: loadingSignUp, error: errorSignUp }] =
-    useMutation(SIGN_UP);
+  const [signUp, { error: errorSignUp }] = useMutation(SIGN_UP);
 
   const { persistUser } = useUserContext();
 

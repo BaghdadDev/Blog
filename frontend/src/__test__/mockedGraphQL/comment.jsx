@@ -7,7 +7,7 @@ import {
   UPDATED_COMMENT_SUB,
 } from "../../gql/comment.jsx";
 import { mockedComments } from "../mockedData/mockedComments.jsx";
-import mockedPosts from "../mockedData/Post/mockedPosts.jsx";
+import mockedPosts from "../mockedData/mockedPosts.jsx";
 import mockedUser from "../mockedData/mockedUser.jsx";
 
 // MOCKED QUERIES --------------------------------------------------------

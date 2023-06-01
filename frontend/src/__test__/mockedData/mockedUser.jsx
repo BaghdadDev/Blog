@@ -1,4 +1,4 @@
-import mockedPhoto from "./Post/mockedPhoto.jsx";
+import mockedPhoto from "./mockedPhoto.jsx";
 
 export default {
   __typename: "User",

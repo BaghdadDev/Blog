@@ -38,7 +38,7 @@ function OptionsPostDetails({ idPost }) {
           className={
             "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
           }
-          data-testid={"button-optionsPostDetails"}
+          data-testid={"btn-optionsPostDetails"}
           onClick={(e) => {
             setOpen((prev) => !prev);
           }}

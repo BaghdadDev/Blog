@@ -1,6 +1,6 @@
 import mockedPicture from "./mockedPicture.jsx";
-import mockedUser from "../mockedUser.jsx";
-import { mockedComments } from "../mockedComments.jsx";
+import mockedUser from "./mockedUser.jsx";
+import { mockedComments } from "./mockedComments.jsx";
 
 export default [
   {

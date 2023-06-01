@@ -10,7 +10,7 @@ import {
   TOGGLED_LIKE_POST_SUB,
   UPDATED_POST_SUB,
 } from "../../gql/post.jsx";
-import mockedPosts from "../mockedData/Post/mockedPosts.jsx";
+import mockedPosts from "../mockedData/mockedPosts.jsx";
 import mockedUser from "../mockedData/mockedUser.jsx";
 
 // GET POSTS LIST -------------------------------------------

@@ -35,8 +35,8 @@ export default function RootLayout() {
           "opacity-25 transition-opacity delay-200 duration-200"
         }`}
       >
-        {/* {navigation.state === "loading" ? <OvalLoader /> : <Outlet />} */}
-        <Outlet />
+        {navigation.state === "loading" ? <OvalLoader /> : <Outlet />}
+        {/* <Outlet /> */}
       </div>
     </div>
   );

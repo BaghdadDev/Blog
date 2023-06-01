@@ -179,6 +179,7 @@ function Post({ post }) {
             navigate(PATH.POST_DETAILS.split(":")[0] + `${post._id}`)
           }
           aria-label={`post-img`}
+          data-testid={`post-img-link-${post._id}`}
         />
       </Link>
       <p className={"pl-2 font-semibold"}>{post.title}</p>
