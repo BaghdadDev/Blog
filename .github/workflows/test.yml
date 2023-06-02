@@ -31,7 +31,7 @@ jobs:
         run: | 
           cd frontend
           yarn test
-        if: success();
+        if: success()
 
       - name: Build Frontend
         run: |
