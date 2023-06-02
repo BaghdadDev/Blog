@@ -22,6 +22,7 @@ export function UserProvider({ children, initialValue }) {
   useEffect(() => {
     if (initialValue) {
       setUser(initialValue);
+      setAuthChecked(true);
       return;
     }
     const userFromStorageString = localStorage.getItem(keyStorage);
