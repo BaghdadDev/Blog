@@ -25,11 +25,13 @@ jobs:
         run: |
           cd frontend
           yarn install
+          ls -a
 
       - name: Run Frontend Tests
         run: | 
           cd frontend
           yarn test
+        if: success();
 
       - name: Build Frontend
         run: |
