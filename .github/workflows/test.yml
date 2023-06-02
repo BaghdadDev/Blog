@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Backend Dependencies
         run: |
@@ -21,24 +21,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Go To The Root Directory
-        run: cd frontend
-
-      - name: Node dependency report
-        uses: alexrogalskiy/github-action-node-dependency@master
-        with:
-          mode: 'package_versions'
-          reportFile: 'report.json'
-          reportPath: './data'
+      - name: Setup the Dependencies
+        run: |
+          cd frontend
+          npm install
 
       - name: Run Frontend Tests
         run: | 
           cd frontend
-          yarn test
+          npm run test
         if: success()
 
       - name: Build Frontend
         run: |
           cd frontend
-          yarn build
+          npm run build
         if: success()
