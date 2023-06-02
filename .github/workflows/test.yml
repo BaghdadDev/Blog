@@ -30,6 +30,8 @@ jobs:
         run: | 
           cd frontend
           yarn test
+        env:
+          ACTIONS_STEP_DEBUG: true
 
       - name: Build Frontend
         run: |
