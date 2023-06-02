@@ -1,9 +1,10 @@
 name: Testing Workflow
 
-on:
-  push:
-    branches:
-      - master
+on: push
+#on:
+#  push:
+#    branches:
+#      - master
 
 jobs:
   checkout-test:
