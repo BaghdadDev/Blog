@@ -24,16 +24,15 @@ jobs:
       - name: Setup the Dependencies
         run: |
           cd frontend
-          npm install
+          yarn install
 
       - name: Run Frontend Tests
         run: | 
           cd frontend
-          npm run test
-        if: success()
+          yarn test
 
       - name: Build Frontend
         run: |
           cd frontend
-          npm run build
+          yarn build
         if: success()
