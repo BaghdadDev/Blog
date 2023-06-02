@@ -26,8 +26,13 @@ jobs:
           cd frontend
           yarn install
           ls -a
+      - name: Run Frontend Tests
+        run: | 
+          cd frontend
+          yarn test
 
-#      - name: Build Frontend
-#        run: |
-#          cd frontend
-#          yarn build
+      - name: Build Frontend
+        run: |
+          cd frontend
+          yarn build
+        if: success()
