@@ -33,9 +33,9 @@ function SignIn() {
         },
       });
       persistUser(dataUser);
-      navigate(PATH.ROOT);
+      // navigate(PATH.ROOT);
     } catch (catchErrorSignIn) {
-      console.log(catchErrorSignIn);
+      console.error(catchErrorSignIn);
     }
   }
 

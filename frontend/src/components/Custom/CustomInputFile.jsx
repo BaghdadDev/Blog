@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { MdInsertPhoto } from "react-icons/md";
 import { ErrorMessage } from "@hookform/error-message";
 import PropTypes from "prop-types";
@@ -19,23 +19,11 @@ CustomInputFile.propTypes = {
 function CustomInputFile({ size, name, register, rules, errors, classImage }) {
   const [file, setFile] = useState(undefined);
 
-  // async function initFile(dataURL, filename, contentType) {
-  //   const data = await fetch(dataURL);
-  //   const blob = await data.blob();
-  //   const initFile = new File([blob], filename, { type: contentType });
-  //   setFile(initFile);
-  // }
-
-  // useEffect(() => {
-  //   initFile(
-  //     `data:${defaultValue.contentType};base64,${defaultValue.data}`,
-  //     defaultValue.filename,
-  //     defaultValue.contentType
-  //   );
-  // }, []);
-
   return (
-    <label htmlFor={name} className={`relative flex flex-col items-center`}>
+    <label
+      htmlFor={name}
+      className={`relative flex w-full flex-col items-center`}
+    >
       {!file ? (
         <MdInsertPhoto
           style={{ width: `${size}rem` }}

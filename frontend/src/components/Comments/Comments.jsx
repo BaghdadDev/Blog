@@ -71,6 +71,7 @@ function IndexComments({ idPost }) {
           const filteredComments = dataCache.getComments.filter(
             (comment) => comment._id !== idDeletedComment
           );
+          console.log(filteredComments);
           return {
             getComments: filteredComments,
           };

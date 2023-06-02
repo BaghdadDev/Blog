@@ -10,10 +10,10 @@ import { UserProvider } from "./context/userContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ApolloProvider client={apolloClient}>
-      <UserProvider>
+    <UserProvider>
+      <ApolloProvider client={apolloClient}>
         <RouterProvider router={router} />
-      </UserProvider>
-    </ApolloProvider>
+      </ApolloProvider>
+    </UserProvider>
   </React.StrictMode>
 );

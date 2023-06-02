@@ -6,7 +6,10 @@ function getAccessTokenByIdUser(idUser) {
   const accessToken = jwt.sign({ idUser }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: expiresAccessToken / 1000, // It has to be in seconds
   });
-  return { accessToken: accessToken, expiresAccessToken: expiresAccessToken };
+  return {
+    accessToken: accessToken,
+    expiresAccessToken: Date.now() + expiresAccessToken,
+  };
 }
 
 module.exports = { getAccessTokenByIdUser };
