@@ -1,17 +1,22 @@
 name: Testing Workflow
 
 on: push
-#on:
-#  push:
-#    branches:
-#      - master
 
 jobs:
-  checkout-test:
+  checkout-and-install-dependencies:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Go to the root project
         run: |
           pwd
+          ls -a
+          yarn install
+  install-dependencies:
+    runs-on: ubuntu-latest
+    needs: checkout-and-install-dependencies
+    steps:
+      - name: Test if i am in the working directory
+        run: |
+          pwd 
           ls -a
