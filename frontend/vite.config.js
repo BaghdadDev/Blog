@@ -10,8 +10,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/__test__/setup.jsx",
   },
-  resolve: {
-    // alias: [{ find: "@", replacement: resolve(__dirname, "./src") }],
+  optimizeDeps: {
+    exclude: ["react"],
   },
-  base: "/",
 });
