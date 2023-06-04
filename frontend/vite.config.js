@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import graphql from "@rollup/plugin-graphql";
+import { fileURLToPath, URL } from "url";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,7 +11,9 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/__test__/setup.jsx",
   },
-  optimizeDeps: {
-    exclude: ["react"],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
   },
 });
