@@ -10,10 +10,14 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/__test__/setup.jsx",
-  },
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    coverage: {
+      reporter: ["text", "json", "html"],
+      reportsDirectory: "./src/__test__/coverage",
     },
   },
+  // resolve: {
+  //   alias: {
+  //     "@": fileURLToPath(new URL("./src", import.meta.url)),
+  //   },
+  // },
 });
