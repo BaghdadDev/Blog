@@ -25,11 +25,11 @@ jobs:
         run: |
           cd frontend
           yarn install
-        if: success()
 
       - name: Run Frontend Tests
         run: |
           cd frontend
+          ls -a
           yarn test
         env:
           ACTIONS_STEP_DEBUG: true
