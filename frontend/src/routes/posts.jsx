@@ -3,7 +3,7 @@ import { useQuery, useSubscription } from "@apollo/client";
 
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
-import Post from "../components/post/Post.jsx";
+import Post from "../components/Post/Post.jsx";
 import apolloClient from "../config/apollo-client.jsx";
 import { CREATED_POST_SUB, GET_POSTS } from "../gql/post.jsx";
 
