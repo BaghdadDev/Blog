@@ -10,6 +10,7 @@ backend/.env
 /coverage
 
 /build
+/dist
 
 .eslintrc.json
 
