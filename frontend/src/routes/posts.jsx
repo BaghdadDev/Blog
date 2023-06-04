@@ -1,5 +1,5 @@
-import { useQuery, useSubscription } from "@apollo/client";
 import React from "react";
+import { useQuery, useSubscription } from "@apollo/client";
 
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
