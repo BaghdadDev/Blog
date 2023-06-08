@@ -8,6 +8,7 @@ Welcome to the "Blog" repository! This project is a comprehensive blog applicati
 
 The frontend of the blog is built using the following technologies:
 
+- **Vite**: A build tool that aims to provide a faster and leaner development experience for modern web projects.
 - **React**: A powerful JavaScript library for building user interfaces. It serves as the foundation for creating an interactive and responsive frontend for the blog.
 - **GraphQL**: A sophisticated query language and runtime for APIs. In this project, GraphQL is integrated with Apollo Client to ensure efficient data fetching and manipulation.
 - **Real-Time**: The blog includes real-time functionality, implemented using subscriptions. This feature allows users to receive instantaneous updates without requiring manual page refreshes.
@@ -28,21 +29,39 @@ The backend of the blog is powered by the following technologies:
 To start using the blog project, follow these explicit steps:
 
 1. Clone this repository to your local machine using the following command:
+
    `git clone https://github.com/HamzaLinge/Blog.git`
 
 2. Install the necessary dependencies:
-   `cd Blog/frontend |
-yarn install |
-cd ../backend |
-yarn install`
 
-3. Start the backend server by running the following command:
+   `cd Blog/frontend |
+   yarn install |
+   cd ../backend |
+   yarn install`
+
+3. Set up the environment variables :
+
+   **Backend**:
+
+   `MONGODB_URI_LOCAL=mongodb://127.0.0.1:27017/<Database_Name> (e.g: BlogDB)`
+
+   `PORT_EXPRESS=<Express_Port_Number> (e.g: 4000)`
+
+   `ACCESS_TOKEN_SECRET=<Random_Token_For_JsonWebToken> (e.g: e6iK4...)`
+
+   **Frontend**:
+
+   `VITE_URL_HOST=http://localhost:<Port_Express_Number>/graphql`
+
+4. Start the backend server by running the following command:
+
    `yarn start` _(or `yarn dev` for development mode)_
 
-4. Finally, launch the frontend application by running the following command:
+5. Finally, launch the frontend application by running the following command:
+
    `yarn preview` _(or `yarn dev` for development mode)_
 
-5. Access the blog in your web browser by navigating to http://localhost:5173 and explore the various features and functionalities it offers.
+6. Access the blog in your web browser by navigating to http://localhost:5173 and explore the various features and functionalities it offers.
 
 ## Usage
 
