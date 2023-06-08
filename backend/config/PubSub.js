@@ -10,6 +10,7 @@ const { PubSub } = require("graphql-subscriptions");
  *** To lunch Redis => CLI:
  * ubuntu
  * sudo service redis-server start
+ * Password: 1234
  * redis-cli
  * 127.0.0.1:6379> ping
  * PONG

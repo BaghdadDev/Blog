@@ -254,6 +254,7 @@ const Mutation = {
         });
       await CommentModel.deleteMany({ post: idPost });
       await PostModel.findOneAndDelete({ _id: idPost });
+      await FileModel.findOneAndDelete({ _id: postExists.picture });
       await pubSub.publish("DELETED_POST", {
         deletedPost: { _id: postExists._id },
       });

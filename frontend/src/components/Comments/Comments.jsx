@@ -16,6 +16,7 @@ import Comment from "./Comment.jsx";
 import ErrorGraphQL from "../ErrorGraphQL";
 import apolloClient from "../../config/apollo-client.jsx";
 import SkeletonComments from "../Skeleton/SkeletonComments.jsx";
+import { GET_POST_BY_ID } from "../../gql/post.jsx";
 
 function IndexComments({ idPost }) {
   const userContext = useUserContext();
@@ -54,6 +55,22 @@ function IndexComments({ idPost }) {
           };
         }
       );
+      apolloClient.cache.updateQuery(
+        { query: GET_POST_BY_ID, variables: { idPost } },
+        (dataCache) => {
+          const newComment = {
+            __typename: createdComment.__typename,
+            _id: createdComment._id,
+          };
+          const copyComments = Array.isArray(dataCache.getPostById?.comments)
+            ? [newComment, ...dataCache.getPostById?.comments]
+            : [newComment];
+          const copyPost = { ...dataCache.getPostById, comments: copyComments };
+          return {
+            getPostById: copyPost,
+          };
+        }
+      );
     },
   });
 
@@ -71,9 +88,22 @@ function IndexComments({ idPost }) {
           const filteredComments = dataCache.getComments.filter(
             (comment) => comment._id !== idDeletedComment
           );
-          console.log(filteredComments);
           return {
             getComments: filteredComments,
+          };
+        }
+      );
+      apolloClient.cache.updateQuery(
+        { query: GET_POST_BY_ID, variables: { idPost } },
+        (dataCache) => {
+          const filteredComments = dataCache.getPostById.comments.filter(
+            (comment) => comment._id !== idDeletedComment
+          );
+          return {
+            getPostById: {
+              ...dataCache.getPostById,
+              comments: filteredComments,
+            },
           };
         }
       );
