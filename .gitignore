@@ -20,3 +20,7 @@ backend/.env
 /.github/workflows/context.yml
 /.github/workflows/env.yml
 /.github/workflows/simple.yml
+/frontend/dist/index.html
+/frontend/dist/assets/index-262be39d.css
+/frontend/dist/assets/index-b25cd8c9.js
+/frontend/dist/vite.svg
