@@ -21,7 +21,7 @@ const { typeDefs, resolvers } = require("./graphQL");
 const authenticationMiddleware = require("./middleware/authentication.js");
 
 // Set the port number
-const port = process.env.PORT || process.env.PORT_EXPRESS;
+const port = process.env.BLOG_PORT_EXPRESS || 4000;
 
 async function mountServer() {
   // Setting up the connection with database
@@ -106,8 +106,9 @@ async function mountServer() {
   app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 
   // Put the api endpoint
+  app.get("/api", async (req, res) => res.send("Blog's API").status(200));
   app.use(
-    "/graphql",
+    "/api/blog/graphql",
     expressMiddleware(server, {
       context: ({ req }) => ({ headers: req.headers }),
     })

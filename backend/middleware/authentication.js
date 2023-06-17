@@ -23,7 +23,7 @@ async function authenticationMiddleware(resolve, root, args, context, info) {
     try {
       const { idUser } = jwt.verify(
         accessToken,
-        process.env.ACCESS_TOKEN_SECRET
+        process.env.BLOG_ACCESS_TOKEN_SECRET
       );
       return await resolve(root, { ...args, idUser: idUser }, context, info);
     } catch (errorVerifyingJWT) {

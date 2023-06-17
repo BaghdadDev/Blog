@@ -43,7 +43,7 @@ const terminateLink = createUploadLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: `ws://${String(import.meta.env.VITE_URL_HOST).split("//")[1]}`,
+    url: `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`,
   })
 );
 
