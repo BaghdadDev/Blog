@@ -28,18 +28,13 @@ jobs:
       - name: Test the Connexion with Hostinger
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.HOSTINGER_SSH_HOST }}
-          username: ${{ secrets.HOSTINGER_USERNAME }}
-          password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          port: 22
           script: |
             pwd
-            ls
-            cd domains/hamzacode.com/backends
-            pwd
-            ls
-            cd ../public_html
-            pwd
+            cd /var/www
             ls
 
 #      - name : Deploy the Backend
