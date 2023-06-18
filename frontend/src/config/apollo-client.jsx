@@ -38,7 +38,7 @@ const errorNotAuthenticatedLink = new ApolloLink((operation, forward) => {
 });
 
 const terminateLink = createUploadLink({
-  uri: import.meta.env.VITE_URL_HOST,
+  uri: import.meta.env.VITE_BLOG_URL_HOST,
 });
 
 const wsLink = new GraphQLWsLink(
@@ -46,6 +46,8 @@ const wsLink = new GraphQLWsLink(
     url: `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`,
   })
 );
+
+console.log(import.meta.env.VITE_BLOG_URL_HOST);
 
 const splitLink = split(
   ({ query }) => {

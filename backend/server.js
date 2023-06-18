@@ -108,7 +108,7 @@ async function mountServer() {
   // Put the api endpoint
   app.get("/api", async (req, res) => res.send("Blog's API").status(200));
   app.use(
-    "/api/blog/graphql",
+    "/api/graphql",
     expressMiddleware(server, {
       context: ({ req }) => ({ headers: req.headers }),
     })
