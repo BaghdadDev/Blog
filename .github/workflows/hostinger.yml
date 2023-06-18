@@ -10,26 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: SSH Access
-      #   uses: appleboy/ssh-action@v0.1.10
-      #   with:
-      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
-      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-      #     script: |
-      #       cd /var/www/backends/blog
-      #       pwd
-      #       echo "---------------------------------------------"
-      #       echo "MYVAR=HamzaCode" >> .env
-      #       cat .env
-      #       echo "---------------------------------------------"
-      #       ls -a
-      #       echo "---------------------------------------------"
-      #       cd /var/www/html
-      #       pwd
-      #       echo "---------------------------------------------"
-      #       ls
-      #       echo "---------------------------------------------"
+      - name: SSH Access
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          script: |
+            cd /var/www/html
+            echo "---------------------------------------------"
+            rm .env
+            rm -r frontend
+            ls
 
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -52,7 +44,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_VPS_IP }}
           username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          source: "./backend"
+          source: "backend"
           target: "/var/www/backends/"
 
       - name: Copy the Frontend to Hostinger's VPS
@@ -61,7 +53,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_VPS_IP }}
           username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          source: "./frontend/dist"
+          source: "frontend/dist"
           target: "/var/www/html/"
           strip_components: 1
 
