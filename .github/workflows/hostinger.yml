@@ -10,39 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.16.0"
-
-      - name: Install the Dependencies, Test and Build the Frontend
-        run: |
-          cd frontend
-          yarn install
-          yarn test
-          yarn build
-
-      - name: Copy the Backend to Hostinger's VPS
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.HOSTINGER_VPS_IP }}
-          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          source: "./backend"
-          target: "/var/www/backends/"
-
-      - name: Copy the Frontend to Hostinger's VPS
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.HOSTINGER_VPS_IP }}
-          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          source: "./frontend/dist"
-          target: "/var/www/html/"
-
       - name: Set up the Backend and Frontend Code from Hostinger's VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -51,14 +18,59 @@ jobs:
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
           script: |
             cd /var/www/backends
-            rm -r blog
-            mv backend blog
-            cd blog
-            yarn install
-            echo ${{secrets.HOSTINGER_VPS_USERNAME}} >> .env
-            cat .env
-            ls -a
+            ls
             cd /var/www/html
-            rm -r blog
-            mv dist blog
-            ls -a
+            ls
+
+      # - name: Checkout Code
+      #   uses: actions/checkout@v3
+
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: "18.16.0"
+
+      # - name: Install the Dependencies, Test and Build the Frontend
+      #   run: |
+      #     cd frontend
+      #     yarn install
+      #     yarn test
+      #     yarn build
+
+      # - name: Copy the Backend to Hostinger's VPS
+      #   uses: appleboy/scp-action@v0.1.4
+      #   with:
+      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
+      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+      #     source: "./backend"
+      #     target: "/var/www/backends/"
+
+      # - name: Copy the Frontend to Hostinger's VPS
+      #   uses: appleboy/scp-action@v0.1.4
+      #   with:
+      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
+      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+      #     source: "./frontend/dist"
+      #     target: "/var/www/html/"
+
+      # - name: Set up the Backend and Frontend Code from Hostinger's VPS
+      #   uses: appleboy/ssh-action@v0.1.10
+      #   with:
+      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
+      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+      #     script: |
+      #       cd /var/www/backends
+      #       rm -r blog
+      #       mv backend blog
+      #       cd blog
+      #       yarn install
+      #       echo ${{secrets.HOSTINGER_VPS_USERNAME}} >> .env
+      #       cat .env
+      #       ls -a
+      #       cd /var/www/html
+      #       rm -r blog
+      #       mv dist blog
+      #       ls -a
