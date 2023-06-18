@@ -17,9 +17,9 @@ jobs:
           username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
           script: |
-            cd /var/www/backends
+            cd /var/www/backends/blog
             ls
-            cd /var/www/html
+            cd /var/www/html/frontend
             ls
 
       # - name: Checkout Code
