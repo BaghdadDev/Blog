@@ -18,8 +18,11 @@ jobs:
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
           script: |
             cd /var/www/backends/blog
+            echo "MYVAR=HamzaCode" >> .env
+            cat .env
             ls
-            cd /var/www/html/frontend
+            cd /var/www/html
+            rm -r frontend
             ls
 
       # - name: Checkout Code
@@ -54,6 +57,7 @@ jobs:
       #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
       #     source: "./frontend/dist"
       #     target: "/var/www/html/"
+      #     strip_components: 1
 
       # - name: Set up the Backend and Frontend Code from Hostinger's VPS
       #   uses: appleboy/ssh-action@v0.1.10
