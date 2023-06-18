@@ -18,61 +18,47 @@ jobs:
         with:
           node-version: "18.16.0"
 
-      - name: Install the Dependencies Test and Build the Frontend
+      - name: Install the Dependencies, Test and Build the Frontend
         run: |
           cd frontend
           yarn install
           yarn test
           yarn build
 
-      - name: Copy the Backend to the Hostinger's VPS
-        run: |
-          pwd
+      - name: Copy the Backend to Hostinger's VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          source: "./backend"
+          target: "/var/www/backends/"
 
-      - name: Test the Connexion with Hostinger
+      - name: Copy the Frontend to Hostinger's VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          source: "./frontend/dist"
+          target: "/var/www/html/"
+
+      - name: Set up the Backend and Frontend Code from Hostinger's VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOSTINGER_VPS_IP }}
           username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          port: 22
           script: |
-            lsb_release
-            
-
-#      - name : Deploy the Backend
-#        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-#        with:
-#          server: ${{ secrets.HOSTINGER_FTP_HOST }}
-#          username: ${{ secrets.HOSTINGER_USERNAME }}
-#          password: ${{ secrets.HOSTINGER_PASSWORD }}
-#          port: ${{ secrets.HOSTINGER_FTP_PORT }}
-#          local-dir: backend/
-#          server-dir: backends/blog/
-#          dangerous-clean-slate: true
-#
-#      - name: Deploy the Frontend
-#        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-#        with:
-#          server: ${{ secrets.HOSTINGER_FTP_HOST }}
-#          username: ${{ secrets.HOSTINGER_USERNAME }}
-#          password: ${{ secrets.HOSTINGER_PASSWORD }}
-#          port: ${{ secrets.HOSTINGER_FTP_PORT }}
-#          local-dir: frontend/dist/
-#          server-dir: public_html/blog/
-#          dangerous-clean-slate: true
-#
-#      - name: Install the Dependencies and Lunch the Remote Backend
-#        uses: appleboy/ssh-action@v0.1.10
-#        with:
-#          host: ${{ secrets.HOSTINGER_SSH_HOST }}
-#          username: ${{ secrets.HOSTINGER_USERNAME }}
-#          password: ${{ secrets.HOSTINGER_PASSWORD }}
-#          port: ${{ secrets.HOSTINGER_SSH_PORT }}
-#          script: |
-#            cd domains/hamzacode.com/backends/blog
-#            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-#            source ~/.bashrc
-#            nvm install 18
-#            npm ci
-#            npm run start
+            cd /var/www/backends
+            rm -r blog
+            mv backend blog
+            cd blog
+            yarn install
+            echo ${{secrets.HOSTINGER_VPS_USERNAME}} >> .env
+            cat .env
+            ls -a
+            cd /var/www/html
+            rm -r blog
+            mv dist blog
+            ls -a
