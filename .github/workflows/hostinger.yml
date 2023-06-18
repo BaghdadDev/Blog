@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up the Backend and Frontend Code from Hostinger's VPS
+      - name: SSH Access
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOSTINGER_VPS_IP }}
@@ -18,12 +18,18 @@ jobs:
           password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
           script: |
             cd /var/www/backends/blog
+            pwd
+            echo "---------------------------------------------"
             echo "MYVAR=HamzaCode" >> .env
             cat .env
-            ls
+            echo "---------------------------------------------"
+            ls -a
+            echo "---------------------------------------------"
             cd /var/www/html
-            rm -r frontend
+            pwd
+            echo "---------------------------------------------"
             ls
+            echo "---------------------------------------------"
 
       # - name: Checkout Code
       #   uses: actions/checkout@v3
