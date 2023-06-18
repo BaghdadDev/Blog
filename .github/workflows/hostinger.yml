@@ -10,18 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH Access
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOSTINGER_VPS_IP }}
-          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-          script: |
-            cd /var/www/html
-            echo "---------------------------------------------"
-            rm .env
-            rm -r frontend
-            ls
+      # - name: SSH Access
+      #   uses: appleboy/ssh-action@v0.1.10
+      #   with:
+      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
+      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+      #     script: |
+      #       cd /var/www/html
+      #       echo "---------------------------------------------"
+      #       rm .env
+      #       rm -r frontend
+      #       ls
 
       - name: Checkout Code
         uses: actions/checkout@v3
