@@ -28,21 +28,18 @@ jobs:
 
       - name: Setup the Environment Variables for the Backend
         run: |
-          cd frontend
-          ls -a
-          cd ../backend
+          cd backend
           echo ${{secrets.BACKEND_ENV}} > .env
-          ls -a
 
-      # - name: Prepare the Code for Deploy
-      #   run: |
-      #     mkdir blog
-      #     mkdir blog/frontend
-      #     mkdir blog/backend
-      #     mv frontend/dist/* blog/frontend/
-      #     mv backend/* blog/backend/
-      #     cd blog/backend
-      #     ls -a
+      - name: Prepare the Code for Deploy
+        run: |
+          mkdir blog
+          mkdir blog/frontend
+          mkdir blog/backend
+          mv -r frontend/dist/* blog/frontend/
+          mv -r backend/* blog/backend/
+          cd blog/backend
+          ls -a
 
       # - name: Remove, if exists, the Remote Code
       #   uses: appleboy/ssh-action@v0.1.10
