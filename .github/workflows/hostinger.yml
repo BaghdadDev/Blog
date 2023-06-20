@@ -47,10 +47,10 @@ jobs:
           mkdir blog
           mkdir blog/frontend
           mkdir blog/backend
-          cp frontend/dist blog/frontend
-          cp backend blog/backend
+          mv frontend/dist/* blog/frontend/
+          mv backend/* blog/backend/
 
-      - name: Remove, if exists, the Remote Folder
+      - name: Remove, if exists, the Remote Code
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOSTINGER_VPS_IP }}
