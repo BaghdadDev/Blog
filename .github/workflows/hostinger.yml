@@ -18,17 +18,19 @@ jobs:
         with:
           node-version: "18.16.0"
 
-      # - name: Test, Setup the Environment Variables and Build the Frontend
-      #   run: |
-      #     cd frontend
-      #     yarn install
-      #     yarn test
-      #     echo ${{secrets.FRONTEND_ENV}} > .env
-      #     yarn build
+      - name: Test, Setup the Environment Variables and Build the Frontend
+        run: |
+          cd frontend
+          yarn install
+          yarn test
+          echo ${{secrets.FRONTEND_ENV}} > .env
+          yarn build
 
       - name: Setup the Environment Variables for the Backend
         run: |
-          cd backend
+          cd frontend
+          ls -a
+          cd ../backend
           echo ${{secrets.BACKEND_ENV}} > .env
           ls -a
 
