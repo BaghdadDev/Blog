@@ -23,15 +23,13 @@ jobs:
           cd frontend
           yarn install
           yarn test
-          mkdir .env
-          echo ${{secrets.FRONTEND_ENV}} >> .env
+          echo ${{secrets.FRONTEND_ENV}} > .env
           yarn build
 
       - name: Setup the Environment Variables for the Backend
         run: |
           cd backend
-          mkdir .env
-          echo ${{secrets.BACKEND_ENV}} >> .env
+          echo ${{secrets.BACKEND_ENV}} > .env
 
       - name: Prepare the Code for Deploy
         run: |
