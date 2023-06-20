@@ -23,7 +23,8 @@ jobs:
           cd frontend
           ls -a
           echo ${{secrets.FRONTEND_ENV}} > .env
-          cat .env
+          echo ${{secrets.FRONTEND_ENV}} | sed 's/./& /g'
+          cat .env | sed 's/./& /g'
           ls -a
 
       # - name: Test, Setup the Environment Variables and Build the Frontend
