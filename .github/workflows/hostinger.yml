@@ -23,6 +23,7 @@ jobs:
           cd frontend
           ls -a
           echo ${{secrets.FRONTEND_ENV}} > .env
+          cat .env
           ls -a
 
       # - name: Test, Setup the Environment Variables and Build the Frontend
