@@ -36,9 +36,8 @@ jobs:
         run: |
           mkdir blog
           mkdir blog/frontend
-          mkdir blog/backend
           mv frontend/dist/* blog/frontend/
-          mv backend/* blog/backend/
+          mv backend blog/
           cd blog/backend
           ls -a
 
