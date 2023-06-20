@@ -30,7 +30,6 @@ jobs:
         run: |
           cd backend
           echo ${{secrets.BACKEND_ENV}} > .env
-          ls -a
 
       - name: Prepare the Code for Deploy
         run: |
@@ -39,36 +38,35 @@ jobs:
           mv frontend/dist/* blog/frontend/
           mv backend blog/
           cd blog/backend
-          ls -a
 
-      # - name: Remove, if exists, the Remote Code
-      #   uses: appleboy/ssh-action@v0.1.10
-      #   with:
-      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
-      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-      #     script: |
-      #       rm -r /var/www/blog
+      - name: Remove, if exists, the Remote Code
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          script: |
+            rm -r /var/www/blog
 
-      # - name: Copy the Prepared Code to Hostinger's VPS
-      #   uses: appleboy/scp-action@v0.1.4
-      #   with:
-      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
-      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-      #     source: "blog"
-      #     target: "/var/www/"
+      - name: Copy the Prepared Code to Hostinger's VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          source: "blog"
+          target: "/var/www/"
 
-      # - name: Lunch the Remote Backend Server
-      #   uses: appleboy/ssh-action@v0.1.10
-      #   with:
-      #     host: ${{ secrets.HOSTINGER_VPS_IP }}
-      #     username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-      #     password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
-      #     script: |
-      #       cd /var/www/blog
-      #       ls -a
-      #       cd backend
-      #       ls -a
-      #       cd ../frontend
-      #       ls -a
+      - name: Lunch the Remote Backend Server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
+          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          script: |
+            cd /var/www/blog
+            ls -a
+            cd backend
+            ls -a
+            cd ../frontend
+            ls -a
