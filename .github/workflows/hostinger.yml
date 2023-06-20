@@ -30,14 +30,15 @@ jobs:
         run: |
           cd backend
           echo ${{secrets.BACKEND_ENV}} > .env
+          ls -a
 
       - name: Prepare the Code for Deploy
         run: |
           mkdir blog
           mkdir blog/frontend
           mkdir blog/backend
-          mv -r frontend/dist/* blog/frontend/
-          mv -r backend/* blog/backend/
+          mv frontend/dist/* blog/frontend/
+          mv backend/* blog/backend/
           cd blog/backend
           ls -a
 
