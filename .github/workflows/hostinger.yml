@@ -21,7 +21,7 @@ jobs:
       - name: Test the creation of .env file
         run: |
           cd frontend
-          ls- a
+          ls -a
           echo ${{secrets.FRONTEND_ENV}} > .env
           ls -a
 
