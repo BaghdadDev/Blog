@@ -1,6 +1,8 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 const httpServer = require("http").createServer(app);
 const { expressMiddleware } = require("@apollo/server/express4");
@@ -61,7 +63,7 @@ async function mountServer() {
     server: httpServer,
     // Pass a different path here if app.use
     // serves expressMiddleware at a different path
-    path: "/graphql",
+    path: "/api/graphql",
   });
 
   // Hand in the schema we just created and have the
@@ -113,6 +115,19 @@ async function mountServer() {
       context: ({ req }) => ({ headers: req.headers }),
     })
   );
+
+  // Serve frontend if PRODUCTION Node Environment
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+    app.get("*", (req, res) =>
+      res.sendFile(
+        path.resolve(__dirname, "../", "frontend", "dist", "index.html")
+      )
+    );
+  } else {
+    app.get("/", (req, res) => res.send("Please set to production"));
+  }
 
   // Lunch Server
   try {

@@ -1,1 +1,2 @@
-module.exports = ["http://localhost:5173"];
+// module.exports = ["http://localhost:80", "http://blog.hamzacode.com"];
+module.exports = "*";

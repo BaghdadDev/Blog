@@ -48,6 +48,9 @@ const wsLink = new GraphQLWsLink(
 );
 
 console.log(import.meta.env.VITE_BLOG_URL_HOST);
+console.log(
+  `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`
+);
 
 const splitLink = split(
   ({ query }) => {
