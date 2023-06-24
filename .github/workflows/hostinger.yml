@@ -33,23 +33,23 @@ jobs:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
-          source: "frontend,backend"
-          target: /home/baghdad/sites/blog
+          source: "frontend/baghbagh.txt"
+          target: /home/baghdad/sites/
           overwrite: true
 
-      - name: Setup the App from the Remote Machine (Hostinger)
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOSTINGER_IP }}
-          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
-          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
-          script: |
-            pm2 delete daemon_blog
-            cd sites/Blog/frontend/
-            sudo yarn install
-            sudo yarn build
-            sudo rm -r node_modules
-            cd ../backend/
-            sudo echo ${{secrets.BACKEND_ENV}} >> .env
-            sudo yarn install
-            pm2 start server.js --name daemon_blog
+#      - name: Setup the App from the Remote Machine (Hostinger)
+#        uses: appleboy/ssh-action@v0.1.10
+#        with:
+#          host: ${{ secrets.HOSTINGER_IP }}
+#          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+#          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+#          script: |
+#            pm2 delete daemon_blog
+#            cd sites/Blog/frontend/
+#            sudo yarn install
+#            sudo yarn build
+#            sudo rm -r node_modules
+#            cd ../backend/
+#            sudo echo ${{secrets.BACKEND_ENV}} >> .env
+#            sudo yarn install
+#            pm2 start server.js --name daemon_blog
