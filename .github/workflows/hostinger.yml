@@ -26,10 +26,11 @@ jobs:
 
       - name: Setup the App from the Remote Machine (Hostinger)
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
         with:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
-#          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             pm2 delete daemon_blog
@@ -41,6 +42,7 @@ jobs:
             yarn build
             rm -r node_modules
             cd ../backend/
-            echo ${{secrets.BACKEND_ENV}} >> .env
+            touch .env
+            echo $BACKEND_ENV >> .env
             yarn install
             pm2 start server.js --name daemon_blog
