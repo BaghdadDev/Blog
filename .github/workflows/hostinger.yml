@@ -33,7 +33,7 @@ jobs:
           script: |
             pm2 delete daemon_blog
             cd sites
-            sudo git clone https://github.com/HamzaLinge/Blog.git
+            git clone --depth=1 https://github.com/HamzaLinge/Blog.git
             cd Blog/frontend
             sudo yarn install
             sudo yarn build
