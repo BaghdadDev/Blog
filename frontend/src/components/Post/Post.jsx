@@ -175,9 +175,6 @@ function Post({ post }) {
           src={`data:${post.picture.contentType};base64,${post.picture.data}`}
           alt={post.picture.filename}
           className={"w-full hover:cursor-pointer"}
-          onClick={() =>
-            navigate(PATH.POST_DETAILS.split(":")[0] + `${post._id}`)
-          }
           aria-label={`post-img`}
           data-testid={`post-img-link-${post._id}`}
         />

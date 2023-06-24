@@ -126,7 +126,7 @@ async function mountServer() {
       )
     );
   } else {
-    app.get("/", (req, res) => res.send("Please set to production"));
+    app.get("/", async (req, res) => res.send("Please set to production"));
   }
 
   // Lunch Server

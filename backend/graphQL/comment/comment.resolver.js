@@ -177,7 +177,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("CREATED_COMMENT"),
       (payload, variables) => {
-        return payload.createdComment.post._id.equals(variables.idPost);
+        return payload.createdComment.post._id === variables.idPost;
       }
     ),
   },
@@ -185,7 +185,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_COMMENT"),
       (payload, variables) => {
-        return payload.deletedComment.idPost.equals(variables.idPost);
+        return payload.deletedComment.idPost === variables.idPost;
       }
     ),
   },
@@ -193,7 +193,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_COMMENT"),
       (payload, variables) => {
-        return payload.toggledLikeComment.idComment.equals(variables.idComment);
+        return payload.toggledLikeComment.idComment === variables.idComment;
       }
     ),
   },
@@ -201,7 +201,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("UPDATED_COMMENT"),
       (payload, variables) => {
-        return payload.updatedComment._id.equals(variables.idComment);
+        return payload.updatedComment._id === variables.idComment;
       }
     ),
   },

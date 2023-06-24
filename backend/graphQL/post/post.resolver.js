@@ -226,6 +226,7 @@ const Mutation = {
       await pubSub.publish("TOGGLED_LIKE_POST", {
         toggledLikePost: { _id: idUser, idPost: post._id },
       });
+      console.log("Toggled Like Post : Performed");
       return true;
     } catch (errorToggleLikePost) {
       console.log(
@@ -304,7 +305,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_POST"),
       (payload, variables) => {
-        return payload.deletedPost._id.equals(variables.idPost);
+        return payload.deletedPost._id === variables.idPost;
       }
     ),
   },
@@ -312,7 +313,9 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_POST"),
       (payload, variables) => {
-        return payload.toggledLikePost.idPost.equals(variables.idPost);
+        console.log(payload);
+        console.log(payload.toggledLikePost.idPost === variables.idPost);
+        return payload.toggledLikePost.idPost === variables.idPost;
       }
     ),
   },
@@ -320,7 +323,7 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("UPDATED_POST"),
       (payload, variables) => {
-        return payload.updatedPost._id.equals(variables.idPost);
+        return payload.updatedPost._id === variables.idPost;
       }
     ),
   },

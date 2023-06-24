@@ -12,6 +12,8 @@ import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 import PATH from "../utils/route-path.jsx";
 
+const baseUrl = "/api/graphql";
+
 const contextLink = setContext(async (_, { headers }) => {
   const accessToken =
     JSON.parse(localStorage.getItem("userBlog"))?.token?.accessToken ?? null;
@@ -38,19 +40,18 @@ const errorNotAuthenticatedLink = new ApolloLink((operation, forward) => {
 });
 
 const terminateLink = createUploadLink({
-  uri: import.meta.env.VITE_BLOG_URL_HOST,
+  uri: baseUrl,
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`,
+    // url: `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`,
+    url: `ws://${window.location.host}${baseUrl}`,
   })
 );
 
-console.log(import.meta.env.VITE_BLOG_URL_HOST);
-console.log(
-  `ws://${String(import.meta.env.VITE_BLOG_URL_HOST).split("//")[1]}`
-);
+console.log(baseUrl);
+console.log(`ws://${window.location.host}${baseUrl}`);
 
 const splitLink = split(
   ({ query }) => {
