@@ -13,43 +13,32 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-#      - name: Setup Node.js
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: "18.16.0"
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.16.0"
 
-#      - name: Test the Frontend
-#        run: |
-#
-#          cd frontend
-#          yarn install
-#          yarn test
-#          rm -r node_modules
-#          rm -r src/__test__
+      - name: Test the Frontend
+        run: |
+          cd frontend
+          yarn install
+          yarn test
 
-      - name: Copy the Code to the Remote Machine (Hostinger)
-        uses: appleboy/scp-action@v0.1.4
+      - name: Setup the App from the Remote Machine (Hostinger)
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
-          source: "frontend/baghbagh.txt"
-          target: /home/baghdad/sites/
-          overwrite: true
-
-#      - name: Setup the App from the Remote Machine (Hostinger)
-#        uses: appleboy/ssh-action@v0.1.10
-#        with:
-#          host: ${{ secrets.HOSTINGER_IP }}
-#          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
-#          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
-#          script: |
-#            pm2 delete daemon_blog
-#            cd sites/Blog/frontend/
-#            sudo yarn install
-#            sudo yarn build
-#            sudo rm -r node_modules
-#            cd ../backend/
-#            sudo echo ${{secrets.BACKEND_ENV}} >> .env
-#            sudo yarn install
-#            pm2 start server.js --name daemon_blog
+          script: |
+            pm2 delete daemon_blog
+            cd sites
+            sudo git clone https://github.com/HamzaLinge/Blog.git
+            cd Blog/frontend
+            sudo yarn install
+            sudo yarn build
+            sudo rm -r node_modules
+            cd ../backend/
+            sudo echo ${{secrets.BACKEND_ENV}} >> .env
+            sudo yarn install
+            pm2 start server.js --name daemon_blog
