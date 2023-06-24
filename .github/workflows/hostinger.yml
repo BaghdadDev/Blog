@@ -20,6 +20,7 @@ jobs:
 
       - name: Test the Frontend
         run: |
+          pwd
           cd frontend
           yarn install
           yarn test
@@ -32,7 +33,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
-          source: "Blog"
+          source: "../Blog"
           target: /home/baghdad/sites
           overwrite: true
 
