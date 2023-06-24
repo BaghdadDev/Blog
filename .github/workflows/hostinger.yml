@@ -27,12 +27,15 @@ jobs:
       - name: Setup the App from the Remote Machine (Hostinger)
         uses: appleboy/ssh-action@v0.1.10
         env:
-          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+          NODE_ENV: ${{ secrets.BACKEND_ENV_NODE_ENV }}
+          BLOG_MONGODB_URI_ATLAS: ${{ secrets.BACKEND_ENV_BLOG_MONGODB_URI_ATLAS }}
+          BLOG_PORT_EXPRESS: ${{ secrets.BACKEND_ENV_BLOG_PORT_EXPRESS }}
+          BLOG_ACCESS_TOKEN_SECRET: ${{ secrets.BACKEND_ENV_BLOG_ACCESS_TOKEN_SECRET }}
         with:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          envs: BACKEND_ENV
+          envs: NODE_ENV, BLOG_MONGODB_URI_ATLAS, BLOG_PORT_EXPRESS, BLOG_ACCESS_TOKEN_SECRET
           script: |
             pm2 delete daemon_blog
             cd sites
@@ -44,6 +47,9 @@ jobs:
             rm -r node_modules
             cd ../backend/
             touch .env
-            echo $BACKEND_ENV >> .env
+            echo $NODE_ENV > .env
+            echo $BLOG_MONGODB_URI_ATLAS >> .env
+            echo $BLOG_PORT_EXPRESS >> .env
+            echo $BLOG_ACCESS_TOKEN_SECRET >> .env
             yarn install
             pm2 start server.js --name daemon_blog
