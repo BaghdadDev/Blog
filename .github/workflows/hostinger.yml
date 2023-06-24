@@ -29,9 +29,9 @@ jobs:
       - name: Deploy the Site via SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.HOSTINGER_VPS_IP }}
-          username: ${{ secrets.HOSTINGER_VPS_USERNAME }}
-          password: ${{ secrets.HOSTINGER_VPS_PASSWORD }}
+          host: ${{ secrets.HOSTINGER_IP }}
+          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           script: |
             pm2 delete daemon_blog
             cd sites
