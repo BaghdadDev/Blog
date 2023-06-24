@@ -26,12 +26,13 @@ jobs:
 
       - name: Setup the App from the Remote Machine (Hostinger)
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
         with:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          env:
-            BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+          envs: BACKEND_ENV
           script: |
             pm2 delete daemon_blog
             cd sites
