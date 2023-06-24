@@ -23,10 +23,20 @@ jobs:
           cd frontend
           yarn install
           yarn test
-          echo ${{secrets.FRONTEND_ENV}} > .env
-          yarn build
+          rm -r node_modules
+          rm -r src/__test__
 
-      - name: Deploy the Site via SSH
+      - name: Copy the Code to the Remote Machine (Hostinger)
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOSTINGER_IP }}
+          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          source: "Blog"
+          target: /home/baghdad/sites/
+          rm: true
+
+      - name: Setup the App from the Remote Machine (Hostinger)
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOSTINGER_IP }}
@@ -34,13 +44,11 @@ jobs:
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           script: |
             pm2 delete daemon_blog
-            cd sites
-            rm -r Blog
-            git clone https://github.com/HamzaLinge/Blog.git
-            cd Blog/frontend/
-            yarn install
-            yarn build
+            cd sites/Blog/frontend/
+            sudo yarn install
+            sudo yarn build
+            sudo rm -r node_modules
             cd ../backend/
             sudo echo ${{secrets.BACKEND_ENV}} >> .env
-            yarn install
+            sudo yarn install
             pm2 start server.js --name daemon_blog
