@@ -29,11 +29,12 @@ jobs:
         with:
           host: ${{ secrets.HOSTINGER_IP }}
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
-          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+#          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             pm2 delete daemon_blog
             cd sites
-            sudo git clone --depth=1 https://github.com/HamzaLinge/Blog.git
+            sudo git clone https://github.com/HamzaLinge/Blog.git
             cd Blog/frontend
             sudo yarn install
             sudo yarn build
