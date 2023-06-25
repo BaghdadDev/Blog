@@ -23,7 +23,7 @@ const { typeDefs, resolvers } = require("./graphQL");
 const authenticationMiddleware = require("./middleware/authentication.js");
 
 // Set the port number
-const port = process.env.BLOG_PORT_EXPRESS || 4000;
+const port = process.env.BLOG_PORT_EXPRESS || 4001;
 
 async function mountServer() {
   // Setting up the connection with database

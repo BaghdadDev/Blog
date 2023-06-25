@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  setup-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,10 +46,10 @@ jobs:
             yarn build
             rm -r node_modules
             cd ../backend/
-            yarn install
             touch .env
             echo $NODE_ENV > .env
             echo $BLOG_MONGODB_URI_ATLAS >> .env
             echo $BLOG_PORT_EXPRESS >> .env
             echo $BLOG_ACCESS_TOKEN_SECRET >> .env
+            yarn install
             pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
