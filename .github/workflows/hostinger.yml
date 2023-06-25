@@ -52,4 +52,19 @@ jobs:
             echo $BLOG_MONGODB_URI_ATLAS >> .env
             echo $BLOG_PORT_EXPRESS >> .env
             echo $BLOG_ACCESS_TOKEN_SECRET >> .env
+            # pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
+
+      - name: Lunch the App from the Remote Machine
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          NODE_ENV: ${{ secrets.BACKEND_ENV_NODE_ENV }}
+          BLOG_MONGODB_URI_ATLAS: ${{ secrets.BACKEND_ENV_BLOG_MONGODB_URI_ATLAS }}
+          BLOG_PORT_EXPRESS: ${{ secrets.BACKEND_ENV_BLOG_PORT_EXPRESS }}
+          BLOG_ACCESS_TOKEN_SECRET: ${{ secrets.BACKEND_ENV_BLOG_ACCESS_TOKEN_SECRET }}
+        with:
+          host: ${{ secrets.HOSTINGER_IP }}
+          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          envs: NODE_ENV, BLOG_MONGODB_URI_ATLAS, BLOG_PORT_EXPRESS, BLOG_ACCESS_TOKEN_SECRET
+          script: |
             pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
