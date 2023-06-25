@@ -35,31 +35,19 @@ To start using the blog project, follow these explicit steps:
 2. Install the necessary dependencies:
 
    `cd Blog/frontend |
-   yarn install |
-   cd ../backend |
-   yarn install`
+yarn install |
+cd ../backend |
+yarn install`
 
-3. Set up the environment variables :
-
-   **Backend**:
-
-   `MONGODB_URI_LOCAL=mongodb://127.0.0.1:27017/<Database_Name> (e.g: BlogDB)`
-
-   `PORT_EXPRESS=<Express_Port_Number> (e.g: 4000)`
-
-   `ACCESS_TOKEN_SECRET=<Random_Token_For_JsonWebToken> (e.g: e6iK4...)`
-
-   **Frontend**:
-
-   `VITE_URL_HOST=http://localhost:<Port_Express_Number>/graphql`
+3. Set up the environment variables : _See "backend/.env.example" file_
 
 4. Start the backend server by running the following command:
 
-   `yarn start` _(or `yarn dev` for development mode)_
+   `yarn dev`
 
 5. Finally, launch the frontend application by running the following command:
 
-   `yarn preview` _(or `yarn dev` for development mode)_
+   `yarn dev`
 
 6. Access the blog in your web browser by navigating to http://localhost:5173 and explore the various features and functionalities it offers.
 
