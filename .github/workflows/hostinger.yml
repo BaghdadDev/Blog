@@ -24,7 +24,7 @@ jobs:
           yarn install
           yarn test
 
-      - name: Setup the App from the Remote Machine (Hostinger)
+      - name: Setup and Lunch the App from the Remote Machine (Hostinger)
         uses: appleboy/ssh-action@v0.1.10
         env:
           NODE_ENV: ${{ secrets.BACKEND_ENV_NODE_ENV }}

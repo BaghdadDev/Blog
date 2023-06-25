@@ -129,6 +129,11 @@ async function mountServer() {
     app.get("/", async (req, res) => res.send("Please set to production"));
   }
 
+  console.log(process.env.NODE_ENV);
+  console.log(process.env.BLOG_MONGODB_URI_ATLAS);
+  console.log(process.env.BLOG_ACCESS_TOKEN_SECRET);
+  console.log(process.env.BLOG_PORT_EXPRESS);
+
   // Lunch Server
   try {
     await new Promise((resolve) => httpServer.listen(port, resolve));

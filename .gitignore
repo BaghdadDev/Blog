@@ -26,3 +26,5 @@ backend/.env
 /frontend/dist/vite.svg
 /frontend/dist/assets/index-9d24e66d.js
 /frontend/dist/assets/index-91c97d4c.js
+frontend/dist/assets/index-fd66a6e5.css
+frontend/dist/assets/index-57275db6.js
