@@ -62,4 +62,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            pm2 start sites/Blog/backend/server.js --name daemon_blog --exp-backoff-restart-delay=100
+            cd sites/Blog/backend/
+            pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
+            pm2 delete daemon_blog
+            pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
