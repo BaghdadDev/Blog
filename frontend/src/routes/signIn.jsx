@@ -1,13 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { SIGN_IN } from "../gql/auth.jsx";
-import { useMutation } from "@apollo/client";
-import { useUserContext } from "../context/userContext.jsx";
+import { Link } from "react-router-dom";
+
 import PATH from "../utils/route-path.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
+import { useSignIn } from "../features/authentication";
 
 function SignIn() {
   const {
@@ -16,32 +15,15 @@ function SignIn() {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const navigate = useNavigate();
+  const { signIn } = useSignIn();
 
-  const { persistUser } = useUserContext();
-
-  const [signIn, { error: errorSignIn }] = useMutation(SIGN_IN);
-
-  async function handleSubmitSignIn(data) {
-    try {
-      const {
-        data: { signIn: dataUser },
-      } = await signIn({
-        variables: {
-          usernameOrEmail: data.usernameOrEmail.toLowerCase(),
-          password: data.password,
-        },
-      });
-      persistUser(dataUser);
-      // navigate(PATH.ROOT);
-    } catch (catchErrorSignIn) {
-      console.error(catchErrorSignIn);
-    }
+  function handleSignIn(data) {
+    signIn(data.usernameOrEmail, data.password);
   }
 
   return (
     <form
-      onSubmit={handleSubmit(handleSubmitSignIn)}
+      onSubmit={handleSubmit(handleSignIn)}
       className={
         "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
       }

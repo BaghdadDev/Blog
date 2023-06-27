@@ -1,6 +1,6 @@
 import React from "react";
 import { Node } from "slate";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { useSubscription } from "@apollo/client";
 import apolloClient from "../../config/apollo-client.jsx";
@@ -16,114 +16,18 @@ import {
 } from "../../gql/post.jsx";
 import PATH from "../../utils/route-path.jsx";
 import Avatar from "../Avatar.jsx";
+import {
+  subDeletePost,
+  subUpdatePost,
+  subToggleLikePost,
+  subCreateComment,
+} from "../../features/subscriptions";
 
 function Post({ post }) {
-  const navigate = useNavigate();
-
-  useSubscription(DELETED_POST_SUB, {
-    variables: { idPost: post._id },
-    onData: ({
-      data: {
-        data: { deletedPost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const filteredPosts = dataCache.getPosts.filter(
-          (post) => post._id !== deletedPost._id
-        );
-        return {
-          getPosts: filteredPosts,
-        };
-      });
-    },
-  });
-
-  useSubscription(UPDATED_POST_SUB, {
-    variables: { idPost: post._id },
-    onData: ({
-      data: {
-        data: { updatedPost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        let copyPosts = [...dataCache.getPosts];
-        copyPosts[
-          dataCache.getPosts.findIndex(({ _id }) => _id === updatedPost._id)
-        ] = updatedPost;
-        return {
-          getPosts: copyPosts,
-        };
-      });
-    },
-  });
-
-  useSubscription(TOGGLED_LIKE_POST_SUB, {
-    variables: { idPost: post._id },
-    onData: ({
-      data: {
-        data: { toggledLikePost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const idUserToggledLikePost = toggledLikePost._id;
-        const indexPost = dataCache.getPosts.findIndex(
-          ({ _id }) => _id === post._id
-        );
-        const copyLikes = Array.isArray(dataCache.getPosts[indexPost]?.likes)
-          ? [...dataCache.getPosts[indexPost].likes]
-          : [];
-        if (
-          dataCache.getPosts[indexPost]?.likes.find(
-            (like) => like._id === idUserToggledLikePost
-          )
-        ) {
-          copyLikes.splice(
-            copyLikes.findIndex((like) => like._id === idUserToggledLikePost),
-            1
-          );
-        } else {
-          copyLikes.push({ __typename: "User", _id: idUserToggledLikePost });
-        }
-        let copyPosts = [...dataCache.getPosts];
-        copyPosts[indexPost] = { ...copyPosts[indexPost], likes: copyLikes };
-        return {
-          getPosts: copyPosts,
-        };
-      });
-    },
-  });
-
-  useSubscription(CREATED_COMMENT_SUB, {
-    variables: { idPost: post._id },
-    onData: ({
-      data: {
-        data: { createdComment },
-      },
-    }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const indexPost = dataCache.getPosts.findIndex(
-          ({ _id }) => _id === createdComment.post._id
-        );
-        const copyComments = Array.isArray(
-          dataCache.getPosts[indexPost]?.comments
-        )
-          ? [...dataCache.getPosts[indexPost].comments]
-          : [];
-        copyComments.push({
-          __typename: "Comment",
-          _id: createdComment._id,
-        });
-        let copyPosts = [...dataCache.getPosts];
-        copyPosts[indexPost] = {
-          ...dataCache.getPosts[indexPost],
-          comments: copyComments,
-        };
-        return {
-          getPosts: copyPosts,
-        };
-      });
-    },
-  });
+  subDeletePost(post._id);
+  subUpdatePost(post._id);
+  subToggleLikePost(post._id);
+  subCreateComment(post._id);
 
   useSubscription(DELETED_COMMENT_SUB, {
     variables: { idPost: post._id },

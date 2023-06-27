@@ -1,19 +1,15 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@apollo/client";
 
 import PATH from "../utils/route-path.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
-import { SIGN_UP } from "../gql/auth.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
-import { useUserContext } from "../context/userContext.jsx";
 import CustomInputFile from "../components/Custom/CustomInputFile.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
+import { useSignUp } from "../features/authentication";
 
 function SignUp() {
-  const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -21,35 +17,22 @@ function SignUp() {
     watch,
   } = useForm();
 
-  const [signUp, { error: errorSignUp }] = useMutation(SIGN_UP);
+  const { signUp } = useSignUp();
 
-  const { persistUser } = useUserContext();
-
-  async function handleSubmitSignUp(data) {
-    const userInput = {
-      username: data.username.toLowerCase(),
-      email: data.email.toLowerCase(),
-      password: data.password,
-      firstName: data.firstName.toLowerCase(),
-      lastName: data.lastName.toLowerCase(),
-      photo: data.files[0],
-    };
-    try {
-      const res = await signUp({ variables: { userInput } });
-      if (res?.data?.signUp) {
-        persistUser(res.data.signUp);
-        navigate(PATH.ROOT);
-      }
-    } catch (err) {}
+  function handleSignUp(data) {
+    signUp(
+      data.username,
+      data.email,
+      data.password,
+      data.firstName,
+      data.lastName,
+      data.files[0]
+    );
   }
-
-  useEffect(() => {
-    if (errorSignUp) console.log(errorSignUp);
-  }, [errorSignUp]);
 
   return (
     <form
-      onSubmit={handleSubmit(handleSubmitSignUp)}
+      onSubmit={handleSubmit(handleSignUp)}
       className={
         "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
       }
