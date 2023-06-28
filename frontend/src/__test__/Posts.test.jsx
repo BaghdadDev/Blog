@@ -8,7 +8,7 @@ import PATH from "../utils/route-path.jsx";
 import Posts from "../routes/posts.jsx";
 import PostDetails from "../routes/postDetails.jsx";
 import NewPost from "../routes/newPost.jsx";
-import RootLayout from "../components/Layout/RootLayout.jsx";
+import Index from "../components/Layout/index.jsx";
 import SignIn from "../routes/signIn.jsx";
 import EditPost from "../routes/editPost.jsx";
 
@@ -39,7 +39,7 @@ describe("Posts : All pages should render without any problem", () => {
     const routes = [
       {
         path: PATH.ROOT,
-        element: <RootLayout />,
+        element: <Index />,
         children: [
           { index: true, element: <Posts /> },
           { path: PATH.SIGN_IN, element: <SignIn /> },
@@ -81,7 +81,7 @@ describe("Posts : All pages should render without any problem", () => {
     const routes = [
       {
         path: PATH.ROOT,
-        element: <RootLayout />,
+        element: <Index />,
         children: [
           { index: true, element: <Posts /> },
           { path: PATH.NEW_POST, element: <NewPost /> },
@@ -99,7 +99,7 @@ describe("Posts : All pages should render without any problem", () => {
     const routes = [
       {
         path: PATH.ROOT,
-        element: <RootLayout />,
+        element: <Index />,
         children: [
           { index: true, element: <Posts /> },
           { path: PATH.SIGN_IN, element: <SignIn /> },

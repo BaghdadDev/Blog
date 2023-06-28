@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useMutation, useSubscription } from "@apollo/client";
 
-import Avatar from "../Avatar.jsx";
-import { useUserContext } from "../../context/userContext.jsx";
+import Avatar from "../../Avatar.jsx";
+import { useUserContext } from "../../../context/userContext.jsx";
 import OptionsComment from "./OptionsComment.jsx";
 import {
   GET_COMMENTS,
   TOGGLE_LIKE_COMMENT,
   TOGGLED_LIKE_COMMENT_SUB,
   UPDATED_COMMENT_SUB,
-} from "../../gql/comment.jsx";
+} from "../../../gql/comment.jsx";
 import CommentInput from "./CommentInput.jsx";
-import apolloClient from "../../config/apollo-client.jsx";
+import apolloClient from "../../../lib/apollo-client.jsx";
 
 function Comment({ comment }) {
   const userContext = useUserContext();

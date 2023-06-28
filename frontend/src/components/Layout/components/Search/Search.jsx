@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
 
-import { SEARCH_POSTS } from "../../../gql/post.jsx";
-import SearchResult from "./SearchResult";
+import { SEARCH_POSTS } from "../../../../gql/post.jsx";
+import SearchResult from "./SearchResult.jsx";
 import { useLocation } from "react-router-dom";
 
 function Search() {

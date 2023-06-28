@@ -1,6 +1,6 @@
 import { useSubscription } from "@apollo/client";
 
-import apolloClient from "../../../config/apollo-client";
+import apolloClient from "../../../lib/apollo-client";
 import { GET_POSTS, CREATED_POST_SUB } from "../../../gql/post";
 
 export default function subCreatePost() {

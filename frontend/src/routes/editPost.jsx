@@ -14,7 +14,7 @@ import OvalLoader from "../components/OvalLoader.jsx";
 import { useUserContext } from "../context/userContext.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
-import apolloClient from "../config/apollo-client.jsx";
+import apolloClient from "../lib/apollo-client.jsx";
 import PATH from "../utils/route-path.jsx";
 
 function EditPost() {

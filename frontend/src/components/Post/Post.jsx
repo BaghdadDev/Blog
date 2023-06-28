@@ -2,61 +2,22 @@ import React from "react";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
 
-import { useSubscription } from "@apollo/client";
-import apolloClient from "../../config/apollo-client.jsx";
-import {
-  CREATED_COMMENT_SUB,
-  DELETED_COMMENT_SUB,
-} from "../../gql/comment.jsx";
-import {
-  DELETED_POST_SUB,
-  GET_POSTS,
-  TOGGLED_LIKE_POST_SUB,
-  UPDATED_POST_SUB,
-} from "../../gql/post.jsx";
 import PATH from "../../utils/route-path.jsx";
 import Avatar from "../Avatar.jsx";
 import {
-  subDeletePost,
-  subUpdatePost,
-  subToggleLikePost,
   subCreateComment,
-} from "../../features/subscriptions";
+  subDeleteComment,
+  subDeletePost,
+  subToggleLikePost,
+  subUpdatePost,
+} from "../../features/subscriptions/index.jsx";
 
 function Post({ post }) {
-  subDeletePost(post._id);
-  subUpdatePost(post._id);
-  subToggleLikePost(post._id);
-  subCreateComment(post._id);
-
-  useSubscription(DELETED_COMMENT_SUB, {
-    variables: { idPost: post._id },
-    onData: ({
-      data: {
-        data: { deletedComment },
-      },
-    }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const idDeletedComment = deletedComment._id;
-        const indexPost = dataCache.getPosts.findIndex(
-          ({ _id }) => _id === post._id
-        );
-        const copyComments = [...dataCache.getPosts[indexPost].comments];
-        copyComments.splice(
-          copyComments.findIndex((comment) => comment._id === idDeletedComment),
-          1
-        );
-        let copyPosts = [...dataCache.getPosts];
-        copyPosts[indexPost] = {
-          ...dataCache.getPosts[indexPost],
-          comments: copyComments,
-        };
-        return {
-          getPosts: copyPosts,
-        };
-      });
-    },
-  });
+  subDeletePost(post._id, "GET_POSTS");
+  subUpdatePost(post._id, "GET_POSTS");
+  subToggleLikePost(post._id, "GET_POSTS");
+  subCreateComment(post._id, "GET_POSTS");
+  subDeleteComment(post._id, "GET_POSTS");
 
   return (
     <div

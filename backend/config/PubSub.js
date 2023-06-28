@@ -17,17 +17,18 @@ const { PubSub } = require("graphql-subscriptions");
 
  */
 
-const options = {
-  host: "127.0.0.1",
-  port: 6379,
-  retryStrategy: (times) => {
-    return Math.min(times * 50, 2000);
-  },
-};
-
-module.exports = new RedisPubSub({
-  publisher: new Redis(options),
-  subscriber: new Redis(options),
-});
-
-// module.exports = new PubSub();
+if (process.env.NODE_ENV === "production") {
+  const options = {
+    host: "127.0.0.1",
+    port: 6379,
+    retryStrategy: (times) => {
+      return Math.min(times * 50, 2000);
+    },
+  };
+  module.exports = new RedisPubSub({
+    publisher: new Redis(options),
+    subscriber: new Redis(options),
+  });
+} else {
+  module.exports = new PubSub();
+}

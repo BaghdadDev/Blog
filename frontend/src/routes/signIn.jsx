@@ -15,7 +15,7 @@ function SignIn() {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const { signIn } = useSignIn();
+  const { signIn, error } = useSignIn();
 
   function handleSignIn(data) {
     signIn(data.usernameOrEmail, data.password);
@@ -28,7 +28,7 @@ function SignIn() {
         "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
       }
     >
-      {errorSignIn && <ErrorGraphQL errorGraphQL={errorSignIn} />}
+      {error && <ErrorGraphQL errorGraphQL={error} />}
       <h1 className={"text-3xl font-semibold text-gray-200 md:text-4xl"}>
         Sign In
       </h1>

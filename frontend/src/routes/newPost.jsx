@@ -11,7 +11,7 @@ import { CREATE_POST, GET_POSTS } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import PATH from "../utils/route-path.jsx";
-import apolloClient from "../config/apollo-client.jsx";
+import apolloClient from "../lib/apollo-client.jsx";
 
 function NewPost() {
   const { user } = useUserContext();

@@ -9,6 +9,8 @@ backend/.env
 
 /coverage
 
+.vscode
+
 /build
 /dist
 

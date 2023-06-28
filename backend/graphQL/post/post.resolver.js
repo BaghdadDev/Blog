@@ -304,6 +304,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_POST"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.deletedPost._id.equals(variables.idPost);
         return payload.deletedPost._id === variables.idPost;
       }
     ),
@@ -312,6 +314,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_POST"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.toggledLikePost.idPost.equals(variables.idPost);
         return payload.toggledLikePost.idPost === variables.idPost;
       }
     ),
@@ -320,6 +324,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("UPDATED_POST"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.updatedPost._id.equals(variables.idPost);
         return payload.updatedPost._id === variables.idPost;
       }
     ),

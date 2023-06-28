@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 
-import { useUserContext } from "../context/userContext.jsx";
-import { SIGN_UP } from "../gql/auth.jsx";
+import { SIGN_UP } from "../../../gql/auth.jsx";
+import { useUserContext } from "../../../context/userContext.jsx";
 
 export default function useSignUp() {
   const [signUpMutation, { error: errorSignUp }] = useMutation(SIGN_UP);

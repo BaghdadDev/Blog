@@ -2,11 +2,11 @@ import React from "react";
 import { Link, useLocation, NavLink } from "react-router-dom";
 import { FaSignInAlt, FaPenFancy } from "react-icons/fa";
 
-import PATH from "../../utils/route-path.jsx";
+import PATH from "../../../../utils/route-path.jsx";
 import HeaderDropDown from "./HeaderDropDown.jsx";
-import { useUserContext } from "../../context/userContext.jsx";
-import CustomButton from "../Custom/CustomButton.jsx";
-import Search from "./Search/Search.jsx";
+import { useUserContext } from "../../../../context/userContext.jsx";
+import CustomButton from "../../../Custom/CustomButton.jsx";
+import Search from "../Search/Search.jsx";
 
 function Header() {
   const { user } = useUserContext();

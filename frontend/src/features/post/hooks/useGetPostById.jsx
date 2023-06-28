@@ -1,3 +1,7 @@
+import { useQuery } from "@apollo/client";
+
+import { GET_POST_BY_ID } from "../../../gql/post.jsx";
+
 export default function useGetPostById(idPost) {
   const { data, loading, error } = useQuery(GET_POST_BY_ID, {
     variables: { idPost },

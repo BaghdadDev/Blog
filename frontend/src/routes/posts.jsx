@@ -3,8 +3,8 @@ import React from "react";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
 import Post from "../components/Post/Post.jsx";
-import { useGetPosts } from "../features/post";
-import { subCreatePost } from "../features/subscriptions";
+import { useGetPosts } from "../features/post/index.jsx";
+import { subCreatePost } from "../features/subscriptions/index.jsx";
 
 function Posts() {
   const { posts, error, loading } = useGetPosts();
@@ -18,8 +18,8 @@ function Posts() {
   return (
     <div className={"flex w-full flex-col items-center px-2 py-2 md:mx-0"}>
       <div className={"flex w-full max-w-2xl flex-col items-center gap-y-2"}>
-        {!posts || posts === 0 ? (
-          <p className={"p-2 rounded bg-red-400 italic text-sm font-semibold"}>
+        {!posts || posts.length === 0 ? (
+          <p className={"rounded bg-red-400 p-2 text-sm font-semibold italic"}>
             There are no posts to display !
           </p>
         ) : (

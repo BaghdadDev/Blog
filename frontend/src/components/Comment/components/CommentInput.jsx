@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useMutation } from "@apollo/client";
 
-import { UPDATE_COMMENT } from "../../gql/comment";
-import OvalLoader from "../OvalLoader.jsx";
+import { UPDATE_COMMENT } from "../../../gql/comment.jsx";
+import OvalLoader from "../../OvalLoader.jsx";
 
 function CommentInput({ readyOnly, setReadOnly, idComment, text }) {
   const {

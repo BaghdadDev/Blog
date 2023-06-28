@@ -17,7 +17,7 @@ function SignUp() {
     watch,
   } = useForm();
 
-  const { signUp } = useSignUp();
+  const { signUp, error } = useSignUp();
 
   function handleSignUp(data) {
     signUp(
@@ -37,7 +37,7 @@ function SignUp() {
         "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
       }
     >
-      {errorSignUp && <ErrorGraphQL errorGraphQL={errorSignUp} />}
+      {error && <ErrorGraphQL errorGraphQL={error} />}
       <h1 className={"text-3xl font-semibold text-gray-200 md:text-4xl"}>
         Sign Up
       </h1>

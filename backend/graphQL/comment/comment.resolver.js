@@ -34,7 +34,7 @@ const Query = {
 };
 
 const Mutation = {
-  createComment: async (_, { commentInput }) => {
+  createComment: async (_, { commentInput, idUser }) => {
     console.log("resolver: createComment");
     try {
       const postIfExists = await PostModel.findById(commentInput.post);
@@ -45,7 +45,10 @@ const Mutation = {
             extensions: { code: "NOT-FOUND" },
           }
         );
-      const comment = await CommentModel.create({ ...commentInput });
+      const comment = await CommentModel.create({
+        ...commentInput,
+        user: idUser,
+      });
       await PostModel.findOneAndUpdate(
         { _id: commentInput.post },
         { $push: { comments: comment._id } },
@@ -177,6 +180,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("CREATED_COMMENT"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.createdComment.post._id.equals(variables.idPost);
         return payload.createdComment.post._id === variables.idPost;
       }
     ),
@@ -185,6 +190,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("DELETED_COMMENT"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.deletedComment.idPost.equals(variables.idPost);
         return payload.deletedComment.idPost === variables.idPost;
       }
     ),
@@ -193,6 +200,10 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("TOGGLED_LIKE_COMMENT"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.toggledLikeComment.idComment.equals(
+            variables.idComment
+          );
         return payload.toggledLikeComment.idComment === variables.idComment;
       }
     ),
@@ -201,6 +212,8 @@ const Subscription = {
     subscribe: withFilter(
       () => pubSub.asyncIterator("UPDATED_COMMENT"),
       (payload, variables) => {
+        if (process.env.NODE_ENV !== "production")
+          return payload.updatedComment._id.equals(variables.idComment);
         return payload.updatedComment._id === variables.idComment;
       }
     ),

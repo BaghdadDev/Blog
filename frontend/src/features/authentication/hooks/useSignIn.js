@@ -1,7 +1,6 @@
 import { useMutation } from "@apollo/client";
-
-import { useUserContext } from "../context/userContext.jsx";
-import { SIGN_IN } from "../gql/auth.jsx";
+import { useUserContext } from "../../../context/userContext.jsx";
+import { SIGN_IN } from "../../../gql/auth.jsx";
 
 export default function useSignIn() {
   const { persistUser } = useUserContext();

@@ -6,11 +6,11 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Header from "./Header.jsx";
+import Header from "./components/Header/Header.jsx";
 import { useUserContext } from "../../context/userContext.jsx";
 import PATH from "../../utils/route-path.jsx";
 
-export default function RootLayout() {
+export default function Index() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const location = useLocation();

@@ -1,29 +1,23 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import useOutsideClick from "../Hook/useOutsideClick.jsx";
-import { DELETE_POST } from "../../gql/post.jsx";
-import PATH from "../../utils/route-path.jsx";
-import OvalLoader from "../OvalLoader.jsx";
+import useOutsideClick from "../../Layout/components/hooks/useOutsideClick.jsx";
+import PATH from "../../../utils/route-path.jsx";
+import OvalLoader from "../../OvalLoader.jsx";
+import { useDeletePost } from "../../../features/post/index.jsx";
 
 function OptionsPostDetails({ idPost }) {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
 
   const ref = useOutsideClick(() => setOpen(false));
 
-  const [deletePost, { loading: loadingDeletePost }] = useMutation(DELETE_POST);
+  const { deletePost, loadingDeletePost } = useDeletePost();
 
-  async function handleDeletePost() {
+  function handleDeletePost() {
     setOpen((prev) => !prev);
-    try {
-      await deletePost({ variables: { idPost: idPost } });
-    } catch (errorDeletePost) {
-      console.log(errorDeletePost);
-    }
+    deletePost(idPost);
   }
 
   return (

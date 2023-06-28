@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserAlt, FaSignOutAlt } from "react-icons/fa";
 
-import { useUserContext } from "../../context/userContext.jsx";
-import PATH from "../../utils/route-path.jsx";
-import Avatar from "../Avatar.jsx";
-import useOutsideClick from "../Hook/useOutsideClick.jsx";
+import { useUserContext } from "../../../../context/userContext.jsx";
+import PATH from "../../../../utils/route-path.jsx";
+import Avatar from "../../../Avatar.jsx";
+import useOutsideClick from "../hooks/useOutsideClick.jsx";
 
 function HeaderDropDown() {
   const { user, signOut } = useUserContext();

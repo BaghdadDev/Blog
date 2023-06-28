@@ -3,9 +3,9 @@ import { useMutation } from "@apollo/client";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 
-import useOutsideClick from "../Hook/useOutsideClick.jsx";
-import { DELETE_COMMENT } from "../../gql/comment.jsx";
-import OvalLoader from "../OvalLoader.jsx";
+import useOutsideClick from "../../Layout/components/hooks/useOutsideClick.jsx";
+import { DELETE_COMMENT } from "../../../gql/comment.jsx";
+import OvalLoader from "../../OvalLoader.jsx";
 
 function OptionsComment({ idComment, setReadyOnly }) {
   const [open, setOpen] = useState(false);

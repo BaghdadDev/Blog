@@ -7,7 +7,6 @@ type Comment {
 }
 
 input CommentInput {
-    user: ID
     post: ID
     comment: String
 }

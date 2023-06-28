@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 
 import PATH from "../utils/route-path.jsx";
 import Posts from "../routes/posts.jsx";
-import RootLayout from "../components/Layout/RootLayout.jsx";
+import Index from "../components/Layout/index.jsx";
 import SignIn from "../routes/signIn.jsx";
 
 import { mockedSignIn } from "./mockedGraphQL/auth.jsx";
@@ -35,7 +35,7 @@ describe("Authentication Process", () => {
     const routes = [
       {
         path: PATH.ROOT,
-        element: <RootLayout />,
+        element: <Index />,
         children: [
           { index: true, element: <Posts /> },
           { path: PATH.SIGN_IN, element: <SignIn /> },

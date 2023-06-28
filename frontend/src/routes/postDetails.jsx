@@ -1,151 +1,48 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useContext } from "react";
+import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
-import {
-  DELETED_POST_SUB,
-  GET_POST_BY_ID,
-  GET_POSTS,
-  TOGGLE_LIKE_POST,
-  TOGGLED_LIKE_POST_SUB,
-  UPDATED_POST_SUB,
-} from "../gql/post.jsx";
+import { GET_POST_BY_ID } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import Avatar from "../components/Avatar.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
-import Comments from "../components/Comments/Comments.jsx";
+import Comments from "../components/Comment/index.jsx";
 import { UserContext } from "../context/userContext.jsx";
-import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
-import apolloClient from "../config/apollo-client.jsx";
-import PATH from "../utils/route-path.jsx";
+import OptionsPostDetails from "../components/Post/components/OptionsPostDetails.jsx";
+import { useGetPostById, useToggleLikePost } from "../features/post/index.jsx";
+import {
+  subDeletePost,
+  subToggleLikePost,
+  subUpdatePost,
+} from "../features/subscriptions/index.jsx";
 
 function PostDetails() {
   const { postId } = useParams();
-  const navigate = useNavigate();
 
   const userContext = useContext(UserContext);
 
-  const [optimisticLike, setOptimisticLike] = useState(false);
-
   const {
-    data: dataPost,
-    loading: loadingPost,
-    error: errorPost,
-  } = useQuery(GET_POST_BY_ID, { variables: { idPost: postId } });
+    post,
+    error: errorGetPostById,
+    loading: loadingGetPostById,
+  } = useGetPostById(postId);
 
-  const [toggleLikePost, { loading: loadingToggleLikePost }] =
-    useMutation(TOGGLE_LIKE_POST);
+  const { toggleLikePost, loadingToggleLikePost, optimisticLike } =
+    useToggleLikePost(post);
 
-  useSubscription(TOGGLED_LIKE_POST_SUB, {
-    variables: { idPost: postId },
-    onData: ({
-      data: {
-        data: { toggledLikePost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery(
-        { query: GET_POST_BY_ID, variables: { idPost: postId } },
-        (dataCache) => {
-          if (!dataCache) return;
-          const idUserToggledLike = toggledLikePost._id;
-          const copyLikes = Array.isArray(dataCache.getPostById?.likes)
-            ? [...dataCache.getPostById.likes]
-            : [];
-          if (copyLikes.find(({ _id }) => _id === idUserToggledLike)) {
-            setOptimisticLike(false);
-            copyLikes.splice(
-              copyLikes.findIndex(({ _id }) => _id === idUserToggledLike),
-              1
-            );
-          } else {
-            setOptimisticLike(true);
-            copyLikes.push({ __typename: "User", _id: idUserToggledLike });
-          }
-          return {
-            getPostById: {
-              ...dataCache.getPostById,
-              likes: copyLikes,
-            },
-          };
-        }
-      );
-    },
-  });
+  subToggleLikePost(postId, "GET_POST_BY_ID");
+  subDeletePost(postId, "GET_POST_BY_ID");
+  subUpdatePost(postId, "GET_POST_BY_ID");
 
-  useSubscription(DELETED_POST_SUB, {
-    variables: { idPost: postId },
-    onData: ({
-      data: {
-        data: { deletedPost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery(
-        { query: GET_POST_BY_ID, variables: { idPost: postId } },
-        () => null
-      );
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        if (!dataCache) return;
-        const posts = dataCache.getPosts.filter(
-          (post) => post._id !== deletedPost._id
-        );
-        return { getPosts: posts };
-      });
-      navigate(PATH.ROOT);
-    },
-  });
-
-  useSubscription(UPDATED_POST_SUB, {
-    variables: { idPost: postId },
-    onData: ({
-      data: {
-        data: { updatedPost },
-      },
-    }) => {
-      apolloClient.cache.updateQuery(
-        { query: GET_POST_BY_ID, variables: { idPost: postId } },
-        () => ({
-          getPostById: updatedPost,
-        })
-      );
-    },
-  });
-
-  async function handleToggleLikePost() {
-    setOptimisticLike((prev) => !prev);
-    try {
-      await toggleLikePost({
-        variables: { idPost: postId, idUser: userContext?.user._id },
-      });
-    } catch (errorToggleLikePost) {
-      console.log(errorToggleLikePost);
-      setOptimisticLike((prev) => !prev);
-    }
-  }
-
-  useEffect(() => {
-    if (
-      dataPost?.getPostById.likes.findIndex(
-        (like) => like?._id === userContext?.user._id
-      ) === -1
-    ) {
-      setOptimisticLike(false);
-    } else {
-      setOptimisticLike(true);
-    }
-  }, [dataPost]);
-
-  if (loadingPost)
+  if (loadingGetPostById)
     return (
       <div className={"my-2 min-h-screen w-full max-w-2xl"}>
         <SkeletonPostDetails />
       </div>
     );
 
-  if (errorPost) return <ErrorGraphQL errorGraphQL={errorPost} />;
-
-  const post = dataPost.getPostById;
+  if (errorGetPostById) return <ErrorGraphQL errorGraphQL={errorGetPostById} />;
 
   return (
     <div
@@ -172,7 +69,7 @@ function PostDetails() {
                   : "pointer-events-auto"
               }`}
               data-testid={"button-toggleLikePost"}
-              onClick={handleToggleLikePost}
+              onClick={() => toggleLikePost()}
             >
               {!optimisticLike ? (
                 <AiOutlineHeart className={"h-6 w-6 text-red-800"} />
