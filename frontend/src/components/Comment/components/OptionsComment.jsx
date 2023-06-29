@@ -1,28 +1,20 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 
 import useOutsideClick from "../../Layout/components/hooks/useOutsideClick.jsx";
-import { DELETE_COMMENT } from "../../../gql/comment.jsx";
 import OvalLoader from "../../OvalLoader.jsx";
+import { useDeleteComment } from "../../../features/comment/index.jsx";
 
 function OptionsComment({ idComment, setReadyOnly }) {
   const [open, setOpen] = useState(false);
 
   const ref = useOutsideClick(() => setOpen(false));
 
-  const [deleteComment, { loading: loadingDeleteComment }] =
-    useMutation(DELETE_COMMENT);
+  const { deleteComment, loadingDeleteComment } = useDeleteComment();
 
-  async function handleDeleteComment() {
-    try {
-      await deleteComment({
-        variables: { idComment: idComment },
-      });
-    } catch (errorDeleteComment) {
-      console.log(errorDeleteComment);
-    }
+  function handleDeleteComment() {
+    deleteComment(idComment);
     setOpen((prev) => !prev);
   }
 

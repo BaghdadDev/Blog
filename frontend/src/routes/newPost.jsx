@@ -1,72 +1,43 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import CustomInputFile from "../components/Custom/CustomInputFile.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import { useUserContext } from "../context/userContext.jsx";
-import { CREATE_POST, GET_POSTS } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
-import PATH from "../utils/route-path.jsx";
-import apolloClient from "../lib/apollo-client.jsx";
+import { useCreatePost } from "../features/post/index.jsx";
+import checkObjStoryEmpty from "../utils/checkObjStoryEmpty.jsx";
 
 function NewPost() {
   const { user } = useUserContext();
-  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
+
   const [story, setStory] = useState({ value: undefined, error: undefined });
 
-  const [createPost, { error: errorCreatePost }] = useMutation(CREATE_POST, {
-    onCompleted: ({ createPost }) => {
-      apolloClient.cache.updateQuery({ query: GET_POSTS }, (dataCache) => {
-        const posts = Array.isArray(dataCache?.getPosts)
-          ? dataCache.getPosts
-          : [];
-        return { getPosts: [createPost, ...posts] };
-      });
-      navigate(PATH.ROOT);
-    },
-  });
+  const { createPost, errorCreatePost, loadingCreatePost } = useCreatePost();
 
-  function checkIfStoryIsEmpty(objStory) {
-    return !(
-      objStory.length === 1 &&
-      Object.entries(objStory[0]).length === 2 &&
-      objStory[0].type === "paragraph" &&
-      objStory[0].children[0].text === ""
-    );
-  }
-
-  async function handleSubmitNewPost(data) {
+  function handleCreatePost(data) {
     setStory((prev) => ({ ...prev, error: undefined }));
-    if (!checkIfStoryIsEmpty(JSON.parse(story.value))) {
+    if (!checkObjStoryEmpty(JSON.parse(story.value))) {
       setStory((prev) => ({
         ...prev,
-        error: "Please, don't fill your story",
+        error: "Please, fill your story",
       }));
       return;
     }
-    const postInput = {
-      title: data.title,
-      story: story.value,
-      user: user._id,
-      picture: data.files[0],
-    };
-    try {
-      await createPost({ variables: { postInput } });
-    } catch (err) {}
+    createPost(data.title, story.value, data.files[0]);
   }
 
   return (
     <form
-      onSubmit={handleSubmit(handleSubmitNewPost)}
+      onSubmit={handleSubmit(handleCreatePost)}
       className={
         "relative flex w-full max-w-2xl flex-col items-center gap-y-10 rounded-lg bg-blue-500 px-2 py-4"
       }
@@ -97,7 +68,7 @@ function NewPost() {
       />
 
       <button type={"submit"} className={"btn-form"}>
-        {isSubmitting ? <OvalLoader /> : "Save"}
+        {loadingCreatePost ? <OvalLoader /> : "Save"}
       </button>
     </form>
   );

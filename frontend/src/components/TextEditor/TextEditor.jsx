@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, Slate, useSlate, withReact } from "slate-react";
 import {
@@ -64,18 +64,12 @@ function TextEditor({
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
-  const initialValue = (initValue && deserialize(initValue)) ||
-    (localStorage.getItem(nameDraft) &&
-      deserialize(localStorage.getItem(nameDraft))) || [
-      {
-        type: "paragraph",
-        children: [{ text: "" }],
-      },
-    ];
-
-  // useEffect(() => {
-  //   console.log(initialValue);
-  // }, [initialValue]);
+  const initialValue = (initValue && deserialize(initValue)) || [
+    {
+      type: "paragraph",
+      children: [{ text: "" }],
+    },
+  ];
 
   return (
     <Slate
@@ -87,7 +81,6 @@ function TextEditor({
         );
         if (isAstChange) {
           const serializedValue = serialize(value);
-          localStorage.setItem(nameDraft, serializedValue);
           setValue(serializedValue);
         }
       }}

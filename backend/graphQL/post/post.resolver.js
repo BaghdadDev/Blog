@@ -83,7 +83,7 @@ const Query = {
 };
 
 const Mutation = {
-  createPost: async (_, { postInput }, { postController }) => {
+  createPost: async (_, { postInput, idUser }) => {
     console.log("Resolver: createPost");
     try {
       // Store the file
@@ -92,6 +92,7 @@ const Mutation = {
       const { _doc: createdPost } = await PostModel.create({
         ...postInput,
         picture: file._id,
+        user: idUser,
       });
       // Retrieve the new post with populate
       const newPost = await PostModel.findById(createdPost._id)

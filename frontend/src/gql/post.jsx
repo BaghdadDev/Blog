@@ -22,9 +22,10 @@ export const GET_POST_BY_ID = gql`
 
 // MUTATIONS ----------------------------------------------------
 export const CREATE_POST = gql`
+  ${CORE_POST_FIELDS}
   mutation createPost($postInput: PostInput!) {
     createPost(postInput: $postInput) {
-      _id
+      ...CorePostFields
     }
   }
 `;

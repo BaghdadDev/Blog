@@ -1,33 +1,22 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
-import { useMutation } from "@apollo/client";
 
-import { UPDATE_COMMENT } from "../../../gql/comment.jsx";
 import OvalLoader from "../../OvalLoader.jsx";
+import { useUpdateComment } from "../../../features/comment/index.jsx";
 
 function CommentInput({ readyOnly, setReadOnly, idComment, text }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
 
-  const [updateComment, { loading: loadingUpdateComment }] =
-    useMutation(UPDATE_COMMENT);
+  const { updateComment, loadingUpdateComment } = useUpdateComment();
 
-  async function handleSubmitUpdateComment(data) {
-    const commentInput = {
-      comment: data.updatedComment,
-    };
-    try {
-      await updateComment({
-        variables: { idComment: idComment, commentInput: commentInput },
-      });
-      setReadOnly(true);
-    } catch (errorSubmittingUpdatedComment) {
-      console.log(errorSubmittingUpdatedComment);
-    }
+  async function handleUpdateComment(data) {
+    updateComment(idComment, data.updatedComment);
+    setReadOnly(true);
   }
 
   if (readyOnly) {
@@ -35,7 +24,7 @@ function CommentInput({ readyOnly, setReadOnly, idComment, text }) {
   }
   return (
     <form
-      onSubmit={handleSubmit(handleSubmitUpdateComment)}
+      onSubmit={handleSubmit(handleUpdateComment)}
       className={
         "relative flex grow flex-col items-center justify-center overflow-hidden rounded bg-white text-xs md:text-sm"
       }
@@ -64,7 +53,7 @@ function CommentInput({ readyOnly, setReadOnly, idComment, text }) {
         render={({ message }) => (
           <p
             className={
-              "absolute bottom-0 translate-y-[calc(100%_+_2px)] rounded bg-red-300 p-[1px] text-xs text-xs italic opacity-90 md:text-sm"
+              "absolute bottom-0 translate-y-[calc(100%_+_2px)] rounded bg-red-300 p-[1px] text-xs italic opacity-90 md:text-sm"
             }
           >
             {message}

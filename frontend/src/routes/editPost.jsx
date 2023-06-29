@@ -16,6 +16,7 @@ import CustomInput from "../components/Custom/CustomInput.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import apolloClient from "../lib/apollo-client.jsx";
 import PATH from "../utils/route-path.jsx";
+import checkObjStoryEmpty from "../utils/checkObjStoryEmpty.jsx";
 
 function EditPost() {
   const navigate = useNavigate();
@@ -84,18 +85,9 @@ function EditPost() {
     }
   }
 
-  function checkIfStoryIsEmpty(objStory) {
-    return !(
-      objStory.length === 1 &&
-      Object.entries(objStory[0]).length === 2 &&
-      objStory[0].type === "paragraph" &&
-      objStory[0].children[0].text === ""
-    );
-  }
-
   async function handleSubmitUpdatePostText(data) {
     setStory((prev) => ({ ...prev, error: undefined }));
-    if (!checkIfStoryIsEmpty(JSON.parse(story.value))) {
+    if (!checkObjStoryEmpty(JSON.parse(story.value))) {
       setStory((prev) => ({
         ...prev,
         error: "Please, don't let your story empty",

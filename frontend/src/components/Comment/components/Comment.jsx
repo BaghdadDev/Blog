@@ -1,107 +1,29 @@
 import React, { useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { useMutation, useSubscription } from "@apollo/client";
 
 import Avatar from "../../Avatar.jsx";
 import { useUserContext } from "../../../context/userContext.jsx";
 import OptionsComment from "./OptionsComment.jsx";
-import {
-  GET_COMMENTS,
-  TOGGLE_LIKE_COMMENT,
-  TOGGLED_LIKE_COMMENT_SUB,
-  UPDATED_COMMENT_SUB,
-} from "../../../gql/comment.jsx";
 import CommentInput from "./CommentInput.jsx";
-import apolloClient from "../../../lib/apollo-client.jsx";
+import { useToggleLikeComment } from "../../../features/comment/index.jsx";
+import {
+  subToggleLikeComment,
+  subUpdateComment,
+} from "../../../features/subscriptions/index.jsx";
 
 function Comment({ comment }) {
   const userContext = useUserContext();
 
   const [readOnly, setReadOnly] = useState(true);
 
-  const [optimisticToggleLikeComment, setOptimisticToggleLikeComment] =
-    useState(
-      () => !!comment?.likes.find(({ _id }) => _id === userContext?.user?._id)
-    );
+  const {
+    toggleLikeComment,
+    loadingToggleLikeComment,
+    optimisticToggleLikeComment,
+  } = useToggleLikeComment(comment);
 
-  const [toggleLikeComment, { loading: loadingToggleLikeComment }] =
-    useMutation(TOGGLE_LIKE_COMMENT);
-
-  useSubscription(TOGGLED_LIKE_COMMENT_SUB, {
-    variables: { idComment: comment._id },
-    onData: ({
-      data: {
-        data: { toggledLikeComment },
-      },
-    }) => {
-      apolloClient.cache.updateQuery(
-        { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
-        (dataCache) => {
-          const idUserToggledLikeComment = toggledLikeComment._id;
-          const indexComment = dataCache.getComments.findIndex(
-            ({ _id }) => _id === comment._id
-          );
-          let copyLikes = Array.isArray(
-            dataCache.getComments[indexComment]?.likes
-          )
-            ? [...dataCache.getComments[indexComment].likes]
-            : [];
-          const indexUserLiked = copyLikes.findIndex(
-            (like) => like?._id === idUserToggledLikeComment
-          );
-          if (indexUserLiked !== -1) {
-            copyLikes.splice(indexUserLiked, 1);
-          } else {
-            copyLikes.push({
-              __typename: "User",
-              _id: idUserToggledLikeComment,
-            });
-          }
-          let copyComments = [...dataCache.getComments];
-          copyComments[indexComment] = {
-            ...dataCache.getComments[indexComment],
-            likes: copyLikes,
-          };
-          return {
-            getComments: copyComments,
-          };
-        }
-      );
-    },
-  });
-
-  useSubscription(UPDATED_COMMENT_SUB, {
-    variables: { idComment: comment._id },
-    onData: ({
-      data: {
-        data: { updatedComment },
-      },
-    }) => {
-      apolloClient.cache.updateQuery(
-        { query: GET_COMMENTS, variables: { idPost: comment.post._id } },
-        (dataCache) => {
-          const indexComment = dataCache.getComments.findIndex(
-            (c) => c._id === updatedComment._id
-          );
-          let commentsCopy = [...dataCache.getComments];
-          commentsCopy[indexComment] = updatedComment;
-          return {
-            getComments: commentsCopy,
-          };
-        }
-      );
-    },
-  });
-
-  async function handleToggleLikeComment() {
-    setOptimisticToggleLikeComment((prev) => !prev);
-    try {
-      await toggleLikeComment({ variables: { idComment: comment._id } });
-    } catch (errorToggleLikeComment) {
-      console.log(errorToggleLikeComment);
-      setOptimisticToggleLikeComment((prev) => !prev);
-    }
-  }
+  subToggleLikeComment(comment._id, comment.post._id);
+  subUpdateComment(comment._id, comment.post._id);
 
   return (
     <div
@@ -131,7 +53,7 @@ function Comment({ comment }) {
                 className={`rounded-full p-1 hover:cursor-pointer hover:bg-gray-100 ${
                   loadingToggleLikeComment ? "pointer-events-none" : ""
                 }`}
-                onClick={handleToggleLikeComment}
+                onClick={toggleLikeComment}
               >
                 {optimisticToggleLikeComment ? (
                   <AiFillHeart

@@ -12,7 +12,7 @@ import { GET_POST_BY_ID, GET_POSTS } from "../../../gql/post.jsx";
  */
 
 export default function subDeleteComment(idPost, query) {
-  if (query === "GET_COMMENTS")
+  if (query === "GET_POSTS")
     useSubscription(DELETED_COMMENT_SUB, {
       variables: { idPost },
       onData: ({
