@@ -5,7 +5,7 @@ import { SIGN_IN } from "../../../gql/auth.jsx";
 export default function useSignIn() {
   const { persistUser } = useUserContext();
 
-  const [signInMutation, { error: errorSignIn }] = useMutation(SIGN_IN);
+  const [signInMutation, { error, loading }] = useMutation(SIGN_IN);
 
   async function signIn(usernameOrEmail, password) {
     try {
@@ -23,5 +23,5 @@ export default function useSignIn() {
     }
   }
 
-  return { signIn, errorSignIn };
+  return { signIn, error, loading };
 }

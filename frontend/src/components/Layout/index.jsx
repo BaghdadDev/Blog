@@ -34,17 +34,18 @@ export default function Index() {
   return (
     <div
       className={
-        "relative flex min-h-screen w-full flex-col text-sm md:text-base"
+        "relative flex w-full min-h-screen flex-col text-sm md:text-base"
       }
     >
       <Header />
       <div
-        className={`flex w-full grow flex-col items-center justify-center bg-gradient-to-t from-gray-200 to-gray-100 ${
-          navigation.state === "loading" &&
-          "opacity-25 transition-opacity delay-200 duration-200"
+        className={`w-full grow flex flex-col items-center justify-center bg-gradient-to-t from-emerald-200 to-emerald-100 ${
+          navigation.state ||
+          (loading === "loading" &&
+            "opacity-25 transition-opacity delay-200 duration-200")
         }`}
       >
-        {/*{navigation.state === "loading" ? <OvalLoader /> : <Outlet />}*/}
+        {/* {navigation.state === "loading" ? <OvalLoader /> : <Outlet />} */}
         <Outlet />
       </div>
     </div>

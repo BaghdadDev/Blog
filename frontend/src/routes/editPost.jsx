@@ -1,25 +1,17 @@
-import React, { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { RxUpdate } from "react-icons/rx";
 
-import {
-  GET_POST_BY_ID,
-  UPDATE_POST_PICTURE,
-  UPDATE_POST_TEXT,
-} from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import OvalLoader from "../components/OvalLoader.jsx";
 import { useUserContext } from "../context/userContext.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import TextEditor from "../components/TextEditor/TextEditor.jsx";
-import apolloClient from "../lib/apollo-client.jsx";
-import PATH from "../utils/route-path.jsx";
 import checkObjStoryEmpty from "../utils/checkObjStoryEmpty.jsx";
+import { useGetPostById, useUpdatePost } from "../features/post/index.jsx";
 
 function EditPost() {
-  const navigate = useNavigate();
   const { postId } = useParams();
   const { user } = useUserContext();
   const [story, setStory] = useState({ value: undefined, error: undefined });
@@ -27,62 +19,30 @@ function EditPost() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
 
   const {
-    data: dataPost,
-    loading: loadingPost,
+    post,
     error: errorPost,
-  } = useQuery(GET_POST_BY_ID, {
-    variables: { idPost: postId },
-    onCompleted: ({ getPostById }) => {
-      setStory((prev) => ({ ...prev, value: getPostById.story }));
-    },
-  });
+    loading: loadingPost,
+  } = useGetPostById(postId);
 
-  const [updatePostPicture, { loading: loadingUpdatePostPicture }] =
-    useMutation(UPDATE_POST_PICTURE, {
-      onCompleted: (res) => {
-        apolloClient.cache.updateQuery(
-          { query: GET_POST_BY_ID, variables: { idPost: postId } },
-          (dataCache) => {
-            return {
-              getPostById: {
-                ...dataCache.getPostById,
-                picture: res.updatePostPicture,
-              },
-            };
-          }
-        );
-      },
-    });
+  useEffect(() => {
+    if (!post) return;
+    setStory((prev) => ({ ...prev, value: post.story }));
+  }, [post]);
 
-  const [updatePostText, { loading: loadingUpdatePostText }] = useMutation(
-    UPDATE_POST_TEXT,
-    {
-      onCompleted: (res) => {
-        apolloClient.cache.updateQuery(
-          { query: GET_POST_BY_ID, variables: { idPost: postId } },
-          (dataCache) => {
-            return { getPostById: res.updatePostText };
-          }
-        );
-        localStorage.removeItem(`textEditor-draft-${user._id}`);
-        navigate(PATH.POST_DETAILS.split(":postId")[0] + postId);
-      },
-    }
-  );
+  const {
+    updatePostPicture,
+    updatePostText,
+    loadingUpdatePostPicture,
+    loadingUpdatePostText,
+  } = useUpdatePost(postId);
 
   async function handleUpdatePostPicture(e) {
     const file = e.target.files[0];
-    try {
-      await updatePostPicture({
-        variables: { idPost: postId, picture: file },
-      });
-    } catch (errorUpdatePostPicture) {
-      console.log(errorUpdatePostPicture);
-    }
+    updatePostPicture(file);
   }
 
   async function handleSubmitUpdatePostText(data) {
@@ -90,36 +50,28 @@ function EditPost() {
     if (!checkObjStoryEmpty(JSON.parse(story.value))) {
       setStory((prev) => ({
         ...prev,
-        error: "Please, don't let your story empty",
+        error: "Please, do not let your story empty",
       }));
       return;
     }
-    const postInput = {
-      title: data.title,
-      story: story.value,
-    };
-    try {
-      await updatePostText({
-        variables: { idPost: postId, postInput: postInput },
-      });
-    } catch (errorSubmittingUpdatePost) {
-      console.log(errorSubmittingUpdatePost);
-    }
+    updatePostText(data.title, story.value);
   }
 
   if (loadingPost) {
-    return <div>Loading ...</div>;
-  }
-
-  if (errorPost) {
     return (
-      <div>
-        <ErrorGraphQL errorGraphQL={errorPost} />
+      <div className={"w-full min-h-screen flex items-center justify-center"}>
+        <OvalLoader />
       </div>
     );
   }
 
-  const post = dataPost.getPostById;
+  if (errorPost) {
+    return (
+      <div className={"w-full min-h-screen flex items-center justify-center"}>
+        <ErrorGraphQL errorGraphQL={errorPost} />;
+      </div>
+    );
+  }
 
   return (
     <div
@@ -175,14 +127,12 @@ function EditPost() {
             initValue={post.story}
             error={story.error}
             nameDraft={`textEditor-draft-${user._id}`}
-            setValue={(value) =>
-              setStory((prev) => ({ ...prev, value: value }))
-            }
+            setValue={(value) => setStory((prev) => ({ ...prev, value }))}
           />
         </div>
 
         <button type={"submit"} className={"btn-form"}>
-          {isSubmitting || loadingUpdatePostText ? <OvalLoader /> : "Save"}
+          {loadingUpdatePostText ? <OvalLoader /> : "Save"}
         </button>
       </form>
     </div>

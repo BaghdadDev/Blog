@@ -12,10 +12,10 @@ function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
 
-  const { signIn, error } = useSignIn();
+  const { signIn, error, loading } = useSignIn();
 
   function handleSignIn(data) {
     signIn(data.usernameOrEmail, data.password);
@@ -62,7 +62,7 @@ function SignIn() {
         />
       </div>
       <button type={"submit"} className={"btn-form mb-4"}>
-        {isSubmitting ? <OvalLoader /> : "Sign In"}
+        {loading ? <OvalLoader /> : "Sign In"}
       </button>
       <Link
         to={"../" + PATH.SIGN_UP}
