@@ -20,7 +20,7 @@ function Header() {
       }
     >
       <Link to={PATH.ROOT}>Blog Logo</Link>
-      {user ? <Search /> : undefined}
+      <Search />
       {!user ? (
         location.pathname !== PATH.SIGN_IN &&
         location.pathname !== PATH.SIGN_UP ? (

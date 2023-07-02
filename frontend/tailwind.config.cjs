@@ -10,6 +10,9 @@ module.exports = {
             transitionProperty: {
                 'width': 'width'
             },
+            brightness: {
+                25: '.25',
+            }
         },
     },
     plugins: [

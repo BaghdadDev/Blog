@@ -9,11 +9,11 @@ import apolloClient from "./lib/apollo-client.jsx";
 import { UserProvider } from "./context/userContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <UserProvider>
-      <ApolloProvider client={apolloClient}>
-        <RouterProvider router={router} />
-      </ApolloProvider>
-    </UserProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <UserProvider>
+    <ApolloProvider client={apolloClient}>
+      <RouterProvider router={router} />
+    </ApolloProvider>
+  </UserProvider>
+  // </React.StrictMode>
 );

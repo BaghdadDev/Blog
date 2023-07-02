@@ -35,15 +35,32 @@ function Post({ post }) {
           {post.user.lastName.toUpperCase()}
         </p>
       </div>
+
       <Link to={PATH.POST_DETAILS.split(":")[0] + `${post._id}`}>
-        <img
-          src={`data:${post.picture.contentType};base64,${post.picture.data}`}
-          alt={post.picture.filename}
-          className={"w-full hover:cursor-pointer"}
-          aria-label={`post-img`}
-          data-testid={`post-img-link-${post._id}`}
-        />
+        <div
+          className={
+            "group relative flex h-80 w-full items-center justify-center overflow-hidden"
+          }
+        >
+          <img
+            src={`data:${post.picture.contentType};base64,${post.picture.data}`}
+            alt={post.picture.filename}
+            aria-label={`post-img`}
+            data-testid={`post-img-link-${post._id}`}
+            className={
+              "transition duration-300 group-hover:scale-110 group-hover:brightness-25 group-hover:filter"
+            }
+          />
+          <p
+            className={
+              "absolute z-10 rounded-lg px-4 py-1 italic text-gray-100 opacity-0 transition duration-300 group-hover:opacity-100 group-hover:delay-150"
+            }
+          >
+            Read the story...
+          </p>
+        </div>
       </Link>
+
       <p className={"pl-2 font-semibold"}>{post.title}</p>
       <p className={"w-full truncate px-2"}>
         {JSON.parse(post.story)
