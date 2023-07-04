@@ -8,7 +8,7 @@ import PATH from "../utils/route-path.jsx";
 import Posts from "../routes/posts.jsx";
 import PostDetails from "../routes/postDetails.jsx";
 import NewPost from "../routes/newPost.jsx";
-import Index from "../components/Layout/index.jsx";
+import Index from "../layout/index.jsx";
 import SignIn from "../routes/signIn.jsx";
 import EditPost from "../routes/editPost.jsx";
 

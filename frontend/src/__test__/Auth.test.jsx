@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 
 import PATH from "../utils/route-path.jsx";
 import Posts from "../routes/posts.jsx";
-import Index from "../components/Layout/index.jsx";
+import Index from "../layout/index.jsx";
 import SignIn from "../routes/signIn.jsx";
 
 import { mockedSignIn } from "./mockedGraphQL/auth.jsx";

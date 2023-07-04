@@ -1,6 +1,5 @@
 const { GraphQLError } = require("graphql");
 const GraphQLUpload = import("graphql-upload/GraphQLUpload.mjs");
-const shortId = require("shortid");
 
 const FileModel = require("../../../models/FileModel.js");
 

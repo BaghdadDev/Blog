@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
 
-export default function useOutsideClick(callback) {
+export default function useOutsideClick(closeCallback) {
   const ref = useRef();
 
   React.useEffect(() => {
     const handleClick = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
-        callback();
+        closeCallback();
       }
     };
 

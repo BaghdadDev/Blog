@@ -1,4 +1,4 @@
-import Index from "../components/Layout/index.jsx";
+import Index from "../layout/index.jsx";
 import { createBrowserRouter } from "react-router-dom";
 
 import PATH from "../utils/route-path.jsx";

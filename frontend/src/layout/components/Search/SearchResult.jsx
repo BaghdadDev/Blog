@@ -1,10 +1,10 @@
 import React from "react";
 
-import OvalLoader from "../../../OvalLoader.jsx";
-import ErrorGraphQL from "../../../ErrorGraphQL.jsx";
+import OvalLoader from "../../../components/OvalLoader.jsx";
+import ErrorGraphQL from "../../../components/ErrorGraphQL.jsx";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
-import PATH from "../../../../utils/route-path.jsx";
+import PATH from "../../../utils/route-path.jsx";
 
 function SearchResult({
   loadingSearchPosts,

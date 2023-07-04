@@ -6,6 +6,7 @@ type Post {
     picture: File!
     likes: [User!]!
     comments: [Comment!]!
+    updatedAt: String!
 }
 
 input PostInput {

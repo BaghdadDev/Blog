@@ -22,7 +22,7 @@ function Post({ post }) {
   return (
     <div
       className={
-        "relative flex w-full flex-col overflow-hidden rounded bg-white"
+        "relative flex w-full flex-col overflow-hidden rounded bg-slate-300"
       }
       data-testid={`post-test-${post._id}`}
     >

@@ -18,11 +18,12 @@ const Query = {
         .populate({ path: "picture" })
         .populate({ path: "likes", select: "_id" })
         .populate({ path: "comments", select: "_id" })
-        .sort({ createdAt: -1 });
+        .sort({ updatedAt: -1 });
       if (!posts || posts.length === 0)
         return new GraphQLError("There is no post available", {
           extensions: { code: "NOT-FOUND" },
         });
+      console.log(posts);
       return posts.map((post) => ({
         ...post._doc,
       }));

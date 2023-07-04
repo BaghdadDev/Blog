@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { RiDoubleQuotesL, RiDoubleQuotesR } from "react-icons/ri";
 
 import { GET_POST_BY_ID } from "../gql/post.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";
@@ -35,6 +36,10 @@ function PostDetails() {
   subDeletePost(postId, "GET_POST_BY_ID");
   subUpdatePost(postId, "GET_POST_BY_ID");
 
+  useEffect(() => {
+    console.log(post);
+  }, [post]);
+
   if (loadingGetPostById)
     return (
       <div className={"my-2 min-h-screen w-full max-w-2xl"}>
@@ -47,11 +52,15 @@ function PostDetails() {
   return (
     <div
       className={
-        "relative my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2"
+        "relative mt-2 flex min-h-screen max-w-3xl flex-col items-center"
       }
       data-testid={`post-details-test`}
     >
-      <div className={"flex w-full items-center justify-between px-2"}>
+      <div
+        className={
+          "mb-4 flex w-[calc(100%_-_20px)] items-center justify-between rounded-lg bg-slate-300 p-2 shadow-lg transition-all duration-300 md:mx-0 md:w-full"
+        }
+      >
         <div className={"flex items-center gap-x-2"}>
           <Avatar {...post.user.photo} />
           <p className={"font-semibold"}>
@@ -87,21 +96,42 @@ function PostDetails() {
         <img
           src={`data:${post.picture.contentType};base64,${post.picture.data}`}
           alt={post.picture.filename}
-          className={"rounded"}
+          className={"rounded-none transition-all duration-300 md:rounded-xl"}
         />
       </div>
-      <p className={"text-center text-2xl font-semibold"}>{post.title}</p>
-      <div className={"mx-2 shadow"}>
-        <TextEditor readOnly={true} initValue={post.story} />
+      <p className={"mb-4 text-3xl font-semibold"}>{post.title}</p>
+      <div
+        className={
+          "mb-2 flex h-auto w-[calc(100%_-_20px)] transition-all duration-300 lg:w-full"
+        }
+      >
+        <span
+          className={
+            "relative top-0 left-0 bottom-0 mr-3 w-[4px] rounded-full bg-slate-300 transition-all duration-500"
+          }
+        ></span>
+        <div className={"relative grow rounded shadow-lg"}>
+          <RiDoubleQuotesL
+            className={
+              "absolute top-0 left-0 z-10 h-4 w-4 -translate-x-1/2 -translate-y-1/2 text-slate-600"
+            }
+          />
+          <RiDoubleQuotesR
+            className={
+              "absolute bottom-0 right-0 z-10 h-4 w-4 translate-x-1/2 translate-y-1/2 text-slate-600"
+            }
+          />
+          <TextEditor readOnly={true} initValue={post.story} />
+        </div>
       </div>
-      <div className={"mx-2 flex items-center gap-x-2 self-end text-sm italic"}>
+      <div className={"mr-2 flex items-center gap-x-2 self-end text-sm italic"}>
         <p>{post.likes.length} Likes</p>
         <p>{post.comments.length} Comments</p>
       </div>
       <div className={"mt-2 mb-4 flex items-center gap-x-4 self-center"}>
-        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
-        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
-        <span className={"h-1 w-1 rounded-full bg-gray-600"}></span>
+        <span className={"h-1 w-1 rounded-full bg-slate-600"}></span>
+        <span className={"h-1 w-1 rounded-full bg-slate-600"}></span>
+        <span className={"h-1 w-1 rounded-full bg-slate-600"}></span>
       </div>
       <Comments idPost={post._id} />
     </div>

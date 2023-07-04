@@ -105,7 +105,7 @@ function TextEditor({
         )}
         <Editable
           readOnly={readOnly}
-          className={"w-full rounded bg-white p-2"}
+          className={"w-full rounded bg-slate-100 p-2"}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           placeholder={placeholder}

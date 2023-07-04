@@ -60,5 +60,6 @@ export const CORE_POST_FIELDS = gql`
     comments {
       _id
     }
+    updatedAt
   }
 `;

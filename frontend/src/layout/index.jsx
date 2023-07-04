@@ -6,9 +6,9 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Header from "./components/Header/Header.jsx";
-import { useUserContext } from "../../context/userContext.jsx";
-import PATH from "../../utils/route-path.jsx";
+import Header from "./components/Header/index.jsx";
+import { useUserContext } from "../context/userContext.jsx";
+import PATH from "../utils/route-path.jsx";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ export default function Index() {
     >
       {userContext.user ? <Header /> : undefined}
       <div
-        className={`flex w-full grow flex-col items-center justify-center bg-gradient-to-t from-emerald-200 to-emerald-100 ${
+        className={`flex w-full grow flex-col items-center justify-center bg-slate-100 ${
           navigation.state ||
           (loading === "loading" &&
             "opacity-25 transition-opacity delay-200 duration-200")

@@ -3,7 +3,7 @@ import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 import { Link } from "react-router-dom";
 
-import useOutsideClick from "../../Layout/components/hooks/useOutsideClick.jsx";
+import useOutsideClick from "../../../layout/components/hooks/useOutsideClick.jsx";
 import PATH from "../../../utils/route-path.jsx";
 import OvalLoader from "../../OvalLoader.jsx";
 import { useDeletePost } from "../../../features/post/index.jsx";
