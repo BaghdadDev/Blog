@@ -4,6 +4,7 @@ type Comment {
     post: Post!
     comment: String!
     likes: [User!]!
+    updatedAt: String!
 }
 
 input CommentInput {

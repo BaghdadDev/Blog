@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import ErrorGraphQL from "../components/ErrorGraphQL";

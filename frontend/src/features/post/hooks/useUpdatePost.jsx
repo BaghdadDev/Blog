@@ -6,7 +6,7 @@ import {
   UPDATE_POST_TEXT,
 } from "../../../gql/post";
 import apolloClient from "../../../lib/apollo-client";
-import PATH from "../../../utils/route-path";
+import PATH from "../../../config/route-path.jsx";
 
 export default function useUpdatePost(idPost) {
   const navigate = useNavigate();

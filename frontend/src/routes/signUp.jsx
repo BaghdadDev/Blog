@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 import CustomInput from "../components/Custom/CustomInput.jsx";
 import OvalLoader from "../components/OvalLoader.jsx";
 import CustomInputFile from "../components/Custom/CustomInputFile.jsx";

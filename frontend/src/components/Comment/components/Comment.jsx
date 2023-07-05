@@ -27,20 +27,20 @@ function Comment({ comment }) {
 
   return (
     <div
-      className={
-        "mb-2 flex w-full flex-col items-center justify-center rounded-lg bg-gray-200 p-1 shadow"
-      }
+      className={`mb-4 flex w-full items-center gap-x-2 rounded-lg border border-slate-200 bg-slate-200 p-1 ${
+        !readOnly ? "bg-slate-50" : ""
+      }`}
     >
-      <div className={"flex w-full items-center gap-x-2"}>
-        <Avatar {...comment.user.photo} size={30} />
-        <CommentInput
-          idComment={comment._id}
-          text={comment.comment}
-          readyOnly={readOnly}
-          setReadOnly={setReadOnly}
-        />
-        {readOnly ? (
-          <>
+      <Avatar {...comment.user.photo} size={30} />
+      <CommentInput
+        idComment={comment._id}
+        text={comment.comment}
+        readyOnly={readOnly}
+        setReadOnly={setReadOnly}
+      />
+      {readOnly ? (
+        <div className={"flex flex-col items-end justify-between"}>
+          <div className={"flex items-center gap-x-2"}>
             {comment.user._id === userContext?.user?._id ? (
               <OptionsComment
                 idComment={comment._id}
@@ -69,9 +69,10 @@ function Comment({ comment }) {
                 {comment.likes.length}
               </span>
             </div>
-          </>
-        ) : undefined}
-      </div>
+          </div>
+          <p className={"text-xs italic text-slate-500"}>{comment.updatedAt}</p>
+        </div>
+      ) : undefined}
     </div>
   );
 }

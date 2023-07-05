@@ -1,7 +1,7 @@
 import Index from "../layout/index.jsx";
 import { createBrowserRouter } from "react-router-dom";
 
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 import ErrorPage from "../components/ErrorPage.jsx";
 import PostDetails from "../routes/postDetails.jsx";
 import Posts from "../routes/posts.jsx";

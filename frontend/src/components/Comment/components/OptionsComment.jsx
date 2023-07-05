@@ -28,7 +28,7 @@ function OptionsComment({ idComment, setReadyOnly }) {
       ) : (
         <SlOptions
           className={
-            "h-6 w-6 cursor-pointer rounded-full p-1 text-gray-800 hover:bg-gray-100"
+            "h-6 w-6 cursor-pointer rounded-full p-1 text-slate-800 hover:bg-slate-100"
           }
           onClick={(e) => {
             setOpen((prev) => !prev);
@@ -39,21 +39,21 @@ function OptionsComment({ idComment, setReadyOnly }) {
       {open && (
         <div
           className={
-            "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-white text-sm italic shadow-xl"
+            "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-slate-100 text-sm italic shadow-xl"
           }
         >
           <p
             className={
-              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
+              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-slate-300"
             }
             onClick={() => setReadyOnly(false)}
           >
-            <AiFillEdit className={"h-4 w-4 text-blue-800"} />
+            <AiFillEdit className={"h-4 w-4 text-slate-800"} />
             <span>Edit</span>
           </p>
           <p
             className={
-              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-gray-100"
+              "flex items-center gap-x-1 p-2 hover:cursor-pointer hover:bg-slate-300"
             }
             onClick={handleDeleteComment}
           >

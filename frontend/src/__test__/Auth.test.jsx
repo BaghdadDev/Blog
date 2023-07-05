@@ -4,7 +4,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 import Posts from "../routes/posts.jsx";
 import Index from "../layout/index.jsx";
 import SignIn from "../routes/signIn.jsx";

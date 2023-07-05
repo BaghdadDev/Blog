@@ -42,7 +42,7 @@ function EditPost() {
 
   async function handleUpdatePostPicture(e) {
     const file = e.target.files[0];
-    updatePostPicture(file);
+    updatePostPicture(file).then();
   }
 
   async function handleSubmitUpdatePostText(data) {
@@ -54,12 +54,12 @@ function EditPost() {
       }));
       return;
     }
-    updatePostText(data.title, story.value);
+    updatePostText(data.title, story.value).then();
   }
 
   if (loadingPost) {
     return (
-      <div className={"w-full min-h-screen flex items-center justify-center"}>
+      <div className={"flex min-h-screen w-full items-center justify-center"}>
         <OvalLoader />
       </div>
     );
@@ -67,7 +67,7 @@ function EditPost() {
 
   if (errorPost) {
     return (
-      <div className={"w-full min-h-screen flex items-center justify-center"}>
+      <div className={"flex min-h-screen w-full items-center justify-center"}>
         <ErrorGraphQL errorGraphQL={errorPost} />;
       </div>
     );
@@ -76,7 +76,7 @@ function EditPost() {
   return (
     <div
       className={
-        "relative my-2 flex min-h-screen w-full max-w-2xl flex-col gap-y-2 pb-10"
+        "relative my-2 flex min-h-screen w-full max-w-3xl flex-col gap-y-2 pb-10"
       }
     >
       <h1 className={"self-center text-2xl font-semibold"}>Edit Post</h1>

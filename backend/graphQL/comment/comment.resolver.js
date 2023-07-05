@@ -1,9 +1,10 @@
 const { GraphQLError } = require("graphql");
+const { withFilter } = require("graphql-subscriptions");
+const moment = require("moment/moment");
 
 const CommentModel = require("../../models/CommentModel.js");
 const PostModel = require("../../models/PostModel.js");
 const pubSub = require("../../config/PubSub.js");
-const { withFilter } = require("graphql-subscriptions");
 
 const Query = {
   getComments: async (_, { idPost }) => {
@@ -17,13 +18,16 @@ const Query = {
         })
         .populate({ path: "post", select: "_id" })
         .populate({ path: "likes", select: "_id" })
-        .sort({ createdAt: -1 });
+        .sort({ updatedAt: -1 });
       if (!comments || comments.length === 0) {
         return new GraphQLError("There are no comments for this post", {
           extensions: { code: "NOT-FOUND" },
         });
       }
-      return comments.map((c) => c);
+      return comments.map((c) => ({
+        ...c._doc,
+        updatedAt: moment(c.updatedAt).fromNow(),
+      }));
     } catch (errorGetComments) {
       console.log(`Something went wrong getting comments.`, errorGetComments);
       return new GraphQLError(`Something went wrong getting comments.`, {
@@ -64,7 +68,10 @@ const Mutation = {
         .populate({ path: "likes", select: "_id" });
       // Return the new comment for subscription
       await pubSub.publish("CREATED_COMMENT", {
-        createdComment: commentCreated,
+        createdComment: {
+          ...commentCreated._doc,
+          updatedAt: moment(commentCreated.updatedAt).fromNow(),
+        },
       });
       return commentCreated;
     } catch (errorCreateComment) {
@@ -163,7 +170,10 @@ const Mutation = {
         .populate({ path: "post", select: "_id" })
         .populate({ path: "likes", select: "_id" });
       await pubSub.publish("UPDATED_COMMENT", {
-        updatedComment: commentUpdated,
+        updatedComment: {
+          ...commentUpdated._doc,
+          updatedAt: moment(commentUpdated.updatedAt).fromNow(),
+        },
       });
       return commentUpdated;
     } catch (errorUpdateComment) {

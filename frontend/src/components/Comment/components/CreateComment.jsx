@@ -25,7 +25,7 @@ function CreateComment({ idPost }) {
     <div className={"mb-4 flex w-full items-center gap-x-2"}>
       <Avatar {...userContext.user?.photo} />
       <form
-        className={"flex grow items-center rounded-lg bg-gray-100 shadow-lg"}
+        className={"flex grow items-center rounded-lg shadow-lg"}
         onSubmit={handleSubmit(handleCreateComment)}
       >
         <CustomInput
@@ -33,7 +33,7 @@ function CreateComment({ idPost }) {
           errors={errors}
           register={register}
           placeholder={"Write your comment here !"}
-          className={"!bg-transparent"}
+          className={"focus:border focus:border-slate-200 focus:bg-white"}
         />
         <button type={"submit"} className={"hidden"}>
           <BiSend className={"h-6 w-6 text-blue-800"} />

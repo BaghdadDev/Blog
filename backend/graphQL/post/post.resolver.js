@@ -1,4 +1,5 @@
 const { GraphQLError } = require("graphql");
+const moment = require("moment");
 
 const PostModel = require("../../models/PostModel");
 const UserModel = require("../../models/UserModel");
@@ -23,10 +24,13 @@ const Query = {
         return new GraphQLError("There is no post available", {
           extensions: { code: "NOT-FOUND" },
         });
-      console.log(posts);
-      return posts.map((post) => ({
-        ...post._doc,
-      }));
+      // console.log(posts[0].updatedAt);
+      return posts.map((post) => {
+        return {
+          ...post._doc,
+          updatedAt: moment(post.updatedAt).fromNow(),
+        };
+      });
     } catch (errorGetPosts) {
       console.log("Something went wrong during Get Posts", errorGetPosts);
       return new GraphQLError("Something went wrong during Get Posts", {
@@ -52,6 +56,7 @@ const Query = {
         });
       return {
         ...post._doc,
+        updatedAt: moment(post.updatedAt).fromNow(),
       };
     } catch (errorGetPostById) {
       console.log(
@@ -107,7 +112,10 @@ const Mutation = {
         .populate({ path: "comments", select: "_id" });
       // Return the new post for subscription
       await pubSub.publish("CREATED_POST", {
-        createdPost: newPost,
+        createdPost: {
+          ...newPost._doc,
+          updatedAt: moment(newPost.updatedAt).fromNow(),
+        },
       });
       // Return the new post for resolver
       return newPost;
@@ -144,7 +152,10 @@ const Mutation = {
         .populate({ path: "likes", select: "_id" })
         .populate({ path: "comments", select: "_id" });
       await pubSub.publish("UPDATED_POST", {
-        updatedPost: updatedPost,
+        updatedPost: {
+          ...updatedPost._doc,
+          updatedAt: moment(updatedPost.updatedAt).fromNow(),
+        },
       });
       return updatedPost;
     } catch (errorUpdatePost) {
@@ -188,7 +199,10 @@ const Mutation = {
         .populate({ path: "comments", select: "_id" });
       // Publish the subscription
       await pubSub.publish("UPDATED_POST", {
-        updatedPost: updatedPost,
+        updatedPost: {
+          ...updatedPost._doc,
+          updatedAt: moment(updatedPost.updatedAt).fromNow(),
+        },
       });
       // Return
       return file;

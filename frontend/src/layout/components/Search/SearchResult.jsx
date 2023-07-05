@@ -4,7 +4,7 @@ import OvalLoader from "../../../components/OvalLoader.jsx";
 import ErrorGraphQL from "../../../components/ErrorGraphQL.jsx";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
-import PATH from "../../../utils/route-path.jsx";
+import PATH from "../../../config/route-path.jsx";
 
 function SearchResult({
   loadingSearchPosts,

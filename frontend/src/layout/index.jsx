@@ -8,7 +8,7 @@ import {
 
 import Header from "./components/Header/index.jsx";
 import { useUserContext } from "../context/userContext.jsx";
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 
 export default function Index() {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CREATE_POST, GET_POSTS } from "../../../gql/post";
 import apolloClient from "../../../lib/apollo-client";
-import PATH from "../../../utils/route-path";
+import PATH from "../../../config/route-path.jsx";
 
 export default function useCreatePost() {
   const navigate = useNavigate();

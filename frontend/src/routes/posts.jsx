@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import ErrorGraphQL from "../components/ErrorGraphQL";
 import SkeletonPosts from "../components/Skeleton/SkeletonPosts.jsx";
-import Post from "../components/Post/index.jsx";
+import Post from "../components/Post/PostCard.jsx";
 import { useGetPosts } from "../features/post/index.jsx";
 import { subCreatePost } from "../features/subscriptions/index.jsx";
 

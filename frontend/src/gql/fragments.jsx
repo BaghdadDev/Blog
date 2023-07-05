@@ -38,6 +38,7 @@ export const CORE_COMMENT_FIELDS = gql`
     likes {
       _id
     }
+    updatedAt
   }
 `;
 

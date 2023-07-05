@@ -2,7 +2,7 @@ import React from "react";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
 
-import PATH from "../../utils/route-path.jsx";
+import PATH from "../../config/route-path.jsx";
 import Avatar from "../Avatar.jsx";
 import {
   subCreateComment,
@@ -26,14 +26,15 @@ function Post({ post }) {
       }
       data-testid={`post-test-${post._id}`}
     >
-      <p className={"hidden"}>{post._id}</p>
       <div className={"my-1 flex items-center gap-x-2 pl-2"}>
         <Avatar {...post.user.photo} />
-        <p className={"font-semibold"}>
-          {post.user.firstName.charAt(0).toUpperCase() +
-            post.user.firstName.substring(1)}{" "}
-          {post.user.lastName.toUpperCase()}
-        </p>
+        <div>
+          <p className={"font-semibold"}>
+            {post.user.firstName.charAt(0).toUpperCase() +
+              post.user.firstName.substring(1)}
+          </p>
+          <p className={"text-xs italic text-slate-600"}>{post.updatedAt}</p>
+        </div>
       </div>
 
       <Link to={PATH.POST_DETAILS.split(":")[0] + `${post._id}`}>
@@ -46,7 +47,7 @@ function Post({ post }) {
             src={`data:${post.picture.contentType};base64,${post.picture.data}`}
             alt={post.picture.filename}
             aria-label={`post-img`}
-            data-testid={`post-img-link-${post._id}`}
+            data-testid={`post-link-${post._id}`}
             className={
               "transition duration-300 group-hover:scale-110 group-hover:brightness-25 group-hover:filter"
             }
@@ -56,7 +57,7 @@ function Post({ post }) {
               "absolute z-10 rounded-lg px-4 py-1 italic text-gray-100 opacity-0 transition duration-300 group-hover:opacity-100 group-hover:delay-150"
             }
           >
-            Read the story...
+            See
           </p>
         </div>
       </Link>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaUserAlt, FaSignOutAlt } from "react-icons/fa";
 
 import { useUserContext } from "../../../context/userContext.jsx";
-import PATH from "../../../utils/route-path.jsx";
+import PATH from "../../../config/route-path.jsx";
 import Avatar from "../../../components/Avatar.jsx";
 import useOutsideClick from "../hooks/useOutsideClick.jsx";
 

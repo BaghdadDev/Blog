@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { RiDoubleQuotesL, RiDoubleQuotesR } from "react-icons/ri";
@@ -10,7 +10,7 @@ import TextEditor from "../components/TextEditor/TextEditor.jsx";
 import SkeletonPostDetails from "../components/Skeleton/SkeletonPostDetails.jsx";
 import Comments from "../components/Comment/index.jsx";
 import { UserContext } from "../context/userContext.jsx";
-import OptionsPostDetails from "../components/Post/components/OptionsPostDetails.jsx";
+import OptionsPostDetails from "../components/Post/OptionsPostDetails.jsx";
 import { useGetPostById, useToggleLikePost } from "../features/post/index.jsx";
 import {
   subDeletePost,
@@ -36,10 +36,6 @@ function PostDetails() {
   subDeletePost(postId, "GET_POST_BY_ID");
   subUpdatePost(postId, "GET_POST_BY_ID");
 
-  useEffect(() => {
-    console.log(post);
-  }, [post]);
-
   if (loadingGetPostById)
     return (
       <div className={"my-2 min-h-screen w-full max-w-2xl"}>
@@ -63,16 +59,18 @@ function PostDetails() {
       >
         <div className={"flex items-center gap-x-2"}>
           <Avatar {...post.user.photo} />
-          <p className={"font-semibold"}>
-            {post.user.firstName.charAt(0).toUpperCase() +
-              post.user.firstName.substring(1)}{" "}
-            {post.user.lastName.toUpperCase()}
-          </p>
+          <div className={"flex flex-col"}>
+            <p className={"font-semibold"}>
+              {post.user.firstName.charAt(0).toUpperCase() +
+                post.user.firstName.substring(1)}
+            </p>
+            <p className={"text-xs italic text-slate-600"}>{post.updatedAt}</p>
+          </div>
         </div>
         {userContext ? (
           <div className={"flex items-center gap-x-2"}>
             <div
-              className={`rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 ${
+              className={`rounded-full p-1 hover:cursor-pointer hover:bg-slate-100 ${
                 loadingToggleLikePost
                   ? "pointer-events-none"
                   : "pointer-events-auto"

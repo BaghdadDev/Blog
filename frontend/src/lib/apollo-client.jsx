@@ -11,7 +11,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-import PATH from "../utils/route-path.jsx";
+import PATH from "../config/route-path.jsx";
 
 const baseUrl =
   import.meta.env.VITE_ENV !== "production"

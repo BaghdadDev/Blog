@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import apolloClient from "../../../lib/apollo-client";
 import { GET_POSTS, DELETED_POST_SUB, GET_POST_BY_ID } from "../../../gql/post";
-import PATH from "../../../utils/route-path.jsx";
+import PATH from "../../../config/route-path.jsx";
 
 /*
  * subDeletePost
