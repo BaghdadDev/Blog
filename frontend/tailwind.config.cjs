@@ -12,7 +12,11 @@ module.exports = {
             },
             brightness: {
                 25: '.25',
-            }
+            },
+            fontFamily: {
+                "BacasimeAntique": ['BacasimeAntique-Regular', 'sans-serif'],
+                "FiraSans": ['FiraSans-Regular', 'sans-serif'],
+            },
         },
     },
     plugins: [

@@ -1,6 +1,7 @@
 import React from "react";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
+import moment from "moment";
 
 import PATH from "../../config/route-path.jsx";
 import Avatar from "../Avatar.jsx";
@@ -11,6 +12,7 @@ import {
   subToggleLikePost,
   subUpdatePost,
 } from "../../features/subscriptions/index.jsx";
+import getFromNow from "../../utils/getFromNow.jsx";
 
 function Post({ post }) {
   subDeletePost(post._id, "GET_POSTS");
@@ -33,7 +35,9 @@ function Post({ post }) {
             {post.user.firstName.charAt(0).toUpperCase() +
               post.user.firstName.substring(1)}
           </p>
-          <p className={"text-xs italic text-slate-600"}>{post.updatedAt}</p>
+          <p className={"text-xs italic text-slate-600"}>
+            {getFromNow(post.updatedAt)}
+          </p>
         </div>
       </div>
 

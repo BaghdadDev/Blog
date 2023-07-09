@@ -10,6 +10,7 @@ import {
   subToggleLikeComment,
   subUpdateComment,
 } from "../../../features/subscriptions/index.jsx";
+import getFromNow from "../../../utils/getFromNow";
 
 function Comment({ comment }) {
   const userContext = useUserContext();
@@ -70,7 +71,9 @@ function Comment({ comment }) {
               </span>
             </div>
           </div>
-          <p className={"text-xs italic text-slate-500"}>{comment.updatedAt}</p>
+          <p className={"text-xs italic text-slate-500"}>
+            {getFromNow(comment.updatedAt)}
+          </p>
         </div>
       ) : undefined}
     </div>

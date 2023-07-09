@@ -36,41 +36,48 @@ function NewPost() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(handleCreatePost)}
+    <div
       className={
-        "relative flex w-full max-w-2xl flex-col items-center gap-y-10 rounded-lg bg-blue-500 px-2 py-4"
+        "flex w-[calc(100%_-_10px)] max-w-3xl grow flex-col items-center"
       }
     >
-      {errorCreatePost && <ErrorGraphQL errorGraphQL={errorCreatePost} />}
-      <h1 className={"text-3xl font-semibold text-gray-200 md:text-4xl"}>
+      <h1 className={"my-4 text-3xl font-semibold text-slate-800 md:text-4xl"}>
         New Post
       </h1>
-      <CustomInputFile
-        size={10}
-        name={"files"}
-        errors={errors}
-        register={register}
-        rules={{ required: "Please, enter a picture" }}
-      />
-      <CustomInput
-        name={"title"}
-        placeholder={"Title"}
-        register={register}
-        errors={errors}
-        rules={{ required: "Please, enter a title" }}
-      />
-      <TextEditor
-        placeholder={"Type your story or whatever you want ;)"}
-        error={story.error}
-        nameDraft={`textEditor-draft-${user._id}`}
-        setValue={(value) => setStory((prev) => ({ ...prev, value: value }))}
-      />
+      <form
+        onSubmit={handleSubmit(handleCreatePost)}
+        className={
+          "relative flex w-full flex-col items-center gap-y-10 rounded-lg bg-slate-400 px-2 py-4"
+        }
+      >
+        {errorCreatePost && <ErrorGraphQL errorGraphQL={errorCreatePost} />}
 
-      <button type={"submit"} className={"btn-form"}>
-        {loadingCreatePost ? <OvalLoader /> : "Save"}
-      </button>
-    </form>
+        <CustomInputFile
+          size={10}
+          name={"files"}
+          errors={errors}
+          register={register}
+          rules={{ required: "Please, enter a picture" }}
+        />
+        <CustomInput
+          name={"title"}
+          placeholder={"Title"}
+          register={register}
+          errors={errors}
+          rules={{ required: "Please, enter a title" }}
+        />
+        <TextEditor
+          placeholder={"Type your story or whatever you want ;)"}
+          error={story.error}
+          nameDraft={`textEditor-draft-${user._id}`}
+          setValue={(value) => setStory((prev) => ({ ...prev, value: value }))}
+        />
+
+        <button type={"submit"} className={"btn-form"}>
+          {loadingCreatePost ? <OvalLoader /> : "Save"}
+        </button>
+      </form>
+    </div>
   );
 }
 

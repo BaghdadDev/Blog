@@ -124,7 +124,6 @@ describe("Posts : All pages should render without any problem", () => {
     expect(btn_optionsPostDetails).toBeInTheDocument();
     userEvent.click(btn_optionsPostDetails);
     const btn_editPost = screen.getByText(/Edit Post/i);
-    // const btn_editPost = screen.getByTestId(/link_editPost/i);
     expect(btn_editPost).toBeInTheDocument();
     userEvent.click(btn_editPost);
     // expect(await screen.findByText(/Edit Post/i)).toBeInTheDocument();

@@ -17,6 +17,7 @@ import {
   subToggleLikePost,
   subUpdatePost,
 } from "../features/subscriptions/index.jsx";
+import getFromNow from "../utils/getFromNow";
 
 function PostDetails() {
   const { postId } = useParams();
@@ -64,7 +65,9 @@ function PostDetails() {
               {post.user.firstName.charAt(0).toUpperCase() +
                 post.user.firstName.substring(1)}
             </p>
-            <p className={"text-xs italic text-slate-600"}>{post.updatedAt}</p>
+            <p className={"text-xs italic text-slate-600"}>
+              {getFromNow(post.updatedAt)}
+            </p>
           </div>
         </div>
         {userContext ? (

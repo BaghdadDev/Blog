@@ -44,7 +44,7 @@ function OptionsPostDetails({ idPost }) {
       {open && (
         <div
           className={
-            "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-gray-200 overflow-hidden rounded bg-slate-100 text-sm italic shadow-xl"
+            "absolute bottom-0 right-1/2 z-10 translate-y-full divide-y divide-slate-200 overflow-hidden rounded bg-slate-100 text-sm italic shadow-xl"
           }
         >
           <Link
@@ -57,7 +57,7 @@ function OptionsPostDetails({ idPost }) {
           >
             <p
               className={
-                "flex items-center gap-x-2 whitespace-nowrap p-2 hover:cursor-pointer hover:bg-slate-400"
+                "flex items-center gap-x-2 whitespace-nowrap p-2 text-slate-800 hover:cursor-pointer hover:bg-slate-400"
               }
             >
               <AiFillEdit className={"h-6 w-6 text-slate-800"} />
@@ -66,7 +66,7 @@ function OptionsPostDetails({ idPost }) {
           </Link>
           <p
             className={
-              "flex items-center gap-x-2 whitespace-nowrap p-2 hover:cursor-pointer hover:bg-slate-400"
+              "flex items-center gap-x-2 whitespace-nowrap p-2 text-slate-800 hover:cursor-pointer hover:bg-slate-400"
             }
             onClick={handleDeletePost}
           >

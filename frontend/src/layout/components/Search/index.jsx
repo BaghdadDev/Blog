@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
 
@@ -7,11 +7,14 @@ import SearchResult from "./SearchResult.jsx";
 import { useLocation } from "react-router-dom";
 
 function Search() {
+  const ref = useRef();
+
   let idTimeOut = undefined;
 
   const location = useLocation();
 
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
   const [
     searchPosts,
@@ -23,10 +26,18 @@ function Search() {
   ] = useMutation(SEARCH_POSTS);
 
   async function handleSearchPosts() {
+    !open && setOpen(true);
     try {
       await searchPosts({ variables: { search: search } });
     } catch (errorHandlingSearchPosts) {}
   }
+
+  const handleClick = (event) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      console.log("Click outside of search");
+      setOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (search.length > 2) {
@@ -38,13 +49,22 @@ function Search() {
   }, [search]);
 
   useEffect(() => {
-    setSearch("");
+    setOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (!open) return;
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [open]);
 
   return (
     <form
+      ref={ref}
       className={
-        "absolute left-1/2 flex h-[calc(100%_-_20px)] w-full max-w-xs grow -translate-x-1/2 items-center rounded-lg bg-slate-100 p-2 transition-all sm:max-w-sm md:max-w-lg"
+        "absolute left-1/2 flex h-[calc(100%_-_20px)] w-[60%] -translate-x-1/2 items-center rounded-lg bg-slate-100 p-2 transition-all md:max-w-lg"
       }
     >
       <AiOutlineSearch className={"mr-2 h-6 w-6 text-slate-800"} />
@@ -57,7 +77,7 @@ function Search() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      {search.length > 2 ? (
+      {open ? (
         <SearchResult
           loadingSearchPosts={loadingSearchPosts}
           errorSearchPosts={errorSearchPosts}

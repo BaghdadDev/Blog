@@ -34,7 +34,7 @@ export default function Index() {
   return (
     <div
       className={
-        "relative flex min-h-screen w-full flex-col text-sm md:text-base"
+        "relative flex min-h-screen w-full flex-col font-FiraSans text-sm md:text-base"
       }
     >
       {userContext.user ? <Header /> : undefined}

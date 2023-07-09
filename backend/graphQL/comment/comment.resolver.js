@@ -26,7 +26,7 @@ const Query = {
       }
       return comments.map((c) => ({
         ...c._doc,
-        updatedAt: moment(c.updatedAt).fromNow(),
+        updatedAt: c.updatedAt.toString(),
       }));
     } catch (errorGetComments) {
       console.log(`Something went wrong getting comments.`, errorGetComments);
@@ -70,10 +70,13 @@ const Mutation = {
       await pubSub.publish("CREATED_COMMENT", {
         createdComment: {
           ...commentCreated._doc,
-          updatedAt: moment(commentCreated.updatedAt).fromNow(),
+          updatedAt: commentCreated.updatedAt.toString(),
         },
       });
-      return commentCreated;
+      return {
+        ...commentCreated._doc,
+        updatedAt: commentCreated.updatedAt.toString(),
+      };
     } catch (errorCreateComment) {
       console.log(`Something went wrong creating comment.`, errorCreateComment);
       return new GraphQLError(`Something went wrong creating comment.`, {
@@ -172,10 +175,13 @@ const Mutation = {
       await pubSub.publish("UPDATED_COMMENT", {
         updatedComment: {
           ...commentUpdated._doc,
-          updatedAt: moment(commentUpdated.updatedAt).fromNow(),
+          updatedAt: commentUpdated.updatedAt.toString(),
         },
       });
-      return commentUpdated;
+      return {
+        ...commentUpdated._doc,
+        updatedAt: commentUpdated.updatedAt.toString(),
+      };
     } catch (errorUpdateComment) {
       console.log(`Something went wrong Updating Comment.`, errorUpdateComment);
       return new GraphQLError(`Something went wrong Updating Comment.`, {

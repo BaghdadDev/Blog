@@ -28,7 +28,7 @@ const Query = {
       return posts.map((post) => {
         return {
           ...post._doc,
-          updatedAt: moment(post.updatedAt).fromNow(),
+          updatedAt: post.updatedAt.toString(),
         };
       });
     } catch (errorGetPosts) {
@@ -56,7 +56,7 @@ const Query = {
         });
       return {
         ...post._doc,
-        updatedAt: moment(post.updatedAt).fromNow(),
+        updatedAt: post.updatedAt.toString(),
       };
     } catch (errorGetPostById) {
       console.log(
@@ -114,11 +114,14 @@ const Mutation = {
       await pubSub.publish("CREATED_POST", {
         createdPost: {
           ...newPost._doc,
-          updatedAt: moment(newPost.updatedAt).fromNow(),
+          updatedAt: newPost.updatedAt.toString(),
         },
       });
       // Return the new post for resolver
-      return newPost;
+      return {
+        ...newPost._doc,
+        updatedAt: newPost.updatedAt.toString(),
+      };
     } catch (errorCreatePost) {
       console.log("Something went wrong during Create Post", errorCreatePost);
       return new GraphQLError("Something went wrong during Create Post", {
@@ -154,10 +157,13 @@ const Mutation = {
       await pubSub.publish("UPDATED_POST", {
         updatedPost: {
           ...updatedPost._doc,
-          updatedAt: moment(updatedPost.updatedAt).fromNow(),
+          updatedAt: updatedPost.updatedAt.toString(),
         },
       });
-      return updatedPost;
+      return {
+        ...updatedPost._doc,
+        updatedAt: updatedPost.updatedAt.toString(),
+      };
     } catch (errorUpdatePost) {
       console.log("Something went wrong during Update Post", errorUpdatePost);
       return new GraphQLError("Something went wrong during Update Post", {
@@ -201,7 +207,7 @@ const Mutation = {
       await pubSub.publish("UPDATED_POST", {
         updatedPost: {
           ...updatedPost._doc,
-          updatedAt: moment(updatedPost.updatedAt).fromNow(),
+          updatedAt: updatedPost.updatedAt.toString(),
         },
       });
       // Return

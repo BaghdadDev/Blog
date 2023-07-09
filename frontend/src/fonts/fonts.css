@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'BacasimeAntique-Regular';
+    src: url('./BacasimeAntique-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraSans-Regular';
+    src: url('./FiraSans-Regular.ttf') format('truetype');
+}

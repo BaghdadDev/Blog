@@ -20,7 +20,7 @@ function SearchResult({
   return (
     <div
       className={
-        "absolute bottom-0 left-0 right-0 translate-y-[calc(100%_+_5px)] overflow-hidden rounded bg-gray-100 shadow-lg"
+        "absolute bottom-0 left-0 right-0 translate-y-[calc(100%_+_5px)] overflow-hidden rounded bg-slate-100 text-slate-800 shadow-lg"
       }
     >
       {loadingSearchPosts ? (
@@ -39,7 +39,7 @@ function SearchResult({
           >
             <div
               className={
-                "flex w-full items-center gap-x-2 overflow-hidden p-2 hover:cursor-pointer hover:bg-gray-200"
+                "flex w-full items-center gap-x-2 overflow-hidden p-2 hover:cursor-pointer hover:bg-slate-200"
               }
             >
               <img

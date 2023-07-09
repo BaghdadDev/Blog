@@ -22,55 +22,61 @@ function SignIn() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(handleSignIn)}
-      className={
-        "relative flex w-full max-w-2xl flex-col items-center gap-y-14 rounded-lg bg-blue-500 px-2 py-4"
-      }
-    >
-      {error && <ErrorGraphQL errorGraphQL={error} />}
-      <h1 className={"text-3xl font-semibold text-gray-200 md:text-4xl"}>
+    <div className={"flex min-h-screen flex-col items-center"}>
+      <h1
+        className={
+          "left-1/2 my-10 text-5xl font-semibold text-slate-800 md:text-6xl"
+        }
+      >
         Sign In
       </h1>
-      <div className={"flex w-full flex-col items-center gap-10"}>
-        <CustomInput
-          name={"usernameOrEmail"}
-          placeholder={"Username or Email"}
-          register={register}
-          errors={errors}
-          rules={{
-            required: "Please, enter your username or email",
-            minLength: {
-              value: 4,
-              message: "It must be at least 4 characters long",
-            },
-          }}
-        />
-        <CustomInput
-          type={"password"}
-          name={"password"}
-          placeholder={"Password"}
-          register={register}
-          errors={errors}
-          rules={{
-            required: "Please, enter a password",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
-          }}
-        />
-      </div>
-      <button type={"submit"} className={"btn-form mb-4"}>
-        {loading ? <OvalLoader /> : "Sign In"}
-      </button>
-      <Link
-        to={"../" + PATH.SIGN_UP}
-        className={"link-form absolute right-1 bottom-1 text-xs"}
+      <form
+        onSubmit={handleSubmit(handleSignIn)}
+        className={
+          "absolute top-1/2 flex w-[calc(100%_-_10px)] max-w-xl -translate-y-1/2 flex-col items-center gap-y-14 rounded-lg bg-slate-800 px-2 py-4 shadow-2xl md:w-full"
+        }
       >
-        Sign Up
-      </Link>
-    </form>
+        <div className={"flex w-full flex-col items-center gap-10"}>
+          <CustomInput
+            name={"usernameOrEmail"}
+            placeholder={"Username or Email"}
+            register={register}
+            errors={errors}
+            rules={{
+              required: "Please, enter your username or email",
+              minLength: {
+                value: 4,
+                message: "It must be at least 4 characters long",
+              },
+            }}
+          />
+          <CustomInput
+            type={"password"}
+            name={"password"}
+            placeholder={"Password"}
+            register={register}
+            errors={errors}
+            rules={{
+              required: "Please, enter a password",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
+          />
+        </div>
+        <button type={"submit"} className={"btn-form mb-4"}>
+          {loading ? <OvalLoader /> : "Sign In"}
+        </button>
+        {error && <ErrorGraphQL errorGraphQL={error} />}
+        <Link
+          to={"../" + PATH.SIGN_UP}
+          className={"link-form absolute right-1 bottom-1 text-xs"}
+        >
+          Sign Up
+        </Link>
+      </form>
+    </div>
   );
 }
 
