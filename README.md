@@ -8,10 +8,11 @@ Welcome to the "Blog" repository! This project is a comprehensive blog applicati
 
 1. [Features](#features)
 2. [Technologies Used](#technologies-used)
-3. [Deployment](#deployment)
-4. [Getting Started](#getting-started)
-5. [Contributions](#contributions)
-6. [License](#license)
+3. [UI/UX](#uiux)
+4. [Deployment](#deployment)
+5. [Getting Started](#getting-started)
+6. [Contributions](#contributions)
+7. [License](#license)
 
 ## <a name="features"></a>Features
 
@@ -42,6 +43,10 @@ The **backend** of the blog is powered by the following technologies:
 - **Express JS (Node JS)**: An efficient and scalable web application framework utilized for developing the robust backend server that powers the blog.
 - **GraphQL**: A sophisticated query language and runtime for APIs. In this project, GraphQL is integrated with Apollo Server to handle data fetching and manipulation efficiently.
 - **MongoDB**: A versatile NoSQL database chosen to store and manage the blog's data. MongoDB offers flexibility and scalability, making it an ideal choice for this project.
+
+## <a name="uiux"></a>UI/UX
+
+The design is quite rudimentary, it's clear that it could have been better thought out and worked on ;).
 
 ## <a name="deployment"></a>Deployment
 
