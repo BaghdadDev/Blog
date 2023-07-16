@@ -1,4 +1,5 @@
 const { GraphQLError } = require("graphql");
+
 const FileModel = require("../models/FileModel.js");
 
 async function storeFile(file) {
@@ -10,12 +11,11 @@ async function storeFile(file) {
       chunks.push(chunk);
     }
     const fileData = Buffer.concat(chunks);
-    const storedFile = await FileModel.create({
+    return await FileModel.create({
       filename,
       contentType: mimetype,
       data: fileData.toString("base64"),
     });
-    return { ...storedFile._doc };
   } catch (errorStoreFile) {
     console.log("Something went wrong while storing file.", errorStoreFile);
     return new GraphQLError("Something went wrong while storing file", {
