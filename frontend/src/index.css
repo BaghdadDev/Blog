@@ -13,7 +13,7 @@
     @apply bg-[#EEEEEE] p-1;
   }
   .text-editor-blockquote {
-    @apply relative mb-2 mb-2 overflow-hidden pl-4 italic text-[#AAAAAA] before:absolute before:left-0 before:h-full before:w-[2px] before:bg-[#AAAAAA];
+    @apply relative mb-2 overflow-hidden pl-4 italic text-[#AAAAAA] before:absolute before:left-0 before:h-full before:w-[2px] before:bg-[#AAAAAA];
   }
   .text-editor-p {
     @apply mb-2;
