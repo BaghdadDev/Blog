@@ -1,7 +1,6 @@
 import React from "react";
 import { Node } from "slate";
 import { Link } from "react-router-dom";
-import moment from "moment";
 
 import PATH from "../../config/route-path.jsx";
 import Avatar from "../Avatar.jsx";
@@ -44,7 +43,7 @@ function Post({ post }) {
       <Link to={PATH.POST_DETAILS.split(":")[0] + `${post._id}`}>
         <div
           className={
-            "group relative flex h-80 w-full items-center justify-center overflow-hidden"
+            "group relative flex h-60 md:h-80 w-full items-center transition-all duration-300 justify-center overflow-hidden"
           }
         >
           <img
@@ -53,7 +52,7 @@ function Post({ post }) {
             aria-label={`post-img`}
             data-testid={`post-link-${post._id}`}
             className={
-              "transition duration-300 group-hover:scale-110 group-hover:brightness-25 group-hover:filter"
+              "transition grow duration-300 group-hover:scale-110 group-hover:brightness-25 group-hover:filter"
             }
           />
           <p

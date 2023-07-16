@@ -34,7 +34,7 @@ function Search() {
 
   const handleClick = (event) => {
     if (ref.current && !ref.current.contains(event.target)) {
-      console.log("Click outside of search");
+      // console.log("Click outside of search");
       setOpen(false);
     }
   };
@@ -63,8 +63,12 @@ function Search() {
   return (
     <form
       ref={ref}
+      onSubmit={(e) => {
+        e.preventDefault();
+        search.length > 2 && handleSearchPosts();
+      }}
       className={
-        "absolute left-1/2 flex h-[calc(100%_-_20px)] w-[60%] -translate-x-1/2 items-center rounded-lg bg-slate-100 p-2 transition-all md:max-w-lg"
+        "absolute left-1/2 flex h-[calc(100%_-_20px)] w-[60%] -translate-x-1/2 items-center rounded-lg focus-within:bg-white border-2 md:border-transparent focus-within:border-slate-400  bg-slate-100 p-2 transition-all md:max-w-lg"
       }
     >
       <AiOutlineSearch className={"mr-2 h-6 w-6 text-slate-800"} />
@@ -75,7 +79,9 @@ function Search() {
           "h-full w-full bg-transparent text-slate-800 outline-none placeholder:italic"
         }
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
       />
       {open ? (
         <SearchResult

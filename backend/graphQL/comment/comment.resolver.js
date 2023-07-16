@@ -1,6 +1,5 @@
 const { GraphQLError } = require("graphql");
 const { withFilter } = require("graphql-subscriptions");
-const moment = require("moment/moment");
 
 const CommentModel = require("../../models/CommentModel.js");
 const PostModel = require("../../models/PostModel.js");

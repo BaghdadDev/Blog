@@ -1,5 +1,4 @@
 const { GraphQLError } = require("graphql");
-const moment = require("moment");
 
 const PostModel = require("../../models/PostModel");
 const UserModel = require("../../models/UserModel");

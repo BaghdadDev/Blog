@@ -16,10 +16,14 @@ function Header() {
   return (
     <header
       className={
-        "left- sticky top-0 z-20 flex h-16 w-full items-center justify-between bg-slate-800 px-2 py-4 text-sm text-slate-100 shadow-lg"
+        "left-0 sticky top-0 z-20 flex h-16 w-full items-center justify-between bg-slate-800 px-2 py-4 text-sm text-slate-100 shadow-lg"
       }
     >
-      <Link to={PATH.ROOT}>Blog Logo</Link>
+      <Link to={PATH.ROOT}>
+        <p className="p-2 rounded-full hover:bg-slate-100 hover:text-slate-800 transition duration-300">
+          Logo
+        </p>
+      </Link>
       <Search />
       <NavLink
         to={PATH.NEW_POST}
