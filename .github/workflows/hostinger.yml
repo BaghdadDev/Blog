@@ -44,6 +44,7 @@ jobs:
             cd Blog/frontend
             yarn install
             echo "VITE_ENV=production" > .env
+            export NODE_OPTIONS=--max-old-space-size=1024 # To free up the memory space to let the build process (yarn build) executes correctly
             yarn build
             rm -r node_modules
             cd ../backend/
@@ -53,7 +54,6 @@ jobs:
             echo $BLOG_PORT_EXPRESS >> .env
             echo $BLOG_ACCESS_TOKEN_SECRET >> .env
             yarn install
-            # pm2 start server.js --name daemon_blog --exp-backoff-restart-delay=100
 
       - name: Lunch the App
         uses: appleboy/ssh-action@v0.1.10
